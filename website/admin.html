@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Login — Inkthread Hub</title>
+<meta name="description" content="Secure Admin Login Portal for Inkthread Hub Operations."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#FBF9F9",
+                        "surface": "#F5F3F3",
+                        "surface-container": "#EFEDED",
+                        "surface-container-high": "#E9E8E7",
+                        "primary": "#121212",
+                        "secondary": "#5E5E5B",
+                        "accent": "#DBDAD9",
+                        "outline": "#747878",
+                        "outline-variant": "#C4C7C7"
+                    },
+                    fontFamily: {
+                        "display": ["'Bodoni Moda'", "serif"],
+                        "sans": ["'Hanken Grotesk'", "sans-serif"]
+                    }
+                }
+            }
+        }
+</script>
+<style>
+    body { background-color: #FBF9F9; color: #121212; font-family: 'Hanken Grotesk', sans-serif; }
+    .font-serif-headline { font-family: 'Bodoni Moda', serif; }
+    .label-caps {
+        font-family: 'Hanken Grotesk', sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .badge-status {
+        font-size: 9px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 4px;
+    }
+    .badge-published { background: #DCFCE7; color: #166534; border: 1px solid #86EFAC; }
+    .badge-draft { background: #FEF9C3; color: #854D0E; border: 1px solid #FDE047; }
+</style>
+</head>
+<body class="antialiased min-h-screen flex flex-col md:flex-row">
+
+<!-- DEDICATED ADMIN LOGIN SCREEN (NO FORGOT PASSWORD OPTION) -->
+<div id="admin-login-screen" class="fixed inset-0 z-[200] bg-primary/95 backdrop-blur-md flex items-center justify-center p-6">
+    <div class="bg-background border border-outline-variant/60 p-8 md:p-12 max-w-md w-full rounded-2xl shadow-2xl space-y-6 text-center">
+        <div class="w-16 h-16 bg-surface border border-outline-variant/60 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-inner">
+            <span class="material-symbols-outlined text-primary text-3xl">lock</span>
+        </div>
+
+        <div>
+            <h2 class="font-serif-headline text-3xl text-primary">Admin Access Login</h2>
+            <p class="text-xs text-secondary font-light mt-1">Authorized Inkthread Hub Portal Only</p>
+        </div>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-4 text-left pt-2">
+            <div>
+                <label class="label-caps text-secondary block mb-1">Username</label>
+                <input type="text" id="login-user" required value="admin" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-4 py-3 focus:outline-none focus:border-primary text-sm font-sans"/>
+            </div>
+
+            <div>
+                <label class="label-caps text-secondary block mb-1">Password</label>
+                <input type="password" id="login-pass" required placeholder="Enter password" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-4 py-3 focus:outline-none focus:border-primary text-sm font-sans"/>
+            </div>
+
+            <div id="login-error" class="hidden text-xs text-red-600 font-semibold bg-red-50 p-3 rounded border border-red-200 text-center">
+                Incorrect Password! Access Denied.
+            </div>
+
+            <button type="submit" class="w-full bg-primary text-background label-caps py-4 tracking-widest hover:bg-secondary transition-colors rounded-lg text-xs font-bold shadow-lg">
+                Login To Admin Panel
+            </button>
+        </form>
+
+        <div class="pt-4 border-t border-outline-variant/40 text-center">
+            <a href="index.html" class="text-xs text-secondary hover:text-primary label-caps">&larr; Return to Storefront</a>
+        </div>
+    </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="w-full md:w-64 border-r border-outline-variant/60 bg-surface flex-shrink-0 p-6 md:p-8 flex flex-col justify-between">
+    <div>
+        <a class="font-serif-headline text-3xl tracking-tight text-primary block mb-2" href="index.html">Inkthread Hub</a>
+        <span class="label-caps text-[9px] text-secondary block mb-8">Admin Operations Center</span>
+
+        <nav class="space-y-2">
+            <button onclick="switchTab('products')" id="tab-btn-products" class="w-full text-left flex items-center space-x-3 px-4 py-3 bg-surface-container-high text-primary border-l-2 border-primary label-caps">
+                <span class="material-symbols-outlined text-sm">inventory_2</span>
+                <span>Products Catalog</span>
+            </button>
+            <button onclick="switchTab('journal')" id="tab-btn-journal" class="w-full text-left flex items-center space-x-3 px-4 py-3 text-secondary hover:bg-surface-container label-caps transition-colors">
+                <span class="material-symbols-outlined text-sm">auto_stories</span>
+                <span>Journal &amp; Blog CMS</span>
+            </button>
+            <button onclick="switchTab('orders')" id="tab-btn-orders" class="w-full text-left flex items-center space-x-3 px-4 py-3 text-secondary hover:bg-surface-container label-caps transition-colors">
+                <span class="material-symbols-outlined text-sm">shopping_cart</span>
+                <span>Customer Orders</span>
+            </button>
+            <a class="flex items-center space-x-3 px-4 py-3 text-secondary hover:bg-surface-container label-caps transition-colors" href="journal.html" target="_blank">
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                <span>Live Journal Page</span>
+            </a>
+            <a class="flex items-center space-x-3 px-4 py-3 text-secondary hover:bg-surface-container label-caps transition-colors" href="shop.html" target="_blank">
+                <span class="material-symbols-outlined text-sm">storefront</span>
+                <span>Live Catalog</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="pt-8 border-t border-outline-variant/60 space-y-3">
+        <button onclick="handleAdminLogout()" class="w-full text-left flex items-center space-x-3 text-red-600 hover:text-red-800 label-caps text-[10px]">
+            <span class="material-symbols-outlined text-sm">lock</span>
+            <span>Lock / Logout Admin</span>
+        </button>
+        <a class="flex items-center space-x-3 text-secondary hover:text-primary label-caps text-[10px]" href="index.html">
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            <span>Exit Admin Portal</span>
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="flex-1 max-w-[1440px] p-6 md:p-12 overflow-y-auto">
+
+    <!-- PRODUCTS MANAGEMENT TAB -->
+    <div id="view-products" class="space-y-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-outline-variant/40">
+            <div>
+                <span class="label-caps text-secondary block mb-1">Single Source of Truth</span>
+                <h1 class="font-serif-headline text-4xl text-primary mb-1">Centralized Product Management</h1>
+                <p class="text-xs text-secondary font-light">All changes published here instantly update Homepage, Catalog, Search, and Product pages.</p>
+            </div>
+            <button onclick="openProductModal()" class="bg-primary text-background label-caps px-6 py-3.5 hover:bg-secondary transition-colors rounded-lg flex items-center space-x-2 text-xs shadow-md">
+                <span class="material-symbols-outlined text-sm">add</span>
+                <span>+ Add New Product</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-surface p-5 rounded-xl border border-outline-variant/40 space-y-1">
+                <span class="label-caps text-secondary text-[10px]">Total Products</span>
+                <p id="stat-total-prod" class="font-serif-headline text-3xl text-primary">0</p>
+            </div>
+            <div class="bg-surface p-5 rounded-xl border border-outline-variant/40 space-y-1">
+                <span class="label-caps text-emerald-700 text-[10px]">Published Live</span>
+                <p id="stat-live-prod" class="font-serif-headline text-3xl text-emerald-800">0</p>
+            </div>
+            <div class="bg-surface p-5 rounded-xl border border-outline-variant/40 space-y-1">
+                <span class="label-caps text-amber-700 text-[10px]">Low Inventory</span>
+                <p id="stat-low-prod" class="font-serif-headline text-3xl text-amber-800">0</p>
+            </div>
+            <div class="bg-surface p-5 rounded-xl border border-outline-variant/40 space-y-1">
+                <span class="label-caps text-red-700 text-[10px]">Out of Stock</span>
+                <p id="stat-out-prod" class="font-serif-headline text-3xl text-red-800">0</p>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="flex flex-col md:flex-row gap-4 justify-between items-center bg-surface p-4 rounded-xl border border-outline-variant/40 text-xs">
+            <div class="flex flex-wrap gap-2">
+                <button onclick="setFilterStatus('all')" class="filter-status-btn px-3 py-1.5 label-caps rounded bg-primary text-background" data-status="all">All</button>
+                <button onclick="setFilterStatus('published')" class="filter-status-btn px-3 py-1.5 label-caps rounded text-secondary hover:bg-surface-container" data-status="published">Published</button>
+                <button onclick="setFilterStatus('draft')" class="filter-status-btn px-3 py-1.5 label-caps rounded text-secondary hover:bg-surface-container" data-status="draft">Drafts</button>
+            </div>
+            <input type="text" id="prod-search" oninput="renderAdminProductsTable()" placeholder="Search product name or SKU..." class="bg-background border border-outline-variant/60 rounded-lg px-3.5 py-2 text-xs w-full md:w-64 focus:outline-none focus:border-primary"/>
+        </div>
+
+        <!-- Products Table -->
+        <div class="bg-surface border border-outline-variant/60 rounded-xl overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-surface-container-high border-b border-outline-variant/60 label-caps text-secondary">
+                        <tr>
+                            <th class="p-4">Product Info</th>
+                            <th class="p-4">Category</th>
+                            <th class="p-4">Price</th>
+                            <th class="p-4">Stock</th>
+                            <th class="p-4">Status</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-products-table" class="divide-y divide-outline-variant/40">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- JOURNAL & BLOG CMS TAB -->
+    <div id="view-journal" class="hidden space-y-8">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-outline-variant/40">
+            <div>
+                <span class="label-caps text-secondary block mb-1">Journal &amp; Story CMS</span>
+                <h1 class="font-serif-headline text-4xl text-primary mb-1">Manual Journal &amp; Blog Manager</h1>
+                <p class="text-xs text-secondary font-light">Publish fashion articles, slow-craftsmanship stories, and brand essays directly to The Journal page.</p>
+            </div>
+            <button onclick="openJournalModal()" class="bg-primary text-background label-caps px-6 py-3.5 hover:bg-secondary transition-colors rounded-lg flex items-center space-x-2 text-xs shadow-md">
+                <span class="material-symbols-outlined text-sm">edit_note</span>
+                <span>+ Write &amp; Publish New Story</span>
+            </button>
+        </div>
+
+        <!-- Journal Stories Table -->
+        <div class="bg-surface border border-outline-variant/60 rounded-xl overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-surface-container-high border-b border-outline-variant/60 label-caps text-secondary">
+                        <tr>
+                            <th class="p-4">Story Cover &amp; Title</th>
+                            <th class="p-4">Category</th>
+                            <th class="p-4">Author</th>
+                            <th class="p-4">Read Time</th>
+                            <th class="p-4">Date</th>
+                            <th class="p-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-journal-table" class="divide-y divide-outline-variant/40">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOMER ORDERS TAB -->
+    <div id="view-orders" class="hidden space-y-8">
+        <div class="pb-6 border-b border-outline-variant/40">
+            <span class="label-caps text-secondary block mb-1">Fulfillment Dashboard</span>
+            <h1 class="font-serif-headline text-4xl text-primary mb-1">Customer Orders Log</h1>
+            <p class="text-xs text-secondary font-light">Real-time incoming orders with PhonePe UTR payment references and WhatsApp dispatch status.</p>
+        </div>
+
+        <div class="bg-surface border border-outline-variant/60 rounded-xl overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-surface-container-high border-b border-outline-variant/60 label-caps text-secondary">
+                        <tr>
+                            <th class="p-4">Order ID &amp; Date</th>
+                            <th class="p-4">Customer Details</th>
+                            <th class="p-4">Payment Method</th>
+                            <th class="p-4">PhonePe UTR Ref</th>
+                            <th class="p-4">Items Total</th>
+                            <th class="p-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-orders-table" class="divide-y divide-outline-variant/40">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- CREATE / EDIT PRODUCT MODAL -->
+<div id="product-modal" class="fixed inset-0 z-[150] bg-primary/60 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-3xl p-6 md:p-8 max-h-[92vh] overflow-y-auto relative shadow-2xl">
+        <button onclick="closeProductModal()" class="absolute top-6 right-6 text-secondary hover:text-primary">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+
+        <span class="label-caps text-secondary block mb-1" id="modal-subtitle">Add New Item</span>
+        <h3 class="font-serif-headline text-3xl text-primary mb-6" id="modal-title">Create Catalog Product</h3>
+
+        <form id="product-form" onsubmit="saveProductForm(event)" class="space-y-6 text-xs">
+            <input type="hidden" id="prod-id"/>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="sm:col-span-2">
+                    <label class="label-caps text-secondary block mb-1">Product Title / Name *</label>
+                    <input type="text" id="form-name" required placeholder="e.g. Acid Wash Oversized Hoodie | UH62" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                </div>
+
+                <div>
+                    <label class="label-caps text-secondary block mb-1">SKU Code *</label>
+                    <input type="text" id="form-sku" placeholder="e.g. UH62-ACD-L" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary font-mono"/>
+                </div>
+
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Category *</label>
+                    <select id="form-category" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary label-caps">
+                        <option value="Unisex Clothing">Unisex Clothing</option>
+                        <option value="Men's Clothing">Men's Clothing</option>
+                        <option value="Women's Clothing">Women's Clothing</option>
+                        <option value="Kids Clothing">Kids Clothing</option>
+                        <option value="Pet Products">Pet Products</option>
+                        <option value="Accessories">Accessories</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Regular / MRP Price (₹) *</label>
+                    <input type="number" id="form-regular-price" required placeholder="e.g. 699" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary font-mono"/>
+                </div>
+
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Sale Price (₹) *</label>
+                    <input type="number" id="form-sale-price" required placeholder="e.g. 349" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary font-mono"/>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="label-caps text-secondary block mb-1">Front Image URL / Path *</label>
+                    <input type="text" id="form-img-front" required placeholder="images/hd_acidwash_hoodie.png" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                </div>
+
+                <div class="sm:col-span-2">
+                    <label class="label-caps text-secondary block mb-1">Short Description *</label>
+                    <textarea id="form-short-desc" required rows="2" placeholder="Brief summary for product card..." class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"></textarea>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-outline-variant/60 flex justify-end space-x-3">
+                <button type="button" onclick="closeProductModal()" class="px-5 py-3 text-secondary label-caps hover:text-primary">Cancel</button>
+                <button type="submit" class="bg-primary text-background label-caps px-8 py-3 rounded-lg hover:bg-secondary transition-colors font-bold">Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- WRITE / EDIT JOURNAL STORY MODAL -->
+<div id="journal-modal" class="fixed inset-0 z-[150] bg-primary/60 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-2xl p-6 md:p-8 max-h-[92vh] overflow-y-auto relative shadow-2xl">
+        <button onclick="closeJournalModal()" class="absolute top-6 right-6 text-secondary hover:text-primary">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+
+        <span class="label-caps text-secondary block mb-1">CMS Story Editor</span>
+        <h3 class="font-serif-headline text-3xl text-primary mb-6" id="journal-modal-title">Publish Journal Article</h3>
+
+        <form id="journal-form" onsubmit="saveJournalForm(event)" class="space-y-4 text-xs">
+            <input type="hidden" id="art-id"/>
+
+            <div>
+                <label class="label-caps text-secondary block mb-1">Story Title *</label>
+                <input type="text" id="art-title" required placeholder="e.g. The Art of 240 GSM Combed Cotton" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Category *</label>
+                    <input type="text" id="art-category" required placeholder="e.g. Slow Fashion, Style Guide" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                </div>
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Author Name *</label>
+                    <input type="text" id="art-author" required placeholder="e.g. Inkthread Design Lab" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                </div>
+            </div>
+
+            <div>
+                <label class="label-caps text-secondary block mb-1">Cover Image URL / Path *</label>
+                <input type="text" id="art-image" required placeholder="images/hd_acidwash_hoodie.png" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+            </div>
+
+            <div>
+                <label class="label-caps text-secondary block mb-1">Excerpt / Summary *</label>
+                <textarea id="art-excerpt" required rows="2" placeholder="Brief summary displayed on cards..." class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"></textarea>
+            </div>
+
+            <div>
+                <label class="label-caps text-secondary block mb-1">Full Article Content *</label>
+                <textarea id="art-content" required rows="5" placeholder="Write full journal essay story content here..." class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary font-light leading-relaxed"></textarea>
+            </div>
+
+            <div class="pt-4 border-t border-outline-variant/60 flex justify-end space-x-3">
+                <button type="button" onclick="closeJournalModal()" class="px-5 py-3 text-secondary label-caps hover:text-primary">Cancel</button>
+                <button type="submit" class="bg-primary text-background label-caps px-8 py-3 rounded-lg hover:bg-secondary transition-colors font-bold">Publish Story</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Centralized Store Service -->
+<script src="js/store.js"></script>
+<script>
+    // EXACT PASSWORD AUTHENTICATION RULE (inkthread@2026)
+    function handleAdminLogin(e) {
+        e.preventDefault();
+        const pass = document.getElementById('login-pass').value.trim();
+
+        if (pass === 'inkthread@2026') {
+            document.getElementById('admin-login-screen').classList.add('hidden');
+            sessionStorage.setItem('inkthread_admin_auth', 'true');
+            renderAdminDashboard();
+        } else {
+            document.getElementById('login-error').classList.remove('hidden');
+        }
+    }
+
+    function handleAdminLogout() {
+        sessionStorage.removeItem('inkthread_admin_auth');
+        location.reload();
+    }
+
+    function checkAuth() {
+        if (sessionStorage.getItem('inkthread_admin_auth') === 'true') {
+            document.getElementById('admin-login-screen').classList.add('hidden');
+            renderAdminDashboard();
+        }
+    }
+
+    let activeTab = 'products';
+    let currentFilterStatus = 'all';
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.getElementById('view-products').classList.add('hidden');
+        document.getElementById('view-journal').classList.add('hidden');
+        document.getElementById('view-orders').classList.add('hidden');
+
+        document.querySelectorAll('nav button').forEach(b => b.className = 'w-full text-left flex items-center space-x-3 px-4 py-3 text-secondary hover:bg-surface-container label-caps transition-colors');
+
+        if (tab === 'products') {
+            document.getElementById('view-products').classList.remove('hidden');
+            document.getElementById('tab-btn-products').className = 'w-full text-left flex items-center space-x-3 px-4 py-3 bg-surface-container-high text-primary border-l-2 border-primary label-caps';
+        } else if (tab === 'journal') {
+            document.getElementById('view-journal').classList.remove('hidden');
+            document.getElementById('tab-btn-journal').className = 'w-full text-left flex items-center space-x-3 px-4 py-3 bg-surface-container-high text-primary border-l-2 border-primary label-caps';
+            renderAdminJournalTable();
+        } else if (tab === 'orders') {
+            document.getElementById('view-orders').classList.remove('hidden');
+            document.getElementById('tab-btn-orders').className = 'w-full text-left flex items-center space-x-3 px-4 py-3 bg-surface-container-high text-primary border-l-2 border-primary label-caps';
+            renderAdminOrdersTable();
+        }
+    }
+
+    function renderAdminDashboard() {
+        renderAdminProductsTable();
+        renderAdminJournalTable();
+        renderAdminOrdersTable();
+    }
+
+    function renderAdminProductsTable() {
+        const all = ProductsService.getAllProducts({ includeUnpublished: true });
+        const searchQuery = document.getElementById('prod-search')?.value.toLowerCase().trim() || '';
+
+        let filtered = all;
+        if (currentFilterStatus !== 'all') {
+            filtered = filtered.filter(p => p.status === currentFilterStatus);
+        }
+        if (searchQuery) {
+            filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery) || p.sku.toLowerCase().includes(searchQuery));
+        }
+
+        document.getElementById('stat-total-prod').innerText = all.length;
+        document.getElementById('stat-live-prod').innerText = all.filter(p => p.status === 'published').length;
+        document.getElementById('stat-low-prod').innerText = all.filter(p => ProductsService.getTotalStock(p) > 0 && ProductsService.getTotalStock(p) < 15).length;
+        document.getElementById('stat-out-prod').innerText = all.filter(p => ProductsService.getTotalStock(p) === 0).length;
+
+        const tbody = document.getElementById('admin-products-table');
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-secondary">No products found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(p => {
+            const stock = ProductsService.getTotalStock(p);
+            const price = p.salePrice || p.regularPrice;
+
+            return `
+                <tr class="hover:bg-surface-container/50 transition-colors">
+                    <td class="p-4">
+                        <div class="flex items-center space-x-3">
+                            <img src="${p.images ? p.images.front : ''}" class="w-12 h-14 object-cover rounded bg-surface-container" alt="${p.name}"/>
+                            <div>
+                                <h4 class="font-bold text-primary text-sm">${p.name}</h4>
+                                <span class="text-[10px] text-secondary font-mono">SKU: ${p.sku}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 label-caps text-secondary text-[10px]">${p.category}</td>
+                    <td class="p-4 font-mono font-bold text-primary">₹${price.toLocaleString('en-IN')}</td>
+                    <td class="p-4">
+                        <span class="font-bold text-xs ${stock <= 0 ? 'text-red-600' : 'text-emerald-700'}">${stock <= 0 ? 'Out of Stock' : stock + ' units'}</span>
+                    </td>
+                    <td class="p-4">
+                        <span class="badge-status badge-${p.status}">${p.status}</span>
+                    </td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="editProduct('${p.id}')" class="text-primary hover:underline font-semibold text-xs">Edit</button>
+                        <button onclick="ProductsService.deleteProduct('${p.id}')" class="text-red-600 hover:underline text-xs">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderAdminJournalTable() {
+        const articles = ProductsService.getJournalArticles(true);
+        const tbody = document.getElementById('admin-journal-table');
+
+        if (articles.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-secondary">No journal articles found.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = articles.map(a => `
+            <tr class="hover:bg-surface-container/50 transition-colors">
+                <td class="p-4">
+                    <div class="flex items-center space-x-3">
+                        <img src="${a.image}" class="w-12 h-12 object-cover rounded bg-surface-container" alt="${a.title}"/>
+                        <div>
+                            <h4 class="font-bold text-primary text-sm max-w-xs truncate">${a.title}</h4>
+                            <span class="text-[10px] text-secondary">${a.excerpt ? a.excerpt.substring(0, 50) + '...' : ''}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="p-4 label-caps text-secondary text-[10px]">${a.category}</td>
+                <td class="p-4 text-xs font-light text-primary">${a.author}</td>
+                <td class="p-4 text-xs font-mono text-secondary">${a.readTime}</td>
+                <td class="p-4 text-xs font-mono text-secondary">${a.date}</td>
+                <td class="p-4 text-right space-x-2">
+                    <button onclick="editJournalArticle('${a.id}')" class="text-primary hover:underline font-semibold text-xs">Edit</button>
+                    <button onclick="ProductsService.deleteJournalArticle('${a.id}')" class="text-red-600 hover:underline text-xs">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderAdminOrdersTable() {
+        const orders = ProductsService.getOrders();
+        const tbody = document.getElementById('admin-orders-table');
+
+        if (orders.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-secondary">No customer orders recorded yet.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = orders.map(o => `
+            <tr class="hover:bg-surface-container/50 transition-colors">
+                <td class="p-4 font-mono">
+                    <strong class="text-primary block text-sm">${o.orderId}</strong>
+                    <span class="text-[10px] text-secondary">${new Date(o.createdAt).toLocaleString('en-IN')}</span>
+                </td>
+                <td class="p-4">
+                    <div class="font-bold text-primary text-xs">${o.customer.name}</div>
+                    <div class="text-[10px] text-secondary">${o.customer.phone} | ${o.customer.email}</div>
+                    <div class="text-[10px] text-secondary truncate max-w-xs">${o.customer.address} (${o.customer.pincode})</div>
+                </td>
+                <td class="p-4">
+                    <span class="label-caps text-[9px] px-2 py-0.5 rounded ${o.paymentType === 'cod' ? 'bg-amber-100 text-amber-900 font-bold' : 'bg-emerald-100 text-emerald-900 font-bold'}">${o.paymentType.toUpperCase()}</span>
+                </td>
+                <td class="p-4 font-mono font-bold text-xs text-primary">${o.customer.utr || 'Not Provided'}</td>
+                <td class="p-4 font-mono font-bold text-sm text-primary">₹${o.total.toLocaleString('en-IN')}</td>
+                <td class="p-4">
+                    <span class="badge-status badge-published">${o.status}</span>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openJournalModal() {
+        document.getElementById('journal-form').reset();
+        document.getElementById('art-id').value = '';
+        document.getElementById('journal-modal').classList.remove('hidden');
+    }
+
+    function closeJournalModal() {
+        document.getElementById('journal-modal').classList.add('hidden');
+    }
+
+    function editJournalArticle(id) {
+        const articles = ProductsService.getJournalArticles(true);
+        const art = articles.find(a => a.id === id);
+        if (!art) return;
+
+        document.getElementById('art-id').value = art.id;
+        document.getElementById('art-title').value = art.title;
+        document.getElementById('art-category').value = art.category;
+        document.getElementById('art-author').value = art.author;
+        document.getElementById('art-image').value = art.image;
+        document.getElementById('art-excerpt').value = art.excerpt;
+        document.getElementById('art-content').value = art.content;
+
+        document.getElementById('journal-modal').classList.remove('hidden');
+    }
+
+    function saveJournalForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('art-id').value;
+        const title = document.getElementById('art-title').value.trim();
+        const category = document.getElementById('art-category').value.trim();
+        const author = document.getElementById('art-author').value.trim();
+        const image = document.getElementById('art-image').value.trim();
+        const excerpt = document.getElementById('art-excerpt').value.trim();
+        const content = document.getElementById('art-content').value.trim();
+
+        ProductsService.saveJournalArticle({ id, title, category, author, image, excerpt, content });
+        closeJournalModal();
+        renderAdminJournalTable();
+        alert('Journal Story successfully published live!');
+    }
+
+    function openProductModal() {
+        document.getElementById('product-form').reset();
+        document.getElementById('prod-id').value = '';
+        document.getElementById('product-modal').classList.remove('hidden');
+    }
+
+    function closeProductModal() {
+        document.getElementById('product-modal').classList.add('hidden');
+    }
+
+    function editProduct(id) {
+        const p = ProductsService.getProductById(id);
+        if (!p) return;
+
+        document.getElementById('prod-id').value = p.id;
+        document.getElementById('form-name').value = p.name;
+        document.getElementById('form-sku').value = p.sku;
+        document.getElementById('form-category').value = p.category;
+        document.getElementById('form-regular-price').value = p.regularPrice;
+        document.getElementById('form-sale-price').value = p.salePrice || p.regularPrice;
+        document.getElementById('form-img-front').value = p.images ? p.images.front : '';
+        document.getElementById('form-short-desc').value = p.shortDescription || p.fullDescription;
+
+        document.getElementById('product-modal').classList.remove('hidden');
+    }
+
+    function saveProductForm(e) {
+        e.preventDefault();
+        const id = document.getElementById('prod-id').value;
+        const name = document.getElementById('form-name').value.trim();
+        const sku = document.getElementById('form-sku').value.trim();
+        const category = document.getElementById('form-category').value;
+        const regularPrice = parseFloat(document.getElementById('form-regular-price').value);
+        const salePrice = parseFloat(document.getElementById('form-sale-price').value);
+        const frontImg = document.getElementById('form-img-front').value.trim();
+        const shortDescription = document.getElementById('form-short-desc').value.trim();
+
+        ProductsService.saveProduct({
+            id: id || null,
+            name, sku, category, regularPrice, salePrice,
+            shortDescription, fullDescription: shortDescription,
+            images: { front: frontImg, back: frontImg, gallery: [frontImg] }
+        });
+
+        closeProductModal();
+        renderAdminProductsTable();
+        alert('Product successfully saved to single source of truth database!');
+    }
+
+    function setFilterStatus(status) {
+        currentFilterStatus = status;
+        document.querySelectorAll('.filter-status-btn').forEach(b => {
+            b.className = 'filter-status-btn px-3 py-1.5 label-caps rounded text-secondary hover:bg-surface-container';
+        });
+        document.querySelector(`.filter-status-btn[data-status="${status}"]`).className = 'filter-status-btn px-3 py-1.5 label-caps rounded bg-primary text-background';
+        renderAdminProductsTable();
+    }
+
+    window.addEventListener('inkthread_catalog_updated', renderAdminDashboard);
+    document.addEventListener('DOMContentLoaded', checkAuth);
+</script>
+
+</body>
+</html>

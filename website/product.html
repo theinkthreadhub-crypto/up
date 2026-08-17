@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Product Details — Inkthread Hub</title>
+<meta name="description" content="Inkthread Hub story-led product details, material origins, and slow craftsmanship."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#FBF9F9",
+                        "surface": "#F5F3F3",
+                        "surface-container": "#EFEDED",
+                        "primary": "#121212",
+                        "secondary": "#5E5E5B",
+                        "accent": "#DBDAD9",
+                        "outline": "#747878",
+                        "outline-variant": "#C4C7C7"
+                    },
+                    fontFamily: {
+                        "display": ["'Bodoni Moda'", "serif"],
+                        "sans": ["'Hanken Grotesk'", "sans-serif"]
+                    }
+                }
+            }
+        }
+</script>
+<style>
+    body { background-color: #FBF9F9; color: #121212; font-family: 'Hanken Grotesk', sans-serif; }
+    .font-serif-headline { font-family: 'Bodoni Moda', serif; }
+    .label-caps {
+        font-family: 'Hanken Grotesk', sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .drawer-overlay { opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer-content { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .drawer-overlay.open .drawer-content { transform: translateX(0); }
+</style>
+</head>
+<body class="antialiased selection:bg-accent selection:text-primary">
+
+<!-- NAVIGATION -->
+<nav class="bg-background/90 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/40">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-5 flex justify-between items-center relative">
+        <div class="hidden md:flex items-center space-x-10 label-caps">
+            <a class="text-secondary hover:text-primary transition-colors" href="index.html">Home</a>
+            <a class="text-secondary hover:text-primary transition-colors" href="shop.html">Catalog</a>
+            <a class="text-secondary hover:text-primary transition-colors" href="journal.html">Journal</a>
+        </div>
+        <a class="font-serif-headline text-3xl md:text-4xl tracking-tight text-primary md:absolute md:left-1/2 md:-translate-x-1/2" href="index.html">
+            Inkthread Hub
+        </a>
+        <div class="flex items-center space-x-6 text-primary">
+            <a href="admin.html" title="Admin Login" class="hover:text-secondary transition-colors">
+                <span class="material-symbols-outlined text-xl">lock</span>
+            </a>
+            <button onclick="toggleBag()" class="hover:text-secondary transition-colors relative">
+                <span class="material-symbols-outlined">shopping_bag</span>
+                <span id="bag-count" class="absolute -top-1 -right-2 w-4 h-4 bg-primary text-background font-sans text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN PRODUCT CONTAINER -->
+<main class="max-w-[1440px] mx-auto px-6 md:px-16 py-12 md:py-24" id="product-detail-view">
+    <!-- Loaded via JS -->
+</main>
+
+<!-- REVIEWS & REFLECTIONS SECTION -->
+<section class="max-w-[1440px] mx-auto px-6 md:px-16 mb-24">
+    <div class="border-t border-outline-variant/60 pt-16 mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+            <span class="label-caps text-secondary block mb-2">Verified Client Experiences</span>
+            <h2 class="font-serif-headline text-3xl md:text-4xl text-primary">Customer Reviews &amp; Reflections</h2>
+        </div>
+        <button onclick="toggleReviewForm()" class="bg-primary text-background label-caps px-6 py-3 hover:bg-secondary transition-colors rounded">
+            + Write A Review
+        </button>
+    </div>
+
+    <!-- Write Review Form Container -->
+    <div id="review-form-container" class="hidden mb-12 bg-surface p-8 rounded-2xl border border-outline-variant/60 max-w-2xl">
+        <h3 class="font-serif-headline text-2xl text-primary mb-2">Share Your Experience</h3>
+        <p class="text-xs text-secondary font-light mb-6">Your honest review helps others discover intentional quality.</p>
+        
+        <form onsubmit="handleReviewSubmit(event)" class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Your Name *</label>
+                    <input type="text" id="review-name" required placeholder="e.g. Karan V." class="w-full bg-background border border-outline-variant/60 rounded-lg px-3.5 py-2.5 focus:outline-none focus:border-primary text-sm"/>
+                </div>
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Rating (Stars) *</label>
+                    <select id="review-rating" class="w-full bg-background border border-outline-variant/60 rounded-lg px-3.5 py-2.5 focus:outline-none focus:border-primary label-caps">
+                        <option value="5">⭐⭐⭐⭐⭐ (5 / 5)</option>
+                        <option value="4">⭐⭐⭐⭐ (4 / 5)</option>
+                        <option value="3">⭐⭐⭐ (3 / 5)</option>
+                        <option value="2">⭐⭐ (2 / 5)</option>
+                        <option value="1">⭐ (1 / 5)</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="label-caps text-secondary block mb-1">Reflection / Review *</label>
+                <textarea id="review-comment" required rows="3" placeholder="Describe the fit, fabric quality..." class="w-full bg-background border border-outline-variant/60 rounded-lg px-3.5 py-2.5 focus:outline-none focus:border-primary text-sm font-light"></textarea>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="bg-primary text-background label-caps px-6 py-3 hover:bg-secondary transition-colors rounded">
+                    Submit Reflection
+                </button>
+                <button type="button" onclick="toggleReviewForm()" class="text-secondary label-caps px-4 py-3">
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Reviews Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="reviews-list-grid">
+        <!-- Loaded via JS -->
+    </div>
+</section>
+
+<!-- RELATED PRODUCTS SECTION -->
+<section class="max-w-[1440px] mx-auto px-6 md:px-16 mb-24">
+    <div class="border-t border-outline-variant/60 pt-16 mb-12 flex justify-between items-end">
+        <div>
+            <span class="label-caps text-secondary block mb-2">Curated Pairings</span>
+            <h2 class="font-serif-headline text-3xl text-primary">Related Objects</h2>
+        </div>
+        <a href="shop.html" class="label-caps text-primary border-b border-primary">View Catalog &rarr;</a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8" id="related-products-grid">
+        <!-- Loaded via JS -->
+    </div>
+</section>
+
+<!-- SHOPPING BAG DRAWER MODAL -->
+<div id="bag-drawer" class="drawer-overlay fixed inset-0 z-[100] bg-primary/40 backdrop-blur-sm flex justify-end">
+    <div class="drawer-content w-full max-w-md bg-background border-l border-outline-variant/60 h-full flex flex-col justify-between p-8">
+        <div>
+            <div class="flex justify-between items-center pb-6 border-b border-outline-variant/60 mb-6">
+                <h3 class="font-serif-headline text-2xl text-primary">Your Selection</h3>
+                <button onclick="toggleBag()" class="text-secondary hover:text-primary">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div id="cart-drawer-items" class="space-y-6 max-h-[50vh] overflow-y-auto">
+                <!-- Loaded via JS -->
+            </div>
+        </div>
+
+        <div class="pt-6 border-t border-outline-variant/60 space-y-4">
+            <div class="flex justify-between text-sm">
+                <span class="text-secondary">Product Base Subtotal</span>
+                <span id="cart-drawer-subtotal" class="text-primary font-semibold">₹0</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-secondary">Shipping Charge</span>
+                <span class="text-primary text-xs">₹50 (Prepaid) / ₹99 (COD)</span>
+            </div>
+            <div class="flex justify-between text-lg font-serif-headline border-t border-outline-variant/40 pt-3">
+                <span class="text-primary">Subtotal</span>
+                <span id="cart-drawer-total" class="text-primary font-bold">₹0</span>
+            </div>
+            <button onclick="openCheckoutModal()" class="w-full bg-primary text-background label-caps py-4 tracking-widest hover:bg-secondary transition-colors">
+                Proceed to Express Checkout
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- DYNAMIC EXPRESS CHECKOUT & PHONEPE QR MODAL -->
+<div id="checkout-modal" class="fixed inset-0 z-[150] bg-primary/60 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-2xl p-6 md:p-8 max-h-[92vh] overflow-y-auto relative shadow-2xl">
+        <button onclick="closeCheckoutModal()" class="absolute top-6 right-6 text-secondary hover:text-primary">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+
+        <span class="label-caps text-secondary block mb-1">Express Order Dispatch</span>
+        <h3 class="font-serif-headline text-3xl text-primary mb-6">Delivery Details &amp; Payment QR</h3>
+
+        <form id="checkout-form" onsubmit="submitCheckoutOrder(event)" class="space-y-5 text-xs">
+            <!-- Customer Information -->
+            <div class="space-y-3">
+                <h4 class="label-caps text-primary border-b border-outline-variant/40 pb-2">1. Client Shipping Information</h4>
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Full Name *</label>
+                    <input type="text" id="cust-name" required placeholder="e.g. Karan Verma" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="label-caps text-secondary block mb-1">Phone Number (WhatsApp) *</label>
+                        <input type="tel" id="cust-phone" required placeholder="e.g. 9876543210" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                    </div>
+                    <div>
+                        <label class="label-caps text-secondary block mb-1">Pincode *</label>
+                        <input type="text" id="cust-pincode" required placeholder="e.g. 208001" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Email ID (For Order Confirmation Email) *</label>
+                    <input type="email" id="cust-email" required placeholder="e.g. karan@gmail.com" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                </div>
+
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Complete Delivery Address *</label>
+                    <textarea id="cust-address" required rows="2" placeholder="House/Flat No., Building, Street Name, Area..." class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"></textarea>
+                </div>
+            </div>
+
+            <!-- Payment Method Selection -->
+            <div class="pt-4 border-t border-outline-variant/60 space-y-4">
+                <h4 class="label-caps text-primary border-b border-outline-variant/40 pb-2">2. Payment Method Selection</h4>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Option 1: Prepaid Online -->
+                    <label class="border-2 border-primary rounded-xl p-4 cursor-pointer hover:border-primary transition-colors flex flex-col justify-between bg-emerald-50/50 relative" id="label-prepaid">
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="paymentType" value="prepaid" checked onchange="updateCheckoutCalculations()" class="text-primary focus:ring-primary"/>
+                            <span class="font-bold text-sm text-primary">Prepaid (Online UPI / QR)</span>
+                        </div>
+                        <span class="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded mt-2 w-fit">🚚 +₹50 DELIVERY ONLY</span>
+                    </label>
+
+                    <!-- Option 2: Cash on Delivery -->
+                    <label class="border border-outline-variant rounded-xl p-4 cursor-pointer hover:border-primary transition-colors flex flex-col justify-between bg-amber-50/50 relative" id="label-cod">
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="paymentType" value="cod" onchange="updateCheckoutCalculations()" class="text-primary focus:ring-primary"/>
+                            <span class="font-bold text-sm text-primary">Cash on Delivery (COD)</span>
+                        </div>
+                        <span class="text-[10px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded mt-2 w-fit">🚚 +₹99 COD FEE &amp; ₹99 ADVANCE</span>
+                    </label>
+                </div>
+
+                <!-- PHONEPE OFFICIAL QR PAYMENT CONTAINER -->
+                <div class="p-5 bg-surface rounded-2xl border border-outline-variant/80 flex flex-col sm:flex-row items-center gap-6">
+                    <div class="w-44 h-auto shrink-0 bg-white p-2.5 rounded-xl border border-outline-variant shadow-sm flex flex-col items-center">
+                        <img src="images/payment_qr_phonepe.jpg" alt="PhonePe QR Code — Surya Tiwari" class="w-full object-contain rounded"/>
+                        <span class="text-[9px] font-bold font-mono text-center text-primary mt-1">SURYA TIWARI</span>
+                    </div>
+
+                    <div class="flex-1 space-y-2">
+                        <div id="qr-instruction-prepaid" class="space-y-1">
+                            <span class="label-caps text-emerald-800 text-[10px] bg-emerald-100 px-2 py-0.5 rounded">Scan &amp; Pay Full Order Amount</span>
+                            <p class="text-sm font-semibold text-primary">Scan QR via PhonePe / Google Pay / Paytm / UPI</p>
+                            <p class="text-xs text-secondary font-light">Pay exact total <strong id="qr-payable-prepaid" class="text-primary font-bold">₹0</strong> (Product Base Price + ₹50 Prepaid Shipping) to <strong>SURYA TIWARI</strong>!</p>
+                        </div>
+
+                        <div id="qr-instruction-cod" class="hidden space-y-1">
+                            <span class="label-caps text-amber-800 text-[10px] bg-amber-100 px-2 py-0.5 rounded">₹99 Mandatory COD Advance Deposit</span>
+                            <p class="text-sm font-semibold text-primary">Scan QR to pay ₹99 Booking Advance</p>
+                            <p class="text-xs text-secondary font-light">Pay mandatory <strong>₹99 Advance Deposit</strong> to <strong>SURYA TIWARI</strong> to confirm COD dispatch. Remaining balance is paid on delivery.</p>
+                        </div>
+
+                        <div class="pt-2">
+                            <label class="label-caps text-secondary block mb-1">Enter Payment UTR / Transaction Ref ID *</label>
+                            <input type="text" id="cust-utr" placeholder="e.g. 423985712904 (From PhonePe / App)" class="w-full bg-background border border-outline-variant/80 rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:border-primary font-mono"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Total Calculations Breakdown -->
+            <div class="p-4 bg-surface rounded-xl border border-outline-variant/60 space-y-2 text-xs">
+                <div class="flex justify-between text-secondary">
+                    <span>Product Base Price (Fixed / Unchanged)</span>
+                    <span id="checkout-subtotal" class="font-mono text-primary font-semibold">₹0</span>
+                </div>
+                <div id="checkout-shipping-row" class="flex justify-between text-primary font-semibold">
+                    <span id="checkout-shipping-label">Prepaid Shipping Charge</span>
+                    <span id="checkout-shipping" class="font-mono text-emerald-700">+₹50</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-primary pt-2 border-t border-outline-variant/40">
+                    <span>Total Amount</span>
+                    <span id="checkout-final-total" class="font-mono text-base text-primary">₹0</span>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-background label-caps py-4 rounded-xl tracking-widest transition-colors flex items-center justify-center space-x-2 text-sm shadow-md">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>Complete Order &amp; Auto Dispatch</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- AUTOMATIC THANK YOU FOR SHOPPING CONFIRMATION MODAL -->
+<div id="thankyou-modal" class="fixed inset-0 z-[200] bg-primary/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-lg p-8 text-center relative shadow-2xl space-y-6">
+        <div class="w-20 h-20 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <span class="material-symbols-outlined text-4xl">task_alt</span>
+        </div>
+
+        <div>
+            <span class="label-caps text-emerald-800 text-xs block mb-1">Order Successfully Recorded</span>
+            <h3 class="font-serif-headline text-3xl md:text-4xl text-primary">Thank You For Shopping!</h3>
+            <p class="text-xs text-secondary font-light mt-2">Your order confirmation &amp; digital receipt have been dispatched directly to your email address and store administration.</p>
+        </div>
+
+        <!-- Receipt Details -->
+        <div class="bg-surface p-5 rounded-xl border border-outline-variant/60 text-left text-xs space-y-2 font-mono" id="thankyou-receipt-body">
+            <!-- Loaded via JS -->
+        </div>
+
+        <div class="p-3 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-lg text-xs text-center font-light">
+            📧 Order Confirmation email sent to <strong id="sent-cust-email">your email</strong> &amp; <strong>theinkhthreadhub@gmail.com</strong>!
+        </div>
+
+        <button onclick="closeThankYouModal()" class="w-full bg-primary text-background label-caps py-3.5 rounded-xl hover:bg-secondary transition-colors">
+            Continue Browsing Catalog
+        </button>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-surface border-t border-outline-variant/60 mt-20">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-16 flex flex-col md:flex-row justify-between items-center gap-6">
+        <a class="font-serif-headline text-2xl tracking-tight text-primary" href="index.html">Inkthread Hub</a>
+        <p class="label-caps text-xs text-secondary">© 2026 Inkthread Hub. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Centralized Store Service -->
+<script src="js/store.js"></script>
+<script>
+    let currentProduct = null;
+    let selectedColor = '';
+    let selectedSize = '';
+
+    function toggleBag() {
+        document.getElementById('bag-drawer').classList.toggle('open');
+    }
+
+    function toggleReviewForm() {
+        document.getElementById('review-form-container').classList.toggle('hidden');
+    }
+
+    function openCheckoutModal() {
+        const cart = ProductsService.getCart();
+        if (cart.length === 0) {
+            alert('Your selection bag is empty.');
+            return;
+        }
+        document.getElementById('bag-drawer').classList.remove('open');
+        document.getElementById('checkout-modal').classList.remove('hidden');
+        updateCheckoutCalculations();
+    }
+
+    function closeCheckoutModal() {
+        document.getElementById('checkout-modal').classList.add('hidden');
+    }
+
+    function closeThankYouModal() {
+        document.getElementById('thankyou-modal').classList.add('hidden');
+    }
+
+    function updateCheckoutCalculations() {
+        const pType = document.querySelector('input[name="paymentType"]:checked')?.value || 'prepaid';
+        const totals = ProductsService.calculateCheckoutTotals(pType);
+
+        document.getElementById('checkout-subtotal').innerText = '₹' + totals.subtotal.toLocaleString('en-IN');
+
+        const shippingLabel = document.getElementById('checkout-shipping-label');
+        const shippingVal = document.getElementById('checkout-shipping');
+        const qrPrepaid = document.getElementById('qr-instruction-prepaid');
+        const qrCod = document.getElementById('qr-instruction-cod');
+        const labelPrepaid = document.getElementById('label-prepaid');
+        const labelCod = document.getElementById('label-cod');
+
+        if (pType === 'prepaid') {
+            shippingLabel.innerText = 'Prepaid Delivery Charge (+₹50 Extra)';
+            shippingVal.innerText = '+₹50';
+            shippingVal.className = 'font-mono text-emerald-700 font-bold';
+            qrPrepaid.classList.remove('hidden');
+            qrCod.classList.add('hidden');
+            labelPrepaid.classList.add('border-primary', 'border-2');
+            labelCod.classList.remove('border-primary', 'border-2');
+            document.getElementById('qr-payable-prepaid').innerText = '₹' + totals.total.toLocaleString('en-IN');
+        } else {
+            shippingLabel.innerText = 'COD Delivery Charge (+₹99 Extra)';
+            shippingVal.innerText = '+₹99';
+            shippingVal.className = 'font-mono text-amber-800 font-bold';
+            qrPrepaid.classList.add('hidden');
+            qrCod.classList.remove('hidden');
+            labelCod.classList.add('border-primary', 'border-2');
+            labelPrepaid.classList.remove('border-primary', 'border-2');
+        }
+
+        document.getElementById('checkout-final-total').innerText = '₹' + totals.total.toLocaleString('en-IN');
+    }
+
+    function submitCheckoutOrder(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('cust-name').value.trim();
+        const phone = document.getElementById('cust-phone').value.trim();
+        const email = document.getElementById('cust-email').value.trim();
+        const pincode = document.getElementById('cust-pincode').value.trim();
+        const address = document.getElementById('cust-address').value.trim();
+        const utr = document.getElementById('cust-utr').value.trim();
+        const paymentType = document.querySelector('input[name="paymentType"]:checked')?.value || 'prepaid';
+
+        if (!name || !phone || !email || !pincode || !address) {
+            alert('Please fill out all delivery address fields.');
+            return;
+        }
+
+        const result = ProductsService.placeOrder({
+            name, phone, email, pincode, address, utr, paymentType
+        });
+
+        if (result.success) {
+            closeCheckoutModal();
+
+            // 1. Open WhatsApp in background/tab
+            window.open(result.whatsappUrl, '_blank');
+
+            // 2. Populate and display Thank You Confirmation Modal with Customer Email indicator
+            const receiptBody = document.getElementById('thankyou-receipt-body');
+            const o = result.order;
+            document.getElementById('sent-cust-email').innerText = o.customer.email;
+
+            receiptBody.innerHTML = `
+                <div class="flex justify-between border-b border-outline-variant/40 pb-2">
+                    <span class="text-secondary">ORDER ID:</span>
+                    <strong class="text-primary">${o.orderId}</strong>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">Client Name:</span>
+                    <span class="text-primary">${o.customer.name}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">Customer Email:</span>
+                    <span class="text-primary font-bold">${o.customer.email}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">Phone Number:</span>
+                    <span class="text-primary">${o.customer.phone}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">Payment Method:</span>
+                    <span class="text-primary uppercase font-bold">${o.paymentType}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">PhonePe UTR Ref:</span>
+                    <span class="text-primary">${o.customer.utr || 'N/A'}</span>
+                </div>
+                <div class="flex justify-between border-t border-outline-variant/40 pt-2 font-bold text-sm text-primary">
+                    <span>Total Paid/Booked:</span>
+                    <span>₹${o.total.toLocaleString('en-IN')}</span>
+                </div>
+            `;
+
+            document.getElementById('thankyou-modal').classList.remove('hidden');
+            renderCartUI();
+        } else {
+            alert(result.message);
+        }
+    }
+
+    function renderProductPage() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('slug') || urlParams.get('id');
+        
+        if (query) {
+            currentProduct = ProductsService.getProductBySlug(query) || ProductsService.getProductById(query);
+        }
+
+        if (!currentProduct) {
+            const all = ProductsService.getAllProducts();
+            currentProduct = all.length > 0 ? all[0] : null;
+        }
+
+        const container = document.getElementById('product-detail-view');
+
+        if (!currentProduct) {
+            container.innerHTML = `<div class="py-20 text-center text-secondary font-light">Product not found in catalog. <a href="shop.html" class="underline text-primary">Return to catalog</a></div>`;
+            return;
+        }
+
+        selectedColor = currentProduct.colors && currentProduct.colors.length > 0 ? currentProduct.colors[0] : 'Standard';
+        selectedSize = currentProduct.sizes && currentProduct.sizes.length > 0 ? currentProduct.sizes[0] : 'M';
+
+        const price = currentProduct.salePrice || currentProduct.regularPrice;
+        const totalStock = ProductsService.getTotalStock(currentProduct);
+        const isOutOfStock = totalStock <= 0;
+
+        container.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-y-12 md:gap-x-12">
+                <!-- Image Gallery (Left - 7 cols) -->
+                <div class="md:col-span-7 flex flex-col gap-4">
+                    <div class="w-full aspect-[3/4] bg-surface-container relative overflow-hidden group rounded-lg">
+                        <img id="main-img" alt="${currentProduct.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${currentProduct.images ? currentProduct.images.front : ''}"/>
+                    </div>
+                    ${currentProduct.images && currentProduct.images.gallery && currentProduct.images.gallery.length > 0 ? `
+                        <div class="grid grid-cols-3 gap-4">
+                            ${currentProduct.images.gallery.map(imgSrc => `
+                                <div class="w-full aspect-square bg-surface-container relative overflow-hidden rounded group cursor-pointer" onclick="switchImg('${imgSrc}')">
+                                    <img alt="Detail" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${imgSrc}"/>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Product Information (Right - 5 cols) -->
+                <div class="md:col-span-5 flex flex-col md:sticky md:top-28 h-fit">
+                    <nav class="mb-6 label-caps text-secondary flex items-center space-x-2">
+                        <a class="hover:text-primary transition-colors" href="shop.html">Catalog</a>
+                        <span>/</span>
+                        <a class="hover:text-primary transition-colors" href="shop.html?cat=${encodeURIComponent(currentProduct.category)}">${currentProduct.category}</a>
+                    </nav>
+
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="label-caps text-[9px] bg-primary text-background px-3 py-1 rounded">${currentProduct.productType || currentProduct.category}</span>
+                        ${currentProduct.sku ? `<span class="text-xs text-secondary font-mono">SKU: ${currentProduct.sku}</span>` : ''}
+                    </div>
+                    
+                    <h1 class="font-serif-headline text-4xl md:text-5xl text-primary mb-2">${currentProduct.name}</h1>
+
+                    <!-- Rating Summary Header -->
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="flex text-amber-500 text-xs">
+                            ${'⭐'.repeat(Math.round(currentProduct.rating || 5))}
+                        </div>
+                        <span class="text-xs text-secondary font-semibold">${currentProduct.rating || '5.0'} / 5.0 (${currentProduct.reviewsCount || 0} Reviews)</span>
+                    </div>
+                    
+                    <div class="flex items-center gap-4 mb-6">
+                        <span class="font-sans text-2xl text-primary font-medium">₹${price.toLocaleString('en-IN')}</span>
+                        ${currentProduct.regularPrice > price ? `
+                            <span class="font-sans text-base text-secondary line-through">₹${currentProduct.regularPrice.toLocaleString('en-IN')}</span>
+                            <span class="label-caps text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded font-bold">${currentProduct.discountPercent}% OFF</span>
+                        ` : ''}
+                    </div>
+
+                    <p class="text-sm text-secondary font-light mb-8 leading-relaxed">${currentProduct.shortDescription || currentProduct.fullDescription}</p>
+
+                    <!-- Color Selector -->
+                    ${currentProduct.colors && currentProduct.colors.length > 0 ? `
+                        <div class="mb-6">
+                            <div class="flex justify-between items-end mb-3">
+                                <span class="label-caps text-secondary">Color: <strong id="selected-color-label" class="text-primary">${selectedColor}</strong></span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                ${currentProduct.colors.map((col, idx) => `
+                                    <button onclick="selectColor('${col}', this)" class="color-btn px-4 py-2 text-xs border ${idx === 0 ? 'border-primary text-primary bg-surface font-semibold' : 'border-outline-variant text-secondary'} rounded-lg hover:border-primary label-caps">
+                                        ${col}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Size Selector -->
+                    ${currentProduct.sizes && currentProduct.sizes.length > 0 ? `
+                        <div class="mb-8">
+                            <div class="flex justify-between items-end mb-3">
+                                <span class="label-caps text-secondary">Size: <strong id="selected-size-label" class="text-primary">${selectedSize}</strong></span>
+                                <span class="label-caps text-[10px] ${isOutOfStock ? 'text-red-600 font-bold' : 'text-emerald-700'}">${isOutOfStock ? 'Out of Stock' : totalStock + ' units left'}</span>
+                            </div>
+                            <div class="grid grid-cols-4 gap-2">
+                                ${currentProduct.sizes.map((sz, idx) => `
+                                    <button onclick="selectSize('${sz}', this)" class="size-btn py-3 border ${idx === 0 ? 'border-primary text-primary bg-surface font-semibold' : 'border-outline-variant text-secondary'} text-center label-caps rounded-lg hover:border-primary">
+                                        ${sz}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Action Button -->
+                    <button onclick="handleAddToBag()" ${isOutOfStock ? 'disabled' : ''} class="w-full bg-primary text-background py-4 label-caps tracking-widest hover:bg-secondary transition-colors duration-300 mb-10 flex justify-center items-center space-x-2 rounded-lg disabled:opacity-40">
+                        <span>${isOutOfStock ? 'Out of Stock' : 'Add to Selection Bag'}</span>
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+
+                    <!-- Accordion Details -->
+                    <div class="border-t border-outline-variant divide-y divide-outline-variant/60">
+                        <details class="group" open>
+                            <summary class="flex justify-between items-center label-caps py-5 cursor-pointer list-none">
+                                <span>Full Specification &amp; Story</span>
+                                <span class="material-symbols-outlined transition duration-300 group-open:-rotate-180">expand_more</span>
+                            </summary>
+                            <div class="text-secondary text-sm font-light pb-6 leading-relaxed">
+                                ${currentProduct.fullDescription || currentProduct.shortDescription}
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        renderReviewsList();
+        renderRelatedProducts();
+        renderCartUI();
+    }
+
+    function renderReviewsList() {
+        const grid = document.getElementById('reviews-list-grid');
+        const reviews = currentProduct.reviews || [];
+
+        if (reviews.length === 0) {
+            grid.innerHTML = `<div class="col-span-3 text-center py-8 text-secondary font-light">No reviews submitted yet for this product. Be the first to share a reflection!</div>`;
+            return;
+        }
+
+        grid.innerHTML = reviews.map(r => `
+            <div class="space-y-3 p-6 bg-surface rounded-xl border border-outline-variant/30">
+                <div class="flex items-center justify-between">
+                    <div class="flex text-amber-500 text-xs">
+                        ${'⭐'.repeat(Math.round(r.rating))}
+                    </div>
+                    <span class="text-[10px] text-secondary font-mono">${r.date || 'Recent'}</span>
+                </div>
+                <p class="text-sm italic text-secondary font-light">"${r.comment}"</p>
+                <div class="flex justify-between items-center pt-2 border-t border-outline-variant/20">
+                    <span class="label-caps text-primary text-[10px]">${r.name}</span>
+                    <span class="text-[9px] text-emerald-700 label-caps">Verified Purchase</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function handleReviewSubmit(e) {
+        e.preventDefault();
+        if (!currentProduct) return;
+
+        const name = document.getElementById('review-name').value.trim();
+        const rating = parseFloat(document.getElementById('review-rating').value);
+        const comment = document.getElementById('review-comment').value.trim();
+
+        if (!name || !comment) return;
+
+        ProductsService.addReview(currentProduct.id, { name, rating, comment });
+        toggleReviewForm();
+        renderProductPage();
+        alert('Thank you! Your product review has been submitted and live published.');
+    }
+
+    function renderRelatedProducts() {
+        const relatedGrid = document.getElementById('related-products-grid');
+        const all = ProductsService.getAllProducts();
+        const related = all.filter(p => p.id !== currentProduct.id).slice(0, 3);
+
+        if (related.length === 0) {
+            relatedGrid.innerHTML = '';
+            return;
+        }
+
+        relatedGrid.innerHTML = related.map(p => {
+            const price = p.salePrice || p.regularPrice;
+            return `
+                <div class="group block bg-surface p-4 rounded-xl border border-outline-variant/40">
+                    <a href="product.html?slug=${p.slug}" class="block aspect-[3/4] bg-surface-container overflow-hidden rounded-lg mb-3">
+                        <img src="${p.images ? p.images.front : ''}" alt="${p.name}" class="w-full h-full object-cover image-zoom"/>
+                    </a>
+                    <h3 class="font-serif-headline text-lg text-primary group-hover:text-secondary transition-colors">
+                        <a href="product.html?slug=${p.slug}">${p.name}</a>
+                    </h3>
+                    <span class="font-sans text-sm text-primary font-light">₹${price.toLocaleString('en-IN')}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function switchImg(src) {
+        document.getElementById('main-img').src = src;
+    }
+
+    function selectColor(color, btn) {
+        selectedColor = color;
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('border-primary', 'text-primary', 'bg-surface', 'font-semibold'));
+        btn.classList.add('border-primary', 'text-primary', 'bg-surface', 'font-semibold');
+        document.getElementById('selected-color-label').innerText = color;
+
+        if (currentProduct && currentProduct.colorImages) {
+            const match = currentProduct.colorImages.find(ci => ci.color.toLowerCase() === color.toLowerCase());
+            if (match && match.url) {
+                document.getElementById('main-img').src = match.url;
+            }
+        }
+    }
+
+    function selectSize(size, btn) {
+        selectedSize = size;
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('border-primary', 'text-primary', 'bg-surface', 'font-semibold'));
+        btn.classList.add('border-primary', 'text-primary', 'bg-surface', 'font-semibold');
+        document.getElementById('selected-size-label').innerText = size;
+    }
+
+    function handleAddToBag() {
+        if (!currentProduct) return;
+        const success = ProductsService.addToCart(currentProduct.id, selectedColor, selectedSize, 1);
+        if (success) {
+            toggleBag();
+        } else {
+            alert('Unable to add item to bag.');
+        }
+    }
+
+    function renderCartUI() {
+        const cart = ProductsService.getCart();
+        document.getElementById('bag-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+        
+        const cartContainer = document.getElementById('cart-drawer-items');
+        if (cart.length === 0) {
+            cartContainer.innerHTML = `<div class="py-12 text-center text-secondary font-light">Your selection bag is empty.</div>`;
+            document.getElementById('cart-drawer-subtotal').innerText = '₹0';
+            document.getElementById('cart-drawer-total').innerText = '₹0';
+            return;
+        }
+
+        let total = 0;
+        cartContainer.innerHTML = cart.map((item) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            return `
+                <div class="flex gap-4 pb-6 border-b border-outline-variant/40">
+                    <div class="w-20 h-24 bg-surface shrink-0 overflow-hidden rounded">
+                        <img src="${item.image}" class="w-full h-full object-cover" alt="${item.name}"/>
+                    </div>
+                    <div class="flex-1 flex justify-between flex-col">
+                        <div>
+                            <h4 class="font-serif-headline text-lg text-primary">${item.name}</h4>
+                            <p class="text-xs text-secondary">Color: ${item.color} / Size: ${item.size}</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="font-sans text-sm text-primary">₹${item.price.toLocaleString('en-IN')} x ${item.quantity}</span>
+                            <button onclick="ProductsService.removeFromCart('${item.cartId}')" class="text-xs text-red-600 hover:underline">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('cart-drawer-subtotal').innerText = '₹' + total.toLocaleString('en-IN');
+        document.getElementById('cart-drawer-total').innerText = '₹' + total.toLocaleString('en-IN');
+    }
+
+    window.addEventListener('inkthread_catalog_updated', renderProductPage);
+    document.addEventListener('DOMContentLoaded', renderProductPage);
+</script>
+
+</body>
+</html>

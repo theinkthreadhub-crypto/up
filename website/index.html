@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Inkthread Hub — Slow Fashion &amp; Tactile Craftsmanship</title>
+<meta name="description" content="Story-led slow fashion, 240 GSM organic cotton apparel, and handcrafted pet accessories."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#FBF9F9",
+                        "surface": "#F4F2F1",
+                        "surface-container": "#EAE8E7",
+                        "primary": "#121212",
+                        "secondary": "#5E5E5B",
+                        "accent": "#D4AF37",
+                        "outline": "#747878",
+                        "outline-variant": "#C4C7C7"
+                    },
+                    fontFamily: {
+                        "display": ["'Bodoni Moda'", "serif"],
+                        "sans": ["'Hanken Grotesk'", "sans-serif"]
+                    }
+                }
+            }
+        }
+</script>
+<style>
+    body { background-color: #FBF9F9; color: #121212; font-family: 'Hanken Grotesk', sans-serif; }
+    .font-serif-headline { font-family: 'Bodoni Moda', serif; }
+    .label-caps {
+        font-family: 'Hanken Grotesk', sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .image-zoom { transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .group:hover .image-zoom { transform: scale(1.06); }
+    
+    .card-stitch-hover {
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+    }
+    .card-stitch-hover:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px -15px rgba(18, 18, 18, 0.08);
+    }
+
+    .drawer-overlay { opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer-content { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .drawer-overlay.open .drawer-content { transform: translateX(0); }
+</style>
+</head>
+<body class="antialiased selection:bg-primary selection:text-background">
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="bg-primary text-background text-[11px] label-caps py-2.5 px-6 text-center tracking-widest flex justify-center items-center space-x-4 border-b border-white/10">
+    <span>🎁 PREPAID ORDERS: FLAT ₹50 SHIPPING (SAVE ₹49)</span>
+    <span class="opacity-40">•</span>
+    <span>🚚 COD AVAILABLE WITH ₹99 ADVANCE BOOKING</span>
+    <span class="opacity-40">•</span>
+    <span>💬 WHATSAPP ORDER DISPATCH: 6392995127</span>
+</div>
+
+<!-- NAVIGATION -->
+<nav class="bg-background/90 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/40 transition-all duration-300">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-5 flex justify-between items-center relative">
+        <div class="hidden md:flex items-center space-x-10 label-caps">
+            <a class="text-primary border-b-2 border-primary pb-0.5" href="index.html">Home</a>
+            <a class="text-secondary hover:text-primary transition-colors" href="shop.html">Catalog</a>
+            <a class="text-secondary hover:text-primary transition-colors" href="journal.html">Journal</a>
+        </div>
+
+        <button class="md:hidden text-primary" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+
+        <a class="font-serif-headline text-3xl md:text-4xl tracking-tight text-primary md:absolute md:left-1/2 md:-translate-x-1/2" href="index.html">
+            Inkthread Hub
+        </a>
+
+        <div class="flex items-center space-x-6 text-primary">
+            <a href="admin.html" title="Admin Login" class="hover:text-secondary transition-colors">
+                <span class="material-symbols-outlined text-xl">lock</span>
+            </a>
+            <button onclick="toggleBag()" class="hover:text-secondary transition-colors relative">
+                <span class="material-symbols-outlined">shopping_bag</span>
+                <span id="bag-count" class="absolute -top-1 -right-2 w-4 h-4 bg-primary text-background font-sans text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-outline-variant/40 bg-background px-6 py-4 space-y-3 label-caps">
+        <a class="block text-primary" href="index.html">Home</a>
+        <a class="block text-secondary" href="shop.html">Catalog</a>
+        <a class="block text-secondary" href="journal.html">Journal</a>
+        <a class="block text-secondary flex items-center space-x-1" href="admin.html">
+            <span class="material-symbols-outlined text-xs">lock</span>
+            <span>Admin Login</span>
+        </a>
+    </div>
+</nav>
+
+<!-- STITCH EDITORIAL HERO SECTION WITH CHAIR FOLDED CLOTHES BANNER -->
+<section class="max-w-[1440px] mx-auto px-6 md:px-16 py-12 md:py-20">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center bg-surface p-8 md:p-14 rounded-3xl border border-outline-variant/50 shadow-sm relative overflow-hidden">
+        
+        <!-- Left Column: Typography & Action -->
+        <div class="md:col-span-6 space-y-6 relative z-10">
+            <div class="inline-flex items-center space-x-2 bg-background px-3.5 py-1.5 rounded-full border border-outline-variant/60">
+                <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                <span class="label-caps text-[10px] text-primary">Stitch AI Craftsmanship Edition</span>
+            </div>
+
+            <h1 class="font-serif-headline text-5xl md:text-7xl text-primary tracking-tight leading-[1.08]">
+                Slow Fashion &amp; Tactile Craftsmanship
+            </h1>
+
+            <p class="font-sans text-base text-secondary font-light leading-relaxed max-w-lg">
+                Crafted from 240 GSM organic bio-washed cotton, heavy acid-wash fleece, and genuine leather pet collar brackets. Built for silhouette permanence and tactile comfort.
+            </p>
+
+            <div class="pt-4 flex flex-wrap gap-4">
+                <a href="shop.html" class="bg-primary text-background label-caps px-8 py-4 hover:bg-secondary transition-all duration-300 rounded-xl shadow-md">
+                    Explore Full Catalog &rarr;
+                </a>
+                <a href="shop.html?cat=Pet%20Products" class="border border-primary text-primary label-caps px-8 py-4 hover:bg-primary hover:text-background transition-all duration-300 rounded-xl">
+                    Pet Hardware Collection
+                </a>
+            </div>
+        </div>
+
+        <!-- Right Column: Chair Folded Apparel High-Impact Image -->
+        <div class="md:col-span-6 relative">
+            <div class="aspect-[4/3] bg-surface-container rounded-2xl overflow-hidden shadow-2xl border border-outline-variant/60 relative group">
+                <img src="images/hero_banner.png" alt="Folded Apparel on Minimalist Chair — Inkthread Hub" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                
+                <div class="absolute bottom-6 left-6 right-6 bg-background/90 backdrop-blur-md p-4 rounded-xl border border-white/40 flex justify-between items-center shadow-lg">
+                    <div>
+                        <span class="label-caps text-[9px] text-secondary block">Featured Craft</span>
+                        <h4 class="font-serif-headline text-base text-primary">240 GSM Stacked Heavyweight Cotton</h4>
+                    </div>
+                    <a href="shop.html" class="label-caps text-[10px] bg-primary text-background px-3 py-1.5 rounded hover:bg-secondary transition-colors">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- TRUST & CRAFTSMANSHIP BADGES TICKER -->
+<section class="border-y border-outline-variant/60 bg-surface py-8">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="space-y-1">
+            <span class="material-symbols-outlined text-primary text-2xl">workspace_premium</span>
+            <h4 class="font-serif-headline text-lg text-primary">240 GSM Bio-Washed</h4>
+            <p class="text-xs text-secondary font-light">Heavyweight combed cotton built to last</p>
+        </div>
+        <div class="space-y-1">
+            <span class="material-symbols-outlined text-primary text-2xl">local_shipping</span>
+            <h4 class="font-serif-headline text-lg text-primary">Express COD &amp; Prepaid</h4>
+            <p class="text-xs text-secondary font-light">Flat ₹50 Prepaid / ₹99 COD Advance</p>
+        </div>
+        <div class="space-y-1">
+            <span class="material-symbols-outlined text-primary text-2xl">pets</span>
+            <h4 class="font-serif-headline text-lg text-primary">Pet Neck Belts</h4>
+            <p class="text-xs text-secondary font-light">Full-grain leather with solid brass buckle</p>
+        </div>
+        <div class="space-y-1">
+            <span class="material-symbols-outlined text-primary text-2xl">mark_email_read</span>
+            <h4 class="font-serif-headline text-lg text-primary">Auto Email Receipts</h4>
+            <p class="text-xs text-secondary font-light">Instant order details to email &amp; WhatsApp</p>
+        </div>
+    </div>
+</section>
+
+<!-- CURATED FEATURED PRODUCTS GRID -->
+<section class="max-w-[1440px] mx-auto px-6 md:px-16 py-24">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-4 border-b border-outline-variant/60 pb-6">
+        <div>
+            <span class="label-caps text-secondary block mb-1">Single Source of Truth</span>
+            <h2 class="font-serif-headline text-4xl text-primary">Featured Artifacts</h2>
+        </div>
+        <a href="shop.html" class="label-caps text-primary border-b border-primary pb-0.5 hover:text-secondary">View All Products &rarr;</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8" id="featured-products-grid">
+        <!-- Loaded via JS -->
+    </div>
+</section>
+
+<!-- SHOPPING BAG DRAWER -->
+<div id="bag-drawer" class="drawer-overlay fixed inset-0 z-[100] bg-primary/40 backdrop-blur-sm flex justify-end">
+    <div class="drawer-content w-full max-w-md bg-background border-l border-outline-variant/60 h-full flex flex-col justify-between p-8">
+        <div>
+            <div class="flex justify-between items-center pb-6 border-b border-outline-variant/60 mb-6">
+                <h3 class="font-serif-headline text-2xl text-primary">Your Selection</h3>
+                <button onclick="toggleBag()" class="text-secondary hover:text-primary">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div id="cart-drawer-items" class="space-y-6 max-h-[50vh] overflow-y-auto">
+                <!-- Loaded via JS -->
+            </div>
+        </div>
+
+        <div class="pt-6 border-t border-outline-variant/60 space-y-4">
+            <div class="flex justify-between text-sm">
+                <span class="text-secondary">Subtotal</span>
+                <span id="cart-drawer-subtotal" class="text-primary font-semibold">₹0</span>
+            </div>
+            <div class="flex justify-between text-lg font-serif-headline border-t border-outline-variant/40 pt-3">
+                <span class="text-primary">Total</span>
+                <span id="cart-drawer-total" class="text-primary font-bold">₹0</span>
+            </div>
+            <a href="shop.html" class="block w-full bg-primary text-background text-center label-caps py-4 tracking-widest hover:bg-secondary transition-colors rounded-lg">
+                Proceed to Catalog &amp; Express Checkout
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-surface border-t border-outline-variant/60 mt-20">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-16 flex flex-col md:flex-row justify-between items-center gap-6">
+        <a class="font-serif-headline text-2xl tracking-tight text-primary" href="index.html">Inkthread Hub</a>
+        <div class="flex items-center space-x-6 label-caps text-xs">
+            <a href="index.html" class="text-secondary hover:text-primary">Home</a>
+            <a href="shop.html" class="text-secondary hover:text-primary">Catalog</a>
+            <a href="journal.html" class="text-secondary hover:text-primary">Journal</a>
+            <a href="admin.html" class="text-secondary hover:text-primary">Admin Login</a>
+        </div>
+        <p class="label-caps text-xs text-secondary">© 2026 Inkthread Hub. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script>
+    function toggleBag() {
+        document.getElementById('bag-drawer').classList.toggle('open');
+    }
+
+    function renderHomepage() {
+        const grid = document.getElementById('featured-products-grid');
+        const featured = ProductsService.getAllProducts({ isFeatured: true });
+
+        if (featured.length === 0) {
+            grid.innerHTML = `<div class="col-span-4 text-center py-12 text-secondary font-light">No featured products available.</div>`;
+            return;
+        }
+
+        grid.innerHTML = featured.map(p => {
+            const price = p.salePrice || p.regularPrice;
+            const stock = ProductsService.getTotalStock(p);
+            const isOut = stock <= 0;
+            const backImg = (p.images && p.images.back) ? p.images.back : p.images.front;
+
+            return `
+                <div class="group flex flex-col justify-between bg-surface p-4 rounded-2xl border border-outline-variant/40 relative card-stitch-hover">
+                    ${isOut ? `<span class="absolute top-6 left-6 z-10 label-caps text-[9px] bg-red-600 text-white px-2.5 py-1 rounded font-bold">OUT OF STOCK</span>` : ''}
+                    <div>
+                        <a href="product.html?slug=${p.slug}" class="block aspect-[3/4] bg-surface-container overflow-hidden rounded-xl mb-4 relative">
+                            <img src="${p.images ? p.images.front : ''}" alt="${p.name}" class="w-full h-full object-cover image-zoom absolute inset-0 transition-opacity duration-500 group-hover:opacity-0"/>
+                            <img src="${backImg}" alt="${p.name} Back" class="w-full h-full object-cover image-zoom absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"/>
+                        </a>
+                        <span class="label-caps text-[9px] text-secondary block mb-1">${p.category}</span>
+                        <h3 class="font-serif-headline text-lg text-primary group-hover:text-secondary transition-colors mb-1 line-clamp-1">
+                            <a href="product.html?slug=${p.slug}">${p.name}</a>
+                        </h3>
+                    </div>
+                    <div class="flex justify-between items-center pt-3 border-t border-outline-variant/30 mt-3">
+                        <span class="font-sans text-sm text-primary font-bold">₹${price.toLocaleString('en-IN')}</span>
+                        <a href="product.html?slug=${p.slug}" class="label-caps text-[10px] bg-primary text-background px-3 py-1.5 rounded hover:bg-secondary transition-colors">Details &rarr;</a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        renderCartUI();
+    }
+
+    function renderCartUI() {
+        const cart = ProductsService.getCart();
+        document.getElementById('bag-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+        
+        const cartContainer = document.getElementById('cart-drawer-items');
+        if (cart.length === 0) {
+            cartContainer.innerHTML = `<div class="py-12 text-center text-secondary font-light">Your selection bag is empty.</div>`;
+            document.getElementById('cart-drawer-subtotal').innerText = '₹0';
+            document.getElementById('cart-drawer-total').innerText = '₹0';
+            return;
+        }
+
+        let total = 0;
+        cartContainer.innerHTML = cart.map((item) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            return `
+                <div class="flex gap-4 pb-6 border-b border-outline-variant/40">
+                    <div class="w-20 h-24 bg-surface shrink-0 overflow-hidden rounded">
+                        <img src="${item.image}" class="w-full h-full object-cover" alt="${item.name}"/>
+                    </div>
+                    <div class="flex-1 flex justify-between flex-col">
+                        <div>
+                            <h4 class="font-serif-headline text-lg text-primary">${item.name}</h4>
+                            <p class="text-xs text-secondary">Color: ${item.color} / Size: ${item.size}</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="font-sans text-sm text-primary">₹${item.price.toLocaleString('en-IN')} x ${item.quantity}</span>
+                            <button onclick="ProductsService.removeFromCart('${item.cartId}')" class="text-xs text-red-600 hover:underline">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('cart-drawer-subtotal').innerText = '₹' + total.toLocaleString('en-IN');
+        document.getElementById('cart-drawer-total').innerText = '₹' + total.toLocaleString('en-IN');
+    }
+
+    window.addEventListener('inkthread_catalog_updated', renderHomepage);
+    document.addEventListener('DOMContentLoaded', renderHomepage);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Journal &amp; Stories — Inkthread Hub</title>
+<meta name="description" content="Editorial essays on slow fashion, 240 GSM cotton craftsmanship, pet apparel, and verified customer reflections."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#FBF9F9",
+                        "surface": "#F5F3F3",
+                        "surface-container": "#EFEDED",
+                        "primary": "#121212",
+                        "secondary": "#5E5E5B",
+                        "accent": "#DBDAD9",
+                        "outline": "#747878",
+                        "outline-variant": "#C4C7C7"
+                    },
+                    fontFamily: {
+                        "display": ["'Bodoni Moda'", "serif"],
+                        "sans": ["'Hanken Grotesk'", "sans-serif"]
+                    }
+                }
+            }
+        }
+</script>
+<style>
+    body { background-color: #FBF9F9; color: #121212; font-family: 'Hanken Grotesk', sans-serif; }
+    .font-serif-headline { font-family: 'Bodoni Moda', serif; }
+    .label-caps {
+        font-family: 'Hanken Grotesk', sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .image-zoom { transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .group:hover .image-zoom { transform: scale(1.04); }
+</style>
+</head>
+<body class="antialiased selection:bg-accent selection:text-primary">
+
+<!-- NAVIGATION -->
+<nav class="bg-background/90 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/40">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-5 flex justify-between items-center relative">
+        <div class="hidden md:flex items-center space-x-10 label-caps">
+            <a class="text-secondary hover:text-primary transition-colors" href="index.html">Home</a>
+            <a class="text-secondary hover:text-primary transition-colors" href="shop.html">Catalog</a>
+            <a class="text-primary border-b border-primary pb-0.5" href="journal.html">Journal</a>
+        </div>
+        <a class="font-serif-headline text-3xl md:text-4xl tracking-tight text-primary md:absolute md:left-1/2 md:-translate-x-1/2" href="index.html">
+            Inkthread Hub
+        </a>
+        <div class="flex items-center space-x-6 text-primary">
+            <a href="admin.html" title="Admin Login" class="hover:text-secondary transition-colors">
+                <span class="material-symbols-outlined text-xl">lock</span>
+            </a>
+            <a href="shop.html" class="hover:text-secondary transition-colors">
+                <span class="material-symbols-outlined">shopping_bag</span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- HEADER -->
+<header class="pt-16 pb-12 px-6 md:px-16 max-w-4xl mx-auto text-center">
+    <span class="label-caps text-secondary mb-3 block">Editorial &amp; Craftsmanship Notes</span>
+    <h1 class="font-serif-headline text-5xl md:text-7xl text-primary tracking-tight mb-4">The Journal</h1>
+    <p class="font-sans text-base text-secondary max-w-lg mx-auto font-light">
+        Essays on 240 GSM cotton philosophy, print craftsmanship, pet accessories, and verified client experiences.
+    </p>
+</header>
+
+<!-- COVER FEATURE ARTICLE -->
+<section class="max-w-[1440px] mx-auto px-6 md:px-16 mb-24" id="cover-story-container">
+    <!-- Loaded via JS -->
+</section>
+
+<!-- ARTICLES GRID -->
+<main class="max-w-[1440px] mx-auto px-6 md:px-16 mb-28">
+    <div class="border-b border-outline-variant/60 pb-6 mb-12 flex justify-between items-end">
+        <div>
+            <span class="label-caps text-secondary block mb-1">Published Essays &amp; Guides</span>
+            <h2 class="font-serif-headline text-3xl text-primary">Fashion &amp; Design Stories</h2>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10" id="journal-grid">
+        <!-- Loaded via JS -->
+    </div>
+</main>
+
+<!-- 5 VERIFIED CUSTOMER STORY REVIEWS SECTION -->
+<section class="bg-surface border-t border-b border-outline-variant/60 py-24 mb-24">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16">
+        <div class="max-w-xl mb-16">
+            <span class="label-caps text-secondary block mb-2">Verified Client Reflections</span>
+            <h2 class="font-serif-headline text-4xl text-primary mb-3">5 Authentic Inkthread Customer Stories</h2>
+            <p class="text-xs text-secondary font-light">Real reflections from clients who value 240 GSM craftsmanship, pet hardware durability, and express dispatch.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="customer-stories-grid">
+            <!-- Loaded via JS -->
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-surface border-t border-outline-variant/60">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-16 flex flex-col md:flex-row justify-between items-center gap-6">
+        <a class="font-serif-headline text-2xl tracking-tight text-primary" href="index.html">Inkthread Hub</a>
+        <p class="label-caps text-xs text-secondary">© 2026 Inkthread Hub. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Centralized Store Service -->
+<script src="js/store.js"></script>
+<script>
+    function renderJournalPage() {
+        const articles = ProductsService.getJournalArticles();
+        const coverContainer = document.getElementById('cover-story-container');
+        const gridContainer = document.getElementById('journal-grid');
+
+        if (articles.length === 0) {
+            gridContainer.innerHTML = `<div class="col-span-3 text-center py-12 text-secondary font-light">No journal stories published yet.</div>`;
+            return;
+        }
+
+        const cover = articles[0];
+        coverContainer.innerHTML = `
+            <article class="grid grid-cols-1 md:grid-cols-12 gap-12 items-center bg-surface p-8 md:p-12 border border-outline-variant/40 rounded-2xl">
+                <div class="md:col-span-7">
+                    <div class="aspect-[16/10] bg-surface-container overflow-hidden rounded-xl">
+                        <img src="${cover.image}" alt="${cover.title}" class="w-full h-full object-cover"/>
+                    </div>
+                </div>
+                <div class="md:col-span-5 space-y-5">
+                    <div class="flex items-center gap-3">
+                        <span class="label-caps text-secondary text-[10px] bg-background px-3 py-1 rounded border border-outline-variant/40">${cover.category}</span>
+                        <span class="text-[10px] text-secondary font-mono">${cover.readTime}</span>
+                    </div>
+                    <h2 class="font-serif-headline text-3xl md:text-4xl text-primary leading-tight">${cover.title}</h2>
+                    <p class="font-sans text-sm text-secondary font-light leading-relaxed">
+                        ${cover.excerpt}
+                    </p>
+                    <div class="pt-4 border-t border-outline-variant/40 flex justify-between items-center text-xs">
+                        <span class="text-secondary font-light">By ${cover.author}</span>
+                        <span class="text-secondary font-mono">${cover.date}</span>
+                    </div>
+                </div>
+            </article>
+        `;
+
+        const remaining = articles.slice(1);
+        gridContainer.innerHTML = remaining.map(a => `
+            <article class="group space-y-4 bg-surface p-6 rounded-2xl border border-outline-variant/40 flex flex-col justify-between">
+                <div class="space-y-4">
+                    <div class="aspect-[4/3] bg-surface-container overflow-hidden rounded-xl">
+                        <img src="${a.image}" class="w-full h-full object-cover image-zoom" alt="${a.title}"/>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="label-caps text-secondary text-[9px] bg-background px-2.5 py-0.5 rounded border border-outline-variant/40">${a.category}</span>
+                        <span class="text-[10px] text-secondary font-mono">${a.readTime}</span>
+                    </div>
+                    <h3 class="font-serif-headline text-xl text-primary group-hover:text-secondary transition-colors leading-snug">${a.title}</h3>
+                    <p class="text-xs text-secondary font-light leading-relaxed">${a.excerpt}</p>
+                </div>
+                <div class="pt-4 border-t border-outline-variant/30 flex justify-between items-center text-[11px] text-secondary font-light">
+                    <span>By ${a.author}</span>
+                    <span>${a.date}</span>
+                </div>
+            </article>
+        `).join('');
+
+        renderCustomerStories();
+    }
+
+    function renderCustomerStories() {
+        const reviews = ProductsService.getCustomerReviews();
+        const container = document.getElementById('customer-stories-grid');
+
+        container.innerHTML = reviews.map(r => `
+            <div class="bg-background p-8 rounded-2xl border border-outline-variant/60 flex flex-col justify-between space-y-6 shadow-sm">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex text-amber-500 text-xs">
+                            ${'⭐'.repeat(r.rating)}
+                        </div>
+                        <span class="text-[10px] font-mono text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold">Verified Buyer</span>
+                    </div>
+                    <p class="text-sm text-primary font-light italic leading-relaxed">"${r.comment}"</p>
+                </div>
+
+                <div class="pt-4 border-t border-outline-variant/40 flex justify-between items-end">
+                    <div>
+                        <h4 class="font-serif-headline text-base text-primary">${r.name}</h4>
+                        <span class="text-xs text-secondary font-light">${r.location}</span>
+                    </div>
+                    <span class="label-caps text-[9px] text-secondary">${r.productName}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.addEventListener('inkthread_catalog_updated', renderJournalPage);
+    document.addEventListener('DOMContentLoaded', renderJournalPage);
+</script>
+
+</body>
+</html>
