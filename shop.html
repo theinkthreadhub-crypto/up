@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Full Catalog &amp; Wardrobe — Inkthread Hub</title>
+<meta name="description" content="Explore Inkthread Hub full apparel catalog with 3D Wardrobe Slider experience, unisex tees, acid-wash hoodies, women's crop tops, kids wear, and pet collars."/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#FBF9F9",
+                        "surface": "#F5F3F3",
+                        "surface-container": "#EFEDED",
+                        "primary": "#121212",
+                        "secondary": "#5E5E5B",
+                        "accent": "#DBDAD9",
+                        "outline": "#747878",
+                        "outline-variant": "#C4C7C7"
+                    },
+                    fontFamily: {
+                        "display": ["'Bodoni Moda'", "serif"],
+                        "sans": ["'Hanken Grotesk'", "sans-serif"]
+                    }
+                }
+            }
+        }
+</script>
+<style>
+    body { background-color: #FBF9F9; color: #121212; font-family: 'Hanken Grotesk', sans-serif; }
+    .font-serif-headline { font-family: 'Bodoni Moda', serif; }
+    .label-caps {
+        font-family: 'Hanken Grotesk', sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    .image-zoom { transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .group:hover .image-zoom { transform: scale(1.04); }
+
+    .drawer-overlay { opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+    .drawer-content { transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .drawer-overlay.open .drawer-content { transform: translateX(0); }
+
+    /* WARDROBE RACK & SLIDER CUSTOM STYLES */
+    .wardrobe-rod {
+        background: linear-gradient(90deg, #2b2b2b 0%, #747878 50%, #2b2b2b 100%);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .wardrobe-track {
+        display: flex;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+    }
+    .wardrobe-track::-webkit-scrollbar {
+        height: 6px;
+    }
+    .wardrobe-track::-webkit-scrollbar-track {
+        background: #EFEDED;
+        border-radius: 10px;
+    }
+    .wardrobe-track::-webkit-scrollbar-thumb {
+        background: #121212;
+        border-radius: 10px;
+    }
+    .wardrobe-item {
+        scroll-snap-align: center;
+        flex: 0 0 280px;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+    }
+    @media (min-width: 768px) {
+        .wardrobe-item {
+            flex: 0 0 320px;
+        }
+    }
+    .wardrobe-item:hover {
+        transform: translateY(-8px) scale(1.03);
+    }
+    .hanger-hook {
+        width: 24px;
+        height: 28px;
+        border: 3px solid #747878;
+        border-bottom: none;
+        border-radius: 12px 12px 0 0;
+        margin: 0 auto -2px auto;
+    }
+</style>
+</head>
+<body class="antialiased selection:bg-accent selection:text-primary">
+
+<!-- NAVIGATION -->
+<nav class="bg-background/90 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/40">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-5 flex justify-between items-center relative">
+        <div class="hidden md:flex items-center space-x-10 label-caps">
+            <a class="text-secondary hover:text-primary transition-colors" href="index.html">Home</a>
+            <a class="text-primary border-b border-primary pb-0.5" href="shop.html">Catalog</a>
+            <a class="text-secondary hover:text-primary transition-colors" href="journal.html">Journal</a>
+        </div>
+
+        <a class="font-serif-headline text-3xl md:text-4xl tracking-tight text-primary md:absolute md:left-1/2 md:-translate-x-1/2" href="index.html">
+            Inkthread Hub
+        </a>
+
+        <div class="flex items-center space-x-6 text-primary">
+            <a href="admin.html" title="Admin Login" class="hover:text-secondary transition-colors">
+                <span class="material-symbols-outlined text-xl">lock</span>
+            </a>
+            <button onclick="toggleBag()" class="hover:text-secondary transition-colors relative">
+                <span class="material-symbols-outlined">shopping_bag</span>
+                <span id="bag-count" class="absolute -top-1 -right-2 w-4 h-4 bg-primary text-background font-sans text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- HEADER -->
+<header class="pt-16 pb-12 px-6 md:px-16 max-w-[1440px] mx-auto text-center border-b border-outline-variant/40">
+    <span class="label-caps text-secondary mb-3 block">Complete Collection</span>
+    <h1 class="font-serif-headline text-5xl md:text-7xl text-primary tracking-tight mb-4">The Digital Catalog</h1>
+    <p class="font-sans text-base text-secondary max-w-lg mx-auto font-light">
+        Slide through our Interactive Wardrobe Closet or browse the complete Grid collection.
+    </p>
+</header>
+
+<!-- INTERACTIVE WARDROBE CLOSET SLIDER SECTION -->
+<section class="max-w-[1440px] mx-auto px-6 md:px-16 py-12 border-b border-outline-variant/40 bg-surface/50 my-6 rounded-3xl">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <div class="flex items-center space-x-2">
+                <span class="material-symbols-outlined text-primary text-xl">checkroom</span>
+                <span class="label-caps text-secondary text-xs">Interactive Wardrobe Experience</span>
+            </div>
+            <h2 class="font-serif-headline text-3xl text-primary mt-1">Slide The Garment Wardrobe</h2>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <button onclick="scrollWardrobe(-350)" class="w-10 h-10 rounded-full border border-outline-variant bg-background text-primary flex items-center justify-center hover:bg-primary hover:text-background transition-colors">
+                <span class="material-symbols-outlined text-sm">arrow_back</span>
+            </button>
+            <button onclick="scrollWardrobe(350)" class="w-10 h-10 rounded-full border border-outline-variant bg-background text-primary flex items-center justify-center hover:bg-primary hover:text-background transition-colors">
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Wardrobe Closet Metallic Hanger Rod -->
+    <div class="wardrobe-rod h-2.5 w-full rounded-full mb-6 relative"></div>
+
+    <!-- Wardrobe Hanger Track -->
+    <div class="wardrobe-track gap-6 py-4 px-2" id="wardrobe-slider-track">
+        <!-- Loaded via JS -->
+    </div>
+</section>
+
+<!-- CATALOG MAIN CONTENT -->
+<main class="max-w-[1440px] mx-auto px-6 md:px-16 py-12">
+    <!-- Filters & Search Toolbar -->
+    <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-12 bg-surface p-6 rounded-2xl border border-outline-variant/40">
+        <!-- Categories Filters -->
+        <div class="flex flex-wrap gap-2 label-caps text-xs">
+            <button onclick="filterCategory('all', this)" class="cat-filter-btn px-4 py-2 bg-primary text-background rounded-lg">All Objects</button>
+            <button onclick="filterCategory('Unisex Clothing', this)" class="cat-filter-btn px-4 py-2 border border-outline-variant text-secondary rounded-lg hover:border-primary">Unisex Wear</button>
+            <button onclick="filterCategory('Men\'s Clothing', this)" class="cat-filter-btn px-4 py-2 border border-outline-variant text-secondary rounded-lg hover:border-primary">Men's Wear</button>
+            <button onclick="filterCategory('Women\'s Clothing', this)" class="cat-filter-btn px-4 py-2 border border-outline-variant text-secondary rounded-lg hover:border-primary">Women's Wear</button>
+            <button onclick="filterCategory('Kids Clothing', this)" class="cat-filter-btn px-4 py-2 border border-outline-variant text-secondary rounded-lg hover:border-primary">Kids Wear</button>
+            <button onclick="filterCategory('Pet Products', this)" class="cat-filter-btn px-4 py-2 border border-outline-variant text-secondary rounded-lg hover:border-primary">Pet Hardware</button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="w-full md:w-80 relative">
+            <input type="text" id="catalog-search" oninput="handleSearchInput()" placeholder="Search polo, hoodie, pet collar..." class="w-full bg-background border border-outline-variant/60 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-primary pr-10"/>
+            <span class="material-symbols-outlined absolute right-3 top-2.5 text-secondary text-base">search</span>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" id="catalog-products-grid">
+        <!-- Loaded via JS -->
+    </div>
+</main>
+
+<!-- SHOPPING BAG DRAWER -->
+<div id="bag-drawer" class="drawer-overlay fixed inset-0 z-[100] bg-primary/40 backdrop-blur-sm flex justify-end">
+    <div class="drawer-content w-full max-w-md bg-background border-l border-outline-variant/60 h-full flex flex-col justify-between p-8">
+        <div>
+            <div class="flex justify-between items-center pb-6 border-b border-outline-variant/60 mb-6">
+                <h3 class="font-serif-headline text-2xl text-primary">Your Selection</h3>
+                <button onclick="toggleBag()" class="text-secondary hover:text-primary">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <div id="cart-drawer-items" class="space-y-6 max-h-[50vh] overflow-y-auto">
+                <!-- Loaded via JS -->
+            </div>
+        </div>
+
+        <div class="pt-6 border-t border-outline-variant/60 space-y-4">
+            <div class="flex justify-between text-sm">
+                <span class="text-secondary">Subtotal</span>
+                <span id="cart-drawer-subtotal" class="text-primary font-semibold">₹0</span>
+            </div>
+            <div class="flex justify-between text-lg font-serif-headline border-t border-outline-variant/40 pt-3">
+                <span class="text-primary">Total</span>
+                <span id="cart-drawer-total" class="text-primary font-bold">₹0</span>
+            </div>
+            <button onclick="openCheckoutModal()" class="w-full bg-primary text-background label-caps py-4 tracking-widest hover:bg-secondary transition-colors">
+                Proceed to Express Checkout
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- DYNAMIC EXPRESS CHECKOUT & PHONEPE QR MODAL -->
+<div id="checkout-modal" class="fixed inset-0 z-[150] bg-primary/60 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-2xl p-6 md:p-8 max-h-[92vh] overflow-y-auto relative shadow-2xl">
+        <button onclick="closeCheckoutModal()" class="absolute top-6 right-6 text-secondary hover:text-primary">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+
+        <span class="label-caps text-secondary block mb-1">Express Order Dispatch</span>
+        <h3 class="font-serif-headline text-3xl text-primary mb-6">Delivery Details &amp; Payment QR</h3>
+
+        <form id="checkout-form" onsubmit="submitCheckoutOrder(event)" class="space-y-5 text-xs">
+            <div class="space-y-3">
+                <h4 class="label-caps text-primary border-b border-outline-variant/40 pb-2">1. Client Shipping Information</h4>
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Full Name *</label>
+                    <input type="text" id="cust-name" required placeholder="e.g. Karan Verma" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="label-caps text-secondary block mb-1">Phone Number (WhatsApp) *</label>
+                        <input type="tel" id="cust-phone" required placeholder="e.g. 9876543210" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                    </div>
+                    <div>
+                        <label class="label-caps text-secondary block mb-1">Pincode *</label>
+                        <input type="text" id="cust-pincode" required placeholder="e.g. 208001" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Email ID (For Order Confirmation Email) *</label>
+                    <input type="email" id="cust-email" required placeholder="e.g. karan@gmail.com" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                </div>
+
+                <div>
+                    <label class="label-caps text-secondary block mb-1">Complete Delivery Address *</label>
+                    <textarea id="cust-address" required rows="2" placeholder="House/Flat No., Building, Street Name, Area..." class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"></textarea>
+                </div>
+            </div>
+
+            <!-- Payment Method Selection -->
+            <div class="pt-4 border-t border-outline-variant/60 space-y-4">
+                <h4 class="label-caps text-primary border-b border-outline-variant/40 pb-2">2. Payment Method Selection</h4>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- Option 1: Prepaid Online -->
+                    <label class="border-2 border-primary rounded-xl p-4 cursor-pointer hover:border-primary transition-colors flex flex-col justify-between bg-emerald-50/50 relative" id="label-prepaid">
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="paymentType" value="prepaid" checked onchange="updateCheckoutCalculations()" class="text-primary focus:ring-primary"/>
+                            <span class="font-bold text-sm text-primary">Prepaid (Online UPI / QR)</span>
+                        </div>
+                        <span class="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded mt-2 w-fit">🚚 +₹50 DELIVERY ONLY</span>
+                    </label>
+
+                    <!-- Option 2: Cash on Delivery -->
+                    <label class="border border-outline-variant rounded-xl p-4 cursor-pointer hover:border-primary transition-colors flex flex-col justify-between bg-amber-50/50 relative" id="label-cod">
+                        <div class="flex items-center space-x-2">
+                            <input type="radio" name="paymentType" value="cod" onchange="updateCheckoutCalculations()" class="text-primary focus:ring-primary"/>
+                            <span class="font-bold text-sm text-primary">Cash on Delivery (COD)</span>
+                        </div>
+                        <span class="text-[10px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded mt-2 w-fit">🚚 +₹99 COD FEE &amp; ₹99 ADVANCE</span>
+                    </label>
+                </div>
+
+                <!-- PHONEPE OFFICIAL QR PAYMENT CONTAINER -->
+                <div class="p-5 bg-surface rounded-2xl border border-outline-variant/80 flex flex-col sm:flex-row items-center gap-6">
+                    <div class="w-44 h-auto shrink-0 bg-white p-2.5 rounded-xl border border-outline-variant shadow-sm flex flex-col items-center">
+                        <img src="images/payment_qr_phonepe.jpg" alt="PhonePe QR Code — Surya Tiwari" class="w-full object-contain rounded"/>
+                        <span class="text-[9px] font-bold font-mono text-center text-primary mt-1">SURYA TIWARI</span>
+                    </div>
+
+                    <div class="flex-1 space-y-2">
+                        <div id="qr-instruction-prepaid" class="space-y-1">
+                            <span class="label-caps text-emerald-800 text-[10px] bg-emerald-100 px-2 py-0.5 rounded">Scan &amp; Pay Full Order Amount</span>
+                            <p class="text-sm font-semibold text-primary">Scan QR via PhonePe / Google Pay / Paytm / UPI</p>
+                            <p class="text-xs text-secondary font-light">Pay exact total <strong id="qr-payable-prepaid" class="text-primary font-bold">₹0</strong> (Product Base Price + ₹50 Prepaid Shipping) to <strong>SURYA TIWARI</strong>!</p>
+                        </div>
+
+                        <div id="qr-instruction-cod" class="hidden space-y-1">
+                            <span class="label-caps text-amber-800 text-[10px] bg-amber-100 px-2 py-0.5 rounded">₹99 Mandatory COD Advance Deposit</span>
+                            <p class="text-sm font-semibold text-primary">Scan QR to pay ₹99 Booking Advance</p>
+                            <p class="text-xs text-secondary font-light">Pay mandatory <strong>₹99 Advance Deposit</strong> to <strong>SURYA TIWARI</strong> to confirm COD dispatch. Remaining balance is paid on delivery.</p>
+                        </div>
+
+                        <div class="pt-2">
+                            <label class="label-caps text-secondary block mb-1">Enter Payment UTR / Transaction Ref ID *</label>
+                            <input type="text" id="cust-utr" placeholder="e.g. 423985712904 (From PhonePe / App)" class="w-full bg-background border border-outline-variant/80 rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:border-primary font-mono"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Total Calculations Breakdown -->
+            <div class="p-4 bg-surface rounded-xl border border-outline-variant/60 space-y-2 text-xs">
+                <div class="flex justify-between text-secondary">
+                    <span>Product Base Price (Fixed / Unchanged)</span>
+                    <span id="checkout-subtotal" class="font-mono text-primary font-semibold">₹0</span>
+                </div>
+                <div id="checkout-shipping-row" class="flex justify-between text-primary font-semibold">
+                    <span id="checkout-shipping-label">Prepaid Shipping Charge</span>
+                    <span id="checkout-shipping" class="font-mono text-emerald-700">+₹50</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-primary pt-2 border-t border-outline-variant/40">
+                    <span>Total Amount</span>
+                    <span id="checkout-final-total" class="font-mono text-base text-primary">₹0</span>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-background label-caps py-4 rounded-xl tracking-widest transition-colors flex items-center justify-center space-x-2 text-sm shadow-md">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>Complete Order &amp; Auto Dispatch</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- AUTOMATIC THANK YOU FOR SHOPPING CONFIRMATION MODAL -->
+<div id="thankyou-modal" class="fixed inset-0 z-[200] bg-primary/70 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-lg p-8 text-center relative shadow-2xl space-y-6">
+        <div class="w-20 h-20 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <span class="material-symbols-outlined text-4xl">task_alt</span>
+        </div>
+
+        <div>
+            <span class="label-caps text-emerald-800 text-xs block mb-1">Order Successfully Recorded</span>
+            <h3 class="font-serif-headline text-3xl md:text-4xl text-primary">Thank You For Shopping!</h3>
+            <p class="text-xs text-secondary font-light mt-2">Your order confirmation &amp; digital receipt have been dispatched directly to your email address and store administration.</p>
+        </div>
+
+        <div class="bg-surface p-5 rounded-xl border border-outline-variant/60 text-left text-xs space-y-2 font-mono" id="thankyou-receipt-body">
+            <!-- Loaded via JS -->
+        </div>
+
+        <div class="p-3 bg-emerald-50 text-emerald-900 border border-emerald-200 rounded-lg text-xs text-center font-light">
+            📧 Order Confirmation email sent to <strong id="sent-cust-email">your email</strong> &amp; <strong>theinkhthreadhub@gmail.com</strong>!
+        </div>
+
+        <button onclick="closeThankYouModal()" class="w-full bg-primary text-background label-caps py-3.5 rounded-xl hover:bg-secondary transition-colors">
+            Continue Browsing Catalog
+        </button>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="bg-surface border-t border-outline-variant/60 mt-20">
+    <div class="max-w-[1440px] mx-auto px-6 md:px-16 py-16 flex flex-col md:flex-row justify-between items-center gap-6">
+        <a class="font-serif-headline text-2xl tracking-tight text-primary" href="index.html">Inkthread Hub</a>
+        <p class="label-caps text-xs text-secondary">© 2026 Inkthread Hub. All rights reserved.</p>
+    </div>
+</footer>
+
+<script src="js/store.js"></script>
+<script>
+    let activeCategory = 'all';
+
+    function toggleBag() {
+        document.getElementById('bag-drawer').classList.toggle('open');
+    }
+
+    function scrollWardrobe(direction) {
+        const track = document.getElementById('wardrobe-slider-track');
+        if (track) {
+            track.scrollBy({ left: direction, behavior: 'smooth' });
+        }
+    }
+
+    function openCheckoutModal() {
+        const cart = ProductsService.getCart();
+        if (cart.length === 0) {
+            alert('Your selection bag is empty.');
+            return;
+        }
+        document.getElementById('bag-drawer').classList.remove('open');
+        document.getElementById('checkout-modal').classList.remove('hidden');
+        updateCheckoutCalculations();
+    }
+
+    function closeCheckoutModal() {
+        document.getElementById('checkout-modal').classList.add('hidden');
+    }
+
+    function closeThankYouModal() {
+        document.getElementById('thankyou-modal').classList.add('hidden');
+    }
+
+    function updateCheckoutCalculations() {
+        const pType = document.querySelector('input[name="paymentType"]:checked')?.value || 'prepaid';
+        const totals = ProductsService.calculateCheckoutTotals(pType);
+
+        document.getElementById('checkout-subtotal').innerText = '₹' + totals.subtotal.toLocaleString('en-IN');
+
+        const shippingLabel = document.getElementById('checkout-shipping-label');
+        const shippingVal = document.getElementById('checkout-shipping');
+        const qrPrepaid = document.getElementById('qr-instruction-prepaid');
+        const qrCod = document.getElementById('qr-instruction-cod');
+        const labelPrepaid = document.getElementById('label-prepaid');
+        const labelCod = document.getElementById('label-cod');
+
+        if (pType === 'prepaid') {
+            shippingLabel.innerText = 'Prepaid Delivery Charge (+₹50 Extra)';
+            shippingVal.innerText = '+₹50';
+            shippingVal.className = 'font-mono text-emerald-700 font-bold';
+            qrPrepaid.classList.remove('hidden');
+            qrCod.classList.add('hidden');
+            labelPrepaid.classList.add('border-primary', 'border-2');
+            labelCod.classList.remove('border-primary', 'border-2');
+            document.getElementById('qr-payable-prepaid').innerText = '₹' + totals.total.toLocaleString('en-IN');
+        } else {
+            shippingLabel.innerText = 'COD Delivery Charge (+₹99 Extra)';
+            shippingVal.innerText = '+₹99';
+            shippingVal.className = 'font-mono text-amber-800 font-bold';
+            qrPrepaid.classList.add('hidden');
+            qrCod.classList.remove('hidden');
+            labelCod.classList.add('border-primary', 'border-2');
+            labelPrepaid.classList.remove('border-primary', 'border-2');
+        }
+
+        document.getElementById('checkout-final-total').innerText = '₹' + totals.total.toLocaleString('en-IN');
+    }
+
+    function submitCheckoutOrder(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('cust-name').value.trim();
+        const phone = document.getElementById('cust-phone').value.trim();
+        const email = document.getElementById('cust-email').value.trim();
+        const pincode = document.getElementById('cust-pincode').value.trim();
+        const address = document.getElementById('cust-address').value.trim();
+        const utr = document.getElementById('cust-utr').value.trim();
+        const paymentType = document.querySelector('input[name="paymentType"]:checked')?.value || 'prepaid';
+
+        if (!name || !phone || !email || !pincode || !address) {
+            alert('Please fill out all delivery address fields.');
+            return;
+        }
+
+        const result = ProductsService.placeOrder({
+            name, phone, email, pincode, address, utr, paymentType
+        });
+
+        if (result.success) {
+            closeCheckoutModal();
+            window.open(result.whatsappUrl, '_blank');
+
+            const receiptBody = document.getElementById('thankyou-receipt-body');
+            const o = result.order;
+            document.getElementById('sent-cust-email').innerText = o.customer.email;
+
+            receiptBody.innerHTML = `
+                <div class="flex justify-between border-b border-outline-variant/40 pb-2">
+                    <span class="text-secondary">ORDER ID:</span>
+                    <strong class="text-primary">${o.orderId}</strong>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">Client Name:</span>
+                    <span class="text-primary">${o.customer.name}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">Customer Email:</span>
+                    <span class="text-primary font-bold">${o.customer.email}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">Phone Number:</span>
+                    <span class="text-primary">${o.customer.phone}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">Payment Method:</span>
+                    <span class="text-primary uppercase font-bold">${o.paymentType}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-secondary">PhonePe UTR Ref:</span>
+                    <span class="text-primary">${o.customer.utr || 'N/A'}</span>
+                </div>
+                <div class="flex justify-between border-t border-outline-variant/40 pt-2 font-bold text-sm text-primary">
+                    <span>Total Paid/Booked:</span>
+                    <span>₹${o.total.toLocaleString('en-IN')}</span>
+                </div>
+            `;
+
+            document.getElementById('thankyou-modal').classList.remove('hidden');
+            renderCartUI();
+        } else {
+            alert(result.message);
+        }
+    }
+
+    function filterCategory(cat, btn) {
+        activeCategory = cat;
+        document.querySelectorAll('.cat-filter-btn').forEach(b => b.className = 'cat-filter-btn px-4 py-2 border border-outline-variant text-secondary rounded-lg hover:border-primary');
+        btn.className = 'cat-filter-btn px-4 py-2 bg-primary text-background rounded-lg';
+        renderCatalog();
+    }
+
+    function handleSearchInput() {
+        renderCatalog();
+    }
+
+    function renderCatalog() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const catQuery = urlParams.get('cat');
+        if (catQuery && activeCategory === 'all') {
+            activeCategory = catQuery;
+        }
+
+        const searchQuery = document.getElementById('catalog-search')?.value || '';
+        const grid = document.getElementById('catalog-products-grid');
+        const wardrobeTrack = document.getElementById('wardrobe-slider-track');
+
+        const products = ProductsService.getAllProducts({
+            category: activeCategory,
+            search: searchQuery
+        });
+
+        // Render Interactive 3D Wardrobe Hanger Slider
+        if (wardrobeTrack) {
+            if (products.length === 0) {
+                wardrobeTrack.innerHTML = `<div class="w-full text-center py-8 text-secondary font-light">No wardrobe items.</div>`;
+            } else {
+                wardrobeTrack.innerHTML = products.map(p => {
+                    const price = p.salePrice || p.regularPrice;
+                    const backImg = (p.images && p.images.back) ? p.images.back : p.images.front;
+
+                    return `
+                        <div class="wardrobe-item bg-background p-4 rounded-2xl border border-outline-variant/60 shadow-sm relative group">
+                            <!-- Metallic Hanger Visual Hook -->
+                            <div class="hanger-hook"></div>
+
+                            <a href="product.html?slug=${p.slug}" class="block aspect-[3/4] bg-surface-container overflow-hidden rounded-xl mb-3 relative">
+                                <img src="${p.images ? p.images.front : ''}" alt="${p.name}" class="w-full h-full object-cover image-zoom absolute inset-0 transition-opacity duration-500 group-hover:opacity-0"/>
+                                <img src="${backImg}" alt="${p.name} Back" class="w-full h-full object-cover image-zoom absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"/>
+                            </a>
+
+                            <div class="space-y-1">
+                                <span class="label-caps text-[9px] text-secondary block">${p.category}</span>
+                                <h4 class="font-serif-headline text-base text-primary line-clamp-1 group-hover:text-secondary transition-colors">
+                                    <a href="product.html?slug=${p.slug}">${p.name}</a>
+                                </h4>
+                                <div class="flex justify-between items-center pt-2">
+                                    <span class="font-sans text-sm font-bold text-primary">₹${price.toLocaleString('en-IN')}</span>
+                                    <a href="product.html?slug=${p.slug}" class="label-caps text-[9px] bg-primary text-background px-2.5 py-1 rounded hover:bg-secondary transition-colors">
+                                        View Detail
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Render Standard Grid
+        if (products.length === 0) {
+            grid.innerHTML = `<div class="col-span-4 text-center py-20 text-secondary font-light">No products found matching your search.</div>`;
+            return;
+        }
+
+        grid.innerHTML = products.map(p => {
+            const price = p.salePrice || p.regularPrice;
+            const stock = ProductsService.getTotalStock(p);
+            const isOut = stock <= 0;
+            const backImg = (p.images && p.images.back) ? p.images.back : p.images.front;
+
+            return `
+                <div class="group flex flex-col justify-between bg-surface p-4 rounded-xl border border-outline-variant/40 relative">
+                    ${isOut ? `<span class="absolute top-6 left-6 z-10 label-caps text-[9px] bg-red-600 text-white px-2.5 py-1 rounded font-bold">OUT OF STOCK</span>` : ''}
+                    <div>
+                        <a href="product.html?slug=${p.slug}" class="block aspect-[3/4] bg-surface-container overflow-hidden rounded-lg mb-4 relative">
+                            <img src="${p.images ? p.images.front : ''}" alt="${p.name}" class="w-full h-full object-cover image-zoom absolute inset-0 transition-opacity duration-500 group-hover:opacity-0"/>
+                            <img src="${backImg}" alt="${p.name} Back" class="w-full h-full object-cover image-zoom absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"/>
+                        </a>
+                        <span class="label-caps text-[9px] text-secondary block mb-1">${p.category}</span>
+                        <h3 class="font-serif-headline text-lg text-primary group-hover:text-secondary transition-colors mb-1 line-clamp-1">
+                            <a href="product.html?slug=${p.slug}">${p.name}</a>
+                        </h3>
+                    </div>
+                    <div class="flex justify-between items-center pt-3 border-t border-outline-variant/30 mt-3">
+                        <span class="font-sans text-sm text-primary font-bold">₹${price.toLocaleString('en-IN')}</span>
+                        <a href="product.html?slug=${p.slug}" class="label-caps text-[10px] text-primary underline">View Details</a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        renderCartUI();
+    }
+
+    function renderCartUI() {
+        const cart = ProductsService.getCart();
+        document.getElementById('bag-count').innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+        
+        const cartContainer = document.getElementById('cart-drawer-items');
+        if (cart.length === 0) {
+            cartContainer.innerHTML = `<div class="py-12 text-center text-secondary font-light">Your selection bag is empty.</div>`;
+            document.getElementById('cart-drawer-subtotal').innerText = '₹0';
+            document.getElementById('cart-drawer-total').innerText = '₹0';
+            return;
+        }
+
+        let total = 0;
+        cartContainer.innerHTML = cart.map((item) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            return `
+                <div class="flex gap-4 pb-6 border-b border-outline-variant/40">
+                    <div class="w-20 h-24 bg-surface shrink-0 overflow-hidden rounded">
+                        <img src="${item.image}" class="w-full h-full object-cover" alt="${item.name}"/>
+                    </div>
+                    <div class="flex-1 flex justify-between flex-col">
+                        <div>
+                            <h4 class="font-serif-headline text-lg text-primary">${item.name}</h4>
+                            <p class="text-xs text-secondary">Color: ${item.color} / Size: ${item.size}</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="font-sans text-sm text-primary">₹${item.price.toLocaleString('en-IN')} x ${item.quantity}</span>
+                            <button onclick="ProductsService.removeFromCart('${item.cartId}')" class="text-xs text-red-600 hover:underline">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('cart-drawer-subtotal').innerText = '₹' + total.toLocaleString('en-IN');
+        document.getElementById('cart-drawer-total').innerText = '₹' + total.toLocaleString('en-IN');
+    }
+
+    window.addEventListener('inkthread_catalog_updated', renderCatalog);
+    document.addEventListener('DOMContentLoaded', renderCatalog);
+</script>
+
+</body>
+</html>
