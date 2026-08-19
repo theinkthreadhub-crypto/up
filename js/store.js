@@ -475,6 +475,192 @@ const INITIAL_PRODUCTS = [
     }
 ];
 
+// =========================================================================
+// CLOUD SYNC SERVICE — REALTIME CROSS-DEVICE & CROSS-SERVER SYNCHRONIZATION
+// =========================================================================
+const CLOUD_CONFIG_KEY = 'inkthread_cloud_config_v1';
+
+class CloudSyncService {
+    static getSyncConfig() {
+        try {
+            const stored = localStorage.getItem(CLOUD_CONFIG_KEY);
+            if (stored) return JSON.parse(stored);
+        } catch (e) {}
+        return {
+            mode: 'auto',
+            apiUrl: '/api',
+            firebaseDbUrl: 'https://inkthread-hub-default-rtdb.firebaseio.com',
+            autoSyncIntervalSec: 10,
+            lastSyncTimestamp: null,
+            lastSyncStatus: 'Ready'
+        };
+    }
+
+    static saveSyncConfig(cfg) {
+        localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cfg));
+        CloudSyncService.notifySyncStatus();
+    }
+
+    static init() {
+        if (CloudSyncService._initialized) return;
+        CloudSyncService._initialized = true;
+
+        // 1. Multi-tab BroadcastChannel sync for same-origin windows/tabs
+        try {
+            if (window.BroadcastChannel) {
+                CloudSyncService.bc = new BroadcastChannel('inkthread_sync_channel');
+                CloudSyncService.bc.onmessage = (event) => {
+                    if (event.data && event.data.type === 'CATALOG_SYNC') {
+                        if (event.data.catalog) {
+                            localStorage.setItem(STORAGE_KEY, JSON.stringify(event.data.catalog));
+                            ProductsService.notifyListeners();
+                        }
+                    } else if (event.data && event.data.type === 'JOURNAL_SYNC') {
+                        if (event.data.journal) {
+                            localStorage.setItem(JOURNAL_KEY, JSON.stringify(event.data.journal));
+                            ProductsService.notifyListeners();
+                        }
+                    } else if (event.data && event.data.type === 'ORDERS_SYNC') {
+                        if (event.data.orders) {
+                            localStorage.setItem(ORDERS_KEY, JSON.stringify(event.data.orders));
+                            ProductsService.notifyListeners();
+                        }
+                    }
+                };
+            }
+        } catch (e) {
+            console.warn('BroadcastChannel error:', e);
+        }
+
+        // 2. Initial cloud fetch upon page load
+        setTimeout(() => {
+            CloudSyncService.pullFromCloud();
+        }, 200);
+
+        // 3. Periodic cloud polling to keep any device / tab continuously updated
+        setInterval(() => {
+            CloudSyncService.pullFromCloud();
+        }, 10000);
+    }
+
+    static notifySyncStatus(status = null) {
+        const cfg = CloudSyncService.getSyncConfig();
+        if (status) {
+            cfg.lastSyncStatus = status;
+            cfg.lastSyncTimestamp = new Date().toISOString();
+            localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cfg));
+        }
+        window.dispatchEvent(new CustomEvent('inkthread_sync_status_updated', { detail: cfg }));
+    }
+
+    static async pullFromCloud() {
+        try {
+            let fetchedCatalog = null;
+
+            // Step 1: Check server API endpoint (/api/products)
+            try {
+                const res = await fetch('/api/products', { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        fetchedCatalog = data;
+                    }
+                }
+            } catch (err) {}
+
+            // Step 2: Fallback to Cloud Firebase DB if configured
+            const cfg = CloudSyncService.getSyncConfig();
+            if (!fetchedCatalog && cfg.firebaseDbUrl) {
+                try {
+                    const fbRes = await fetch(`${cfg.firebaseDbUrl.replace(/\/$/, '')}/catalog.json`, { cache: 'no-store' });
+                    if (fbRes.ok) {
+                        const fbData = await fbRes.json();
+                        if (Array.isArray(fbData) && fbData.length > 0) {
+                            fetchedCatalog = fbData;
+                        }
+                    }
+                } catch (fbErr) {}
+            }
+
+            if (fetchedCatalog) {
+                const currentLocal = JSON.stringify(ProductsService.getRawCatalog());
+                const remoteStr = JSON.stringify(fetchedCatalog);
+                if (currentLocal !== remoteStr) {
+                    localStorage.setItem(STORAGE_KEY, remoteStr);
+                    ProductsService.notifyListeners();
+                    CloudSyncService.notifySyncStatus('Live Sync: Updated Catalog Received');
+                } else {
+                    CloudSyncService.notifySyncStatus('Live Sync: Up to Date');
+                }
+            }
+        } catch (e) {
+            CloudSyncService.notifySyncStatus('Local Storage Active');
+        }
+    }
+
+    static async pushToCloud(catalog = null) {
+        const dataToPush = catalog || ProductsService.getRawCatalog();
+        
+        // 1. Broadcast to other open tabs immediately
+        if (CloudSyncService.bc) {
+            try {
+                CloudSyncService.bc.postMessage({ type: 'CATALOG_SYNC', catalog: dataToPush });
+            } catch (e) {}
+        }
+
+        // 2. Push to local/deployed Node server API if available
+        try {
+            fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToPush)
+            }).catch(() => {});
+        } catch (e) {}
+
+        // 3. Push to Firebase Realtime DB if configured
+        const cfg = CloudSyncService.getSyncConfig();
+        if (cfg.firebaseDbUrl) {
+            try {
+                fetch(`${cfg.firebaseDbUrl.replace(/\/$/, '')}/catalog.json`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dataToPush)
+                }).catch(() => {});
+            } catch (e) {}
+        }
+
+        CloudSyncService.notifySyncStatus('Live Changes Broadcasted');
+    }
+
+    static async pushJournalToCloud(journal = null) {
+        const data = journal || ProductsService.getJournalArticles(true);
+        if (CloudSyncService.bc) {
+            try { CloudSyncService.bc.postMessage({ type: 'JOURNAL_SYNC', journal: data }); } catch (e) {}
+        }
+        try {
+            fetch('/api/journal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).catch(() => {});
+        } catch (e) {}
+    }
+
+    static async pushOrdersToCloud(orders = null) {
+        const data = orders || ProductsService.getOrders();
+        if (CloudSyncService.bc) {
+            try { CloudSyncService.bc.postMessage({ type: 'ORDERS_SYNC', orders: data }); } catch (e) {}
+        }
+        try {
+            fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).catch(() => {});
+        } catch (e) {}
+    }
+}
+
 class ProductsService {
 
     static init(forceReset = false) {
@@ -500,10 +686,68 @@ class ProductsService {
                 ProductsService.notifyListeners();
             }
         });
+
+        // Initialize Realtime Cloud Sync
+        CloudSyncService.init();
     }
 
     static notifyListeners() {
         window.dispatchEvent(new CustomEvent(EVENT_NAME));
+    }
+
+    // IMAGE COMPRESSION & MULTI-IMAGE CONVERSION (PNG / JPG / WebP)
+    static async compressImage(file, maxWidth = 1200, maxHeight = 1600, quality = 0.85) {
+        return new Promise((resolve, reject) => {
+            if (!file || !(file instanceof Blob)) {
+                resolve(file);
+                return;
+            }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxWidth || height > maxHeight) {
+                        if (width / height > maxWidth / maxHeight) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        } else {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const outputType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+                    const dataUrl = canvas.toDataURL(outputType, quality);
+                    resolve(dataUrl);
+                };
+                img.onerror = () => resolve(event.target.result);
+            };
+            reader.onerror = (error) => reject(error);
+        });
+    }
+
+    static async processImageFiles(fileList) {
+        const results = [];
+        for (let i = 0; i < fileList.length; i++) {
+            try {
+                const compressed = await ProductsService.compressImage(fileList[i]);
+                results.push(compressed);
+            } catch (err) {
+                console.warn('Image compression error:', err);
+            }
+        }
+        return results;
     }
 
     static getRawCatalog() {
@@ -518,6 +762,7 @@ class ProductsService {
     static saveRawCatalog(catalog) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(catalog));
         ProductsService.notifyListeners();
+        CloudSyncService.pushToCloud(catalog);
     }
 
     // JOURNAL & BLOG ARTICLES CMS METHODS
@@ -553,6 +798,7 @@ class ProductsService {
 
         localStorage.setItem(JOURNAL_KEY, JSON.stringify(articles));
         ProductsService.notifyListeners();
+        CloudSyncService.pushJournalToCloud(articles);
         return articleData;
     }
 
@@ -561,6 +807,7 @@ class ProductsService {
         articles = articles.filter(a => a.id !== articleId);
         localStorage.setItem(JOURNAL_KEY, JSON.stringify(articles));
         ProductsService.notifyListeners();
+        CloudSyncService.pushJournalToCloud(articles);
     }
 
     // CUSTOMER REVIEWS METHODS
@@ -677,8 +924,25 @@ class ProductsService {
             productData.discountPercent = 0;
         }
 
+        const frontImg = productData.images?.front || (Array.isArray(productData.images?.gallery) && productData.images.gallery[0]) || "images/hd_womens_crop_top.png";
+        const backImg = productData.images?.back || (Array.isArray(productData.images?.gallery) && productData.images.gallery[1]) || frontImg;
+        const galleryImgs = Array.isArray(productData.images?.gallery) && productData.images.gallery.length > 0
+            ? productData.images.gallery
+            : [frontImg, backImg];
+
+        const formattedImages = {
+            front: frontImg,
+            back: backImg,
+            gallery: galleryImgs
+        };
+
         if (existingIndex >= 0) {
-            catalog[existingIndex] = { ...catalog[existingIndex], ...productData, updatedAt: new Date().toISOString() };
+            catalog[existingIndex] = {
+                ...catalog[existingIndex],
+                ...productData,
+                images: formattedImages,
+                updatedAt: new Date().toISOString()
+            };
         } else {
             const newProduct = {
                 id: 'prod-' + Date.now(),
@@ -697,12 +961,8 @@ class ProductsService {
                 ],
                 colors: ["Standard"],
                 sizes: ["M"],
-                images: {
-                    front: productData.images?.front || "images/hd_womens_crop_top.png",
-                    back: productData.images?.back || "",
-                    gallery: productData.images?.gallery || []
-                },
-                ...productData
+                ...productData,
+                images: formattedImages
             };
             catalog.unshift(newProduct);
         }

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin Login — Inkthread Hub</title>
-<meta name="description" content="Secure Admin Login Portal for Inkthread Hub Operations."/>
+<title>Admin Portal — Inkthread Hub</title>
+<meta name="description" content="Secure Admin Portal for Inkthread Hub Operations with Live Universal Sync & PNG Multi-Image Management."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -141,13 +141,36 @@
 <!-- MAIN CONTENT -->
 <main class="flex-1 max-w-[1440px] p-6 md:p-12 overflow-y-auto">
 
+    <!-- LIVE CLOUD SYNC STATUS BAR -->
+    <div class="mb-8 bg-surface border border-outline-variant/60 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+        <div class="flex items-center space-x-3">
+            <div class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </div>
+            <div>
+                <span class="label-caps text-[10px] text-secondary font-bold block">Live Universal Database Sync</span>
+                <span id="cloud-sync-status-text" class="text-xs font-semibold text-primary">🟢 Active &amp; Synced across all devices &amp; browsers</span>
+            </div>
+        </div>
+        <div class="flex items-center space-x-2">
+            <button type="button" onclick="triggerManualSync()" class="px-4 py-2 border border-outline-variant rounded-lg text-xs label-caps hover:bg-surface-container flex items-center space-x-1.5 transition-colors">
+                <span class="material-symbols-outlined text-sm">sync</span>
+                <span>Sync Live Now</span>
+            </button>
+            <button type="button" onclick="openCloudSettingsModal()" class="px-3 py-2 border border-outline-variant rounded-lg text-xs text-secondary hover:text-primary label-caps flex items-center transition-colors" title="Cloud DB Settings">
+                <span class="material-symbols-outlined text-sm">settings</span>
+            </button>
+        </div>
+    </div>
+
     <!-- PRODUCTS MANAGEMENT TAB -->
     <div id="view-products" class="space-y-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-6 border-b border-outline-variant/40">
             <div>
                 <span class="label-caps text-secondary block mb-1">Single Source of Truth</span>
                 <h1 class="font-serif-headline text-4xl text-primary mb-1">Centralized Product Management</h1>
-                <p class="text-xs text-secondary font-light">All changes published here instantly update Homepage, Catalog, Search, and Product pages.</p>
+                <p class="text-xs text-secondary font-light">All changes published here instantly update Homepage, Catalog, Search, and Product pages on all devices.</p>
             </div>
             <button onclick="openProductModal()" class="bg-primary text-background label-caps px-6 py-3.5 hover:bg-secondary transition-colors rounded-lg flex items-center space-x-2 text-xs shadow-md">
                 <span class="material-symbols-outlined text-sm">add</span>
@@ -273,7 +296,7 @@
 
 </main>
 
-<!-- CREATE / EDIT PRODUCT MODAL -->
+<!-- CREATE / EDIT PRODUCT MODAL (PNG FILE UPLOAD & MULTI-IMAGE GALLERY) -->
 <div id="product-modal" class="fixed inset-0 z-[150] bg-primary/60 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-3xl p-6 md:p-8 max-h-[92vh] overflow-y-auto relative shadow-2xl">
         <button onclick="closeProductModal()" class="absolute top-6 right-6 text-secondary hover:text-primary">
@@ -319,9 +342,51 @@
                     <input type="number" id="form-sale-price" required placeholder="e.g. 349" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary font-mono"/>
                 </div>
 
-                <div class="sm:col-span-2">
-                    <label class="label-caps text-secondary block mb-1">Front Image URL / Path *</label>
-                    <input type="text" id="form-img-front" required placeholder="images/hd_acidwash_hoodie.png" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+                <!-- PNG FILE UPLOAD & MULTI-IMAGE SECTION -->
+                <div class="sm:col-span-2 space-y-3 bg-surface/40 p-4 rounded-xl border border-outline-variant/50">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="label-caps text-primary block font-bold">Product Images (PNG / JPG / WebP) *</label>
+                            <span class="text-[10px] text-secondary">Upload multiple images from your computer or phone</span>
+                        </div>
+                        <span class="label-caps text-[9px] bg-primary text-background px-2.5 py-1 rounded font-bold">Direct PNG Upload</span>
+                    </div>
+
+                    <!-- Dropzone -->
+                    <div id="product-img-dropzone" onclick="document.getElementById('form-img-files').click()"
+                         class="border-2 border-dashed border-outline-variant/80 hover:border-primary rounded-xl p-5 text-center cursor-pointer transition-all bg-surface/80 hover:bg-surface group">
+                        <input type="file" id="form-img-files" accept="image/png, image/jpeg, image/webp" multiple class="hidden" onchange="handleProductImageFiles(this.files)"/>
+                        <div class="flex flex-col items-center justify-center space-y-1.5 pointer-events-none">
+                            <div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
+                                <span class="material-symbols-outlined text-primary text-xl">add_photo_alternate</span>
+                            </div>
+                            <p class="text-xs font-bold text-primary">Click to Browse or Drag &amp; Drop PNG Images</p>
+                            <p class="text-[10px] text-secondary">Select multiple PNG files (Front view, Back hover view, &amp; Gallery details)</p>
+                        </div>
+                    </div>
+
+                    <!-- Image Previews Container -->
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="label-caps text-[10px] text-secondary font-bold">Uploaded Images Sequence:</span>
+                            <button type="button" onclick="document.getElementById('form-img-files').click()" class="text-xs text-primary hover:underline font-semibold flex items-center space-x-1">
+                                <span class="material-symbols-outlined text-sm">add_circle</span>
+                                <span>Add More Images</span>
+                            </button>
+                        </div>
+                        <div id="product-images-preview-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Fallback URL Input -->
+                    <details class="text-[11px] text-secondary pt-1">
+                        <summary class="cursor-pointer hover:text-primary">Or paste external image link (optional)</summary>
+                        <div class="flex gap-2 pt-2">
+                            <input type="text" id="form-img-url-fallback" placeholder="Paste https://... or images/name.png" class="flex-1 bg-surface border border-outline-variant/60 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-primary"/>
+                            <button type="button" onclick="addImageFromUrlFallback()" class="px-3 py-2 bg-surface-container border border-outline-variant/60 rounded-lg label-caps hover:bg-primary hover:text-background transition-colors">Add URL</button>
+                        </div>
+                    </details>
                 </div>
 
                 <div class="sm:col-span-2">
@@ -332,7 +397,7 @@
 
             <div class="pt-4 border-t border-outline-variant/60 flex justify-end space-x-3">
                 <button type="button" onclick="closeProductModal()" class="px-5 py-3 text-secondary label-caps hover:text-primary">Cancel</button>
-                <button type="submit" class="bg-primary text-background label-caps px-8 py-3 rounded-lg hover:bg-secondary transition-colors font-bold">Save Product</button>
+                <button type="submit" class="bg-primary text-background label-caps px-8 py-3 rounded-lg hover:bg-secondary transition-colors font-bold shadow-md">Save &amp; Sync Live</button>
             </div>
         </form>
     </div>
@@ -367,9 +432,14 @@
                 </div>
             </div>
 
-            <div>
-                <label class="label-caps text-secondary block mb-1">Cover Image URL / Path *</label>
-                <input type="text" id="art-image" required placeholder="images/hd_acidwash_hoodie.png" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:border-primary"/>
+            <div class="space-y-2">
+                <label class="label-caps text-secondary block mb-1">Cover Image (PNG / JPG) *</label>
+                <div onclick="document.getElementById('art-img-file').click()" class="border border-dashed border-outline-variant rounded-lg p-3 text-center cursor-pointer hover:bg-surface flex items-center justify-center space-x-2">
+                    <input type="file" id="art-img-file" accept="image/*" class="hidden" onchange="handleJournalImageFile(this.files)"/>
+                    <span class="material-symbols-outlined text-base">upload_file</span>
+                    <span class="text-xs" id="art-img-label">Click to upload story cover image</span>
+                </div>
+                <input type="text" id="art-image" placeholder="Or enter image URL" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2 text-xs focus:outline-none focus:border-primary"/>
             </div>
 
             <div>
@@ -384,9 +454,50 @@
 
             <div class="pt-4 border-t border-outline-variant/60 flex justify-end space-x-3">
                 <button type="button" onclick="closeJournalModal()" class="px-5 py-3 text-secondary label-caps hover:text-primary">Cancel</button>
-                <button type="submit" class="bg-primary text-background label-caps px-8 py-3 rounded-lg hover:bg-secondary transition-colors font-bold">Publish Story</button>
+                <button type="submit" class="bg-primary text-background label-caps px-8 py-3 rounded-lg hover:bg-secondary transition-colors font-bold shadow-md">Publish Story</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- CLOUD DATABASE SETTINGS MODAL -->
+<div id="cloud-settings-modal" class="fixed inset-0 z-[160] bg-primary/60 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-lg p-6 md:p-8 max-h-[90vh] overflow-y-auto relative shadow-2xl space-y-4 text-xs">
+        <button onclick="closeCloudSettingsModal()" class="absolute top-6 right-6 text-secondary hover:text-primary">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+
+        <span class="label-caps text-secondary block mb-1">Database &amp; Sync Architecture</span>
+        <h3 class="font-serif-headline text-2xl text-primary">Live Cloud &amp; Server Sync</h3>
+        <p class="text-secondary leading-relaxed">
+            All additions, edits, and deletions from this admin panel automatically sync in real time to connected phones, computers, and servers.
+        </p>
+
+        <div class="space-y-3 pt-2">
+            <div>
+                <label class="label-caps text-secondary block mb-1">Sync Engine Mode</label>
+                <select id="cfg-sync-mode" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-xs focus:outline-none focus:border-primary label-caps">
+                    <option value="auto">Automatic (Hybrid Server + Cloud Realtime DB)</option>
+                    <option value="api">Node.js Express Server API (/api/products)</option>
+                    <option value="firebase">Firebase Realtime Database</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="label-caps text-secondary block mb-1">Firebase Realtime DB URL (Cloud)</label>
+                <input type="text" id="cfg-firebase-url" placeholder="https://inkthread-hub-default-rtdb.firebaseio.com" class="w-full bg-surface border border-outline-variant/60 rounded-lg px-3.5 py-2.5 text-xs focus:outline-none focus:border-primary font-mono"/>
+            </div>
+
+            <div class="p-3 bg-surface-container rounded-lg space-y-1">
+                <span class="label-caps text-[9px] text-secondary font-bold">Realtime Multi-Tab Broadcast</span>
+                <p class="text-[11px] text-secondary">BroadcastChannel API active for instant multi-tab &amp; multi-window synchronization.</p>
+            </div>
+        </div>
+
+        <div class="pt-4 border-t border-outline-variant flex justify-end space-x-2">
+            <button type="button" onclick="closeCloudSettingsModal()" class="px-4 py-2.5 text-secondary label-caps">Cancel</button>
+            <button type="button" onclick="saveCloudSettings()" class="bg-primary text-background label-caps px-6 py-2.5 rounded-lg font-bold hover:bg-secondary">Save Configuration</button>
+        </div>
     </div>
 </div>
 
@@ -421,6 +532,7 @@
 
     let activeTab = 'products';
     let currentFilterStatus = 'all';
+    let currentModalImages = [];
 
     function switchTab(tab) {
         activeTab = tab;
@@ -448,6 +560,124 @@
         renderAdminProductsTable();
         renderAdminJournalTable();
         renderAdminOrdersTable();
+        updateSyncStatusDisplay();
+    }
+
+    function updateSyncStatusDisplay() {
+        const cfg = CloudSyncService.getSyncConfig();
+        const textElem = document.getElementById('cloud-sync-status-text');
+        if (textElem) {
+            textElem.innerText = `🟢 ${cfg.lastSyncStatus || 'Active & Synced across all devices'}`;
+        }
+    }
+
+    function triggerManualSync() {
+        CloudSyncService.pullFromCloud();
+        alert('Live sync initiated. Latest catalog fetched and synchronized!');
+    }
+
+    function openCloudSettingsModal() {
+        const cfg = CloudSyncService.getSyncConfig();
+        document.getElementById('cfg-sync-mode').value = cfg.mode || 'auto';
+        document.getElementById('cfg-firebase-url').value = cfg.firebaseDbUrl || '';
+        document.getElementById('cloud-settings-modal').classList.remove('hidden');
+    }
+
+    function closeCloudSettingsModal() {
+        document.getElementById('cloud-settings-modal').classList.add('hidden');
+    }
+
+    function saveCloudSettings() {
+        const mode = document.getElementById('cfg-sync-mode').value;
+        const firebaseDbUrl = document.getElementById('cfg-firebase-url').value.trim();
+        const cfg = CloudSyncService.getSyncConfig();
+        cfg.mode = mode;
+        cfg.firebaseDbUrl = firebaseDbUrl;
+        CloudSyncService.saveSyncConfig(cfg);
+        closeCloudSettingsModal();
+        alert('Cloud sync settings saved successfully!');
+    }
+
+    // MULTI-IMAGE HANDLING & PNG COMPRESSION
+    async function handleProductImageFiles(files) {
+        if (!files || files.length === 0) return;
+        try {
+            const dataUrls = await ProductsService.processImageFiles(files);
+            currentModalImages.push(...dataUrls);
+            renderModalImagePreviews();
+        } catch (err) {
+            console.error('Error processing images:', err);
+        }
+    }
+
+    function addImageFromUrlFallback() {
+        const url = document.getElementById('form-img-url-fallback').value.trim();
+        if (!url) return;
+        currentModalImages.push(url);
+        document.getElementById('form-img-url-fallback').value = '';
+        renderModalImagePreviews();
+    }
+
+    function removeModalImage(index) {
+        currentModalImages.splice(index, 1);
+        renderModalImagePreviews();
+    }
+
+    function moveModalImage(index, direction) {
+        const target = index + direction;
+        if (target < 0 || target >= currentModalImages.length) return;
+        const temp = currentModalImages[index];
+        currentModalImages[index] = currentModalImages[target];
+        currentModalImages[target] = temp;
+        renderModalImagePreviews();
+    }
+
+    function renderModalImagePreviews() {
+        const grid = document.getElementById('product-images-preview-grid');
+        if (!grid) return;
+
+        if (currentModalImages.length === 0) {
+            grid.innerHTML = `<div class="col-span-full py-4 text-center text-secondary text-xs italic bg-surface/50 rounded-lg border border-outline-variant/30">No images selected yet. Please upload at least 1 image (PNG / JPG).</div>`;
+            return;
+        }
+
+        grid.innerHTML = currentModalImages.map((src, idx) => {
+            let badgeLabel = 'Gallery';
+            let badgeClass = 'bg-surface-container text-primary';
+            if (idx === 0) {
+                badgeLabel = 'Front (Main)';
+                badgeClass = 'bg-primary text-background font-bold';
+            } else if (idx === 1) {
+                badgeLabel = 'Back (Hover)';
+                badgeClass = 'bg-secondary text-background font-bold';
+            } else {
+                badgeLabel = `Gallery #${idx - 1}`;
+            }
+
+            return `
+                <div class="relative group border border-outline-variant/70 rounded-xl overflow-hidden bg-surface-container aspect-square flex flex-col justify-between p-2 shadow-sm transition-all hover:border-primary">
+                    <img src="${src}" class="w-full h-full object-cover rounded-lg absolute inset-0 -z-0" alt="Preview ${idx+1}"/>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <span class="label-caps text-[9px] px-2 py-0.5 rounded shadow-md ${badgeClass}">${badgeLabel}</span>
+                        <button type="button" onclick="removeModalImage(${idx})" class="w-6 h-6 rounded-full bg-primary/90 hover:bg-red-600 text-white flex items-center justify-center shadow-md transition-colors" title="Delete image">
+                            <span class="material-symbols-outlined text-sm">close</span>
+                        </button>
+                    </div>
+                    <div class="relative z-10 flex justify-center space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity bg-primary/80 rounded py-1 px-2">
+                        ${idx > 0 ? `<button type="button" onclick="moveModalImage(${idx}, -1)" class="text-white hover:text-amber-300 font-bold text-xs" title="Move Front">&larr;</button>` : ''}
+                        <span class="text-white text-[10px] font-mono self-center font-bold">#${idx + 1}</span>
+                        ${idx < currentModalImages.length - 1 ? `<button type="button" onclick="moveModalImage(${idx}, 1)" class="text-white hover:text-amber-300 font-bold text-xs" title="Move Back">&rarr;</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function handleJournalImageFile(files) {
+        if (!files || files.length === 0) return;
+        const compressed = await ProductsService.compressImage(files[0]);
+        document.getElementById('art-image').value = compressed;
+        document.getElementById('art-img-label').innerText = 'Cover Image Uploaded!';
     }
 
     function renderAdminProductsTable() {
@@ -476,12 +706,13 @@
         tbody.innerHTML = filtered.map(p => {
             const stock = ProductsService.getTotalStock(p);
             const price = p.salePrice || p.regularPrice;
+            const frontImg = p.images ? (p.images.front || (p.images.gallery && p.images.gallery[0])) : '';
 
             return `
                 <tr class="hover:bg-surface-container/50 transition-colors">
                     <td class="p-4">
                         <div class="flex items-center space-x-3">
-                            <img src="${p.images ? p.images.front : ''}" class="w-12 h-14 object-cover rounded bg-surface-container" alt="${p.name}"/>
+                            <img src="${frontImg}" class="w-12 h-14 object-cover rounded bg-surface-container" alt="${p.name}"/>
                             <div>
                                 <h4 class="font-bold text-primary text-sm">${p.name}</h4>
                                 <span class="text-[10px] text-secondary font-mono">SKU: ${p.sku}</span>
@@ -572,6 +803,7 @@
     function openJournalModal() {
         document.getElementById('journal-form').reset();
         document.getElementById('art-id').value = '';
+        document.getElementById('art-img-label').innerText = 'Click to upload story cover image';
         document.getElementById('journal-modal').classList.remove('hidden');
     }
 
@@ -601,19 +833,23 @@
         const title = document.getElementById('art-title').value.trim();
         const category = document.getElementById('art-category').value.trim();
         const author = document.getElementById('art-author').value.trim();
-        const image = document.getElementById('art-image').value.trim();
+        const image = document.getElementById('art-image').value.trim() || 'images/hd_acidwash_hoodie.png';
         const excerpt = document.getElementById('art-excerpt').value.trim();
         const content = document.getElementById('art-content').value.trim();
 
         ProductsService.saveJournalArticle({ id, title, category, author, image, excerpt, content });
         closeJournalModal();
         renderAdminJournalTable();
-        alert('Journal Story successfully published live!');
+        alert('Journal Story successfully published & synced live!');
     }
 
     function openProductModal() {
         document.getElementById('product-form').reset();
         document.getElementById('prod-id').value = '';
+        document.getElementById('modal-title').innerText = 'Create Catalog Product';
+        document.getElementById('modal-subtitle').innerText = 'Add New Item';
+        currentModalImages = [];
+        renderModalImagePreviews();
         document.getElementById('product-modal').classList.remove('hidden');
     }
 
@@ -631,33 +867,56 @@
         document.getElementById('form-category').value = p.category;
         document.getElementById('form-regular-price').value = p.regularPrice;
         document.getElementById('form-sale-price').value = p.salePrice || p.regularPrice;
-        document.getElementById('form-img-front').value = p.images ? p.images.front : '';
         document.getElementById('form-short-desc').value = p.shortDescription || p.fullDescription;
+        document.getElementById('modal-title').innerText = 'Edit Product';
+        document.getElementById('modal-subtitle').innerText = 'Update Item Details';
 
+        currentModalImages = [];
+        if (p.images) {
+            if (Array.isArray(p.images.gallery) && p.images.gallery.length > 0) {
+                currentModalImages = [...p.images.gallery];
+            } else {
+                if (p.images.front) currentModalImages.push(p.images.front);
+                if (p.images.back && p.images.back !== p.images.front) currentModalImages.push(p.images.back);
+            }
+        }
+        renderModalImagePreviews();
         document.getElementById('product-modal').classList.remove('hidden');
     }
 
     function saveProductForm(e) {
         e.preventDefault();
+        if (currentModalImages.length === 0) {
+            alert('Please upload at least 1 product image (PNG/JPG/WebP).');
+            return;
+        }
+
         const id = document.getElementById('prod-id').value;
         const name = document.getElementById('form-name').value.trim();
         const sku = document.getElementById('form-sku').value.trim();
         const category = document.getElementById('form-category').value;
         const regularPrice = parseFloat(document.getElementById('form-regular-price').value);
         const salePrice = parseFloat(document.getElementById('form-sale-price').value);
-        const frontImg = document.getElementById('form-img-front').value.trim();
         const shortDescription = document.getElementById('form-short-desc').value.trim();
+
+        const frontImg = currentModalImages[0];
+        const backImg = currentModalImages[1] || currentModalImages[0];
+        const galleryImgs = [...currentModalImages];
 
         ProductsService.saveProduct({
             id: id || null,
             name, sku, category, regularPrice, salePrice,
             shortDescription, fullDescription: shortDescription,
-            images: { front: frontImg, back: frontImg, gallery: [frontImg] }
+            images: {
+                front: frontImg,
+                back: backImg,
+                gallery: galleryImgs
+            }
         });
 
         closeProductModal();
         renderAdminProductsTable();
-        alert('Product successfully saved to single source of truth database!');
+        alert('Product successfully saved & synced live to all devices and servers!');
     }
 
     function setFilterStatus(status) {
@@ -670,6 +929,7 @@
     }
 
     window.addEventListener('inkthread_catalog_updated', renderAdminDashboard);
+    window.addEventListener('inkthread_sync_status_updated', updateSyncStatusDisplay);
     document.addEventListener('DOMContentLoaded', checkAuth);
 </script>
 

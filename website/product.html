@@ -502,18 +502,23 @@
         const totalStock = ProductsService.getTotalStock(currentProduct);
         const isOutOfStock = totalStock <= 0;
 
+        const frontImage = currentProduct.images ? (currentProduct.images.front || (currentProduct.images.gallery && currentProduct.images.gallery[0])) : '';
+        const galleryImages = currentProduct.images && Array.isArray(currentProduct.images.gallery) && currentProduct.images.gallery.length > 0 
+            ? currentProduct.images.gallery 
+            : (frontImage ? [frontImage] : []);
+
         container.innerHTML = `
             <div class="grid grid-cols-1 md:grid-cols-12 gap-y-12 md:gap-x-12">
                 <!-- Image Gallery (Left - 7 cols) -->
                 <div class="md:col-span-7 flex flex-col gap-4">
-                    <div class="w-full aspect-[3/4] bg-surface-container relative overflow-hidden group rounded-lg">
-                        <img id="main-img" alt="${currentProduct.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${currentProduct.images ? currentProduct.images.front : ''}"/>
+                    <div class="w-full aspect-[3/4] bg-surface-container relative overflow-hidden group rounded-lg border border-outline-variant/40 shadow-sm">
+                        <img id="main-img" alt="${currentProduct.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${frontImage}"/>
                     </div>
-                    ${currentProduct.images && currentProduct.images.gallery && currentProduct.images.gallery.length > 0 ? `
-                        <div class="grid grid-cols-3 gap-4">
-                            ${currentProduct.images.gallery.map(imgSrc => `
-                                <div class="w-full aspect-square bg-surface-container relative overflow-hidden rounded group cursor-pointer" onclick="switchImg('${imgSrc}')">
-                                    <img alt="Detail" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="${imgSrc}"/>
+                    ${galleryImages.length > 1 ? `
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                            ${galleryImages.map((imgSrc, idx) => `
+                                <div class="w-full aspect-square bg-surface-container relative overflow-hidden rounded-lg group cursor-pointer border border-outline-variant/60 hover:border-primary transition-all shadow-sm" onclick="switchImgByIndex(${idx})">
+                                    <img alt="Detail ${idx+1}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="${imgSrc}"/>
                                 </div>
                             `).join('')}
                         </div>
@@ -612,6 +617,17 @@
         renderRelatedProducts();
         renderCartUI();
     }
+
+    window.switchImgByIndex = function(idx) {
+        if (!currentProduct || !currentProduct.images) return;
+        const gallery = (currentProduct.images.gallery && currentProduct.images.gallery.length > 0)
+            ? currentProduct.images.gallery
+            : [currentProduct.images.front];
+        if (gallery[idx]) {
+            const mainImg = document.getElementById('main-img');
+            if (mainImg) mainImg.src = gallery[idx];
+        }
+    };
 
     function renderReviewsList() {
         const grid = document.getElementById('reviews-list-grid');
