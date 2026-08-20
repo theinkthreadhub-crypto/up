@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, UserRound, Shield, ArrowRight, AlertCircle } from 'lucide-react';
+import { Lock, UserRound, Shield, ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 const ADMIN_LOGIN_EMAIL = 'theinkthreadhub@gmail.com';
@@ -13,6 +13,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState(ADMIN_LOGIN_ID);
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -102,14 +103,26 @@ export default function AdminLoginPage() {
             <div className="relative">
               <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-street-950 border border-street-800 rounded-xl pl-10 pr-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-neon font-mono"
+                className="w-full bg-street-950 border border-street-800 rounded-xl pl-10 pr-10 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-neon font-mono"
                 placeholder="••••••••"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
             </div>
           </div>
 
