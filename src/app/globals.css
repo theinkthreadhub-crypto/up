@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@theme {
+  /* ─── Brand Colors ─── */
+  --color-brand-neon: #00ff87;
+  --color-brand-neonHover: #00e077;
+  --color-brand-cyan: #60efff;
+  --color-brand-purple: #9d4edd;
+  --color-brand-amber: #ffb703;
+  --color-brand-red: #ff3366;
+
+  /* ─── Background / Foreground ─── */
+  --color-background: #090a0f;
+  --color-foreground: #f3f4f6;
+
+  /* ─── Card ─── */
+  --color-card: #111319;
+  --color-card-foreground: #f3f4f6;
+  --color-card-border: #1f2430;
+
+  /* ─── Street Palette ─── */
+  --color-street-50:  #f6f7f9;
+  --color-street-100: #eceef2;
+  --color-street-200: #d5d9e2;
+  --color-street-300: #b1b9c9;
+  --color-street-400: #8693ab;
+  --color-street-500: #66738f;
+  --color-street-600: #505b75;
+  --color-street-700: #414a60;
+  --color-street-800: #383f51;
+  --color-street-900: #1a1d24;
+  --color-street-950: #0c0d12;
+
+  /* ─── Shadows / Glows ─── */
+  --shadow-glow-neon:    0 0 25px -5px rgba(0, 255, 135, 0.3);
+  --shadow-glow-cyan:    0 0 25px -5px rgba(96, 239, 255, 0.3);
+  --shadow-glow-purple:  0 0 25px -5px rgba(157, 78, 221, 0.3);
+  --shadow-glass:        0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  /* ─── Font Families ─── */
+  --font-sans:    system-ui, -apple-system, sans-serif;
+  --font-display: system-ui, -apple-system, sans-serif;
+  --font-mono:    ui-monospace, 'Cascadia Code', monospace;
+
+  /* ─── Animations ─── */
+  --animate-marquee: marquee 25s linear infinite;
+  --animate-pulse-glow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ─────────────────────────────────────────────
+   BASE STYLES
+───────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #090a0f;
+  color: #f3f4f6;
+  font-family: system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─────────────────────────────────────────────
+   CUSTOM SCROLLBAR
+───────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: #090a0f; }
+::-webkit-scrollbar-thumb  { background: #383f51; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #00ff87; }
+
+/* ─────────────────────────────────────────────
+   GLASSMORPHISM UTILITIES
+───────────────────────────────────────────── */
+.glass-card {
+  background: rgba(17, 19, 25, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ─────────────────────────────────────────────
+   GLOW UTILITY CLASSES
+───────────────────────────────────────────── */
+.shadow-glow-neon   { box-shadow: 0 0 25px -5px rgba(0, 255, 135, 0.35); }
+.shadow-glow-cyan   { box-shadow: 0 0 25px -5px rgba(96, 239, 255, 0.35); }
+.shadow-glow-purple { box-shadow: 0 0 25px -5px rgba(157, 78, 221, 0.35); }
+
+/* ─────────────────────────────────────────────
+   ANIMATE MARQUEE UTILITY
+───────────────────────────────────────────── */
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+/* ─────────────────────────────────────────────
+   TEXT GRADIENT UTILITIES
+───────────────────────────────────────────── */
+.text-gradient-neon {
+  background: linear-gradient(135deg, #00ff87, #60efff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #9d4edd, #60efff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─────────────────────────────────────────────
+   BUTTON / INTERACTIVE BASE
+───────────────────────────────────────────── */
+button, [role="button"] {
+  cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────
+   IMAGE DEFAULTS
+───────────────────────────────────────────── */
+img {
+  max-width: 100%;
+  height: auto;
+}
