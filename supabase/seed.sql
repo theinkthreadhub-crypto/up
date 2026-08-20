@@ -1,245 +1,910 @@
--- ============================================================================
--- INKTHREAD HUB - SEED DATA SCRIPT
--- ============================================================================
+-- ============================================================
+-- INKTHREAD HUB — FULL CATALOG SEED
+-- Run this in Supabase SQL Editor to populate all categories and products
+-- ============================================================
 
--- Site Settings
-INSERT INTO public.site_settings (
-    id, brand_name, tagline, contact_email, support_phone, currency, currency_symbol,
-    free_shipping_threshold, default_shipping_fee, tax_percent,
-    announcement_bar_enabled, announcement_bar_text
-) VALUES (
-    '00000000-0000-0000-0000-000000000001',
-    'InkThread Hub',
-    'Heavyweight Artisanal Drops & Raw Streetwear Culture',
-    'support@inkthreadhub.com',
-    '+91 98765 43210',
-    'INR',
-    '₹',
-    999,
-    99,
-    5,
-    true,
-    '⚡ FLASH DROP: 20% OFF ON ORDERS OVER ₹1,499 | USE CODE: STREET20'
-) ON CONFLICT (id) DO NOTHING;
+-- STEP 1: Insert Categories
+INSERT INTO categories (id, name, slug, description, image_url, is_active, display_order) VALUES
+  ('cat-001', 'New Drops',            'new-drops',           'Latest streetwear drops — fresh off the press.',                     '/images/sungod_luffy_acidwash_front.jpg', true, 1),
+  ('cat-002', 'Oversized T-Shirts',   'oversized-t-shirts',  '240 GSM heavyweight boxy fit drops with drop-shoulder silhouettes.', '/images/plain_oversized_black.jpg',       true, 2),
+  ('cat-003', 'Regular T-Shirts',     'regular-t-shirts',    'Classic crew, V-neck, and everyday tees in premium 180-200 GSM.',    '/images/sungod_classic_black_front.jpg',  true, 3),
+  ('cat-004', 'Acid Wash T-Shirts',   'acid-wash-t-shirts',  'Artisanal acid wash distressed oversized tees.',                     '/images/sungod_luffy_acidwash_front.jpg', true, 4),
+  ('cat-005', 'Full Sleeve T-Shirts', 'full-sleeve',         'Full sleeve streetwear tees for all seasons.',                       '/images/tribal_sun_fullsleeve_front.jpg',  true, 5),
+  ('cat-006', 'Polo T-Shirts',        'polo-t-shirts',       'Premium polo collar tees for the refined streetwear look.',          '/images/plain_oversized_navy.jpg',        true, 6),
+  ('cat-007', 'AOP T-Shirts',         'aop-t-shirts',        'All-over print custom graphic tees.',                                '/images/plain_oversized_teal.jpg',        true, 7),
+  ('cat-008', 'Hoodies',              'hoodies',             '380 GSM fleece and French terry hoodies.',                           '/images/hd_acidwash_hoodie.png',           true, 8),
+  ('cat-009', 'Sweatshirts',          'sweatshirts',         'Heavyweight crewneck sweatshirts.',                                  '/images/hd_acidwash_hoodie.png',           true, 9),
+  ('cat-010', 'Acid Wash Hoodies',    'acid-wash-hoodies',   'Artisanal acid wash heavyweight hoodies.',                           '/images/hd_acidwash_hoodie.png',           true, 10),
+  ('cat-011', 'Bottomwear',           'bottomwear',          'Joggers, sweatpants, and shorts.',                                   '/images/plain_oversized_black.jpg',        true, 11),
+  ('cat-012', 'Women',                'women',               'Streetwear for women — crop tops, baby tees, oversized, hoodies.',   '/images/hd_womens_crop_top.png',           true, 12),
+  ('cat-013', 'Jackets',              'jackets',             'Varsity jackets, AOP bombers, and outerwear.',                       '/images/hd_aop_bomber.png',                true, 13),
+  ('cat-014', 'Caps & Headwear',      'caps-headwear',       'Baseball caps, snapbacks, bucket hats and more.',                    '/images/plain_oversized_black.jpg',        true, 14),
+  ('cat-015', 'Tote Bags',            'tote-bags',           'Everyday totes and drawstring bags.',                                '/images/hd_tote_bag.png',                  true, 15),
+  ('cat-016', 'Phone Cases',          'phone-cases',         'Custom and AOP phone cases.',                                        '/images/plain_oversized_black.jpg',        true, 16),
+  ('cat-017', 'Mugs & Drinkware',     'mugs-drinkware',      'Custom mugs, bottles, tumblers and enamel cups.',                    '/images/plain_oversized_black.jpg',        true, 17),
+  ('cat-018', 'Home & Lifestyle',     'home-lifestyle',      'Posters, canvas prints, cushion covers, notebooks.',                 '/images/plain_oversized_black.jpg',        true, 18),
+  ('cat-019', 'Stickers & Badges',    'stickers-badges',     'Laminated stickers, button badges, and patches.',                    '/images/plain_oversized_black.jpg',        true, 19),
+  ('cat-020', 'Kids',                 'kids',                'Streetwear for kids — tees, hoodies, jackets.',                      '/images/plain_oversized_black.jpg',        true, 20),
+  ('cat-021', 'Pet Products',         'pet',                 'Dog tees, pet tags, and accessories.',                               '/images/hd_pet_collar.png',                true, 21),
+  ('cat-022', 'Bestsellers',          'bestsellers',         'Our most loved drops — customer favourites.',                        '/images/sungod_classic_black_front.jpg',   true, 22),
+  ('cat-023', 'Limited Drops',        'limited-drops',       'Exclusive limited edition drops. Once gone, gone forever.',          '/images/sungod_luffy_acidwash_front.jpg',  true, 23),
+  ('cat-024', 'Tank Tops & Sleeveless','tank-tops',          'Sleeveless tees, tank tops, and crop tanks.',                        '/images/plain_oversized_white.jpg',        true, 24)
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  slug = EXCLUDED.slug,
+  description = EXCLUDED.description,
+  image_url = EXCLUDED.image_url,
+  is_active = EXCLUDED.is_active,
+  display_order = EXCLUDED.display_order;
 
--- Categories
-INSERT INTO public.categories (id, name, slug, description, image_url, display_order) VALUES
-('11111111-1111-1111-1111-111111110001', 'Men', 'men', 'Heavyweight streetwear, boxy oversized graphic tees & hoodies for Men.', '/images/sungod_classic_black_front.jpg', 1),
-('11111111-1111-1111-1111-111111110002', 'Women', 'women', 'Oversized crop tees, relaxed streetwear silhouettes & hoodies for Women.', '/images/plain_oversized_white.jpg', 2),
-('11111111-1111-1111-1111-111111110003', 'Pet Accessories', 'pet', 'Genuine leather brass-buckle collars, neck belts & high-street pet gear.', '/images/hd_pet_collar.png', 3),
-('11111111-1111-1111-1111-111111110004', 'Oversized T-Shirts', 'oversized-t-shirts', '240 GSM heavyweight boxy fit drops with drop-shoulder silhouettes.', '/images/plain_oversized_black.jpg', 4),
-('11111111-1111-1111-1111-111111110005', 'Heavyweight Hoodies', 'heavyweight-hoodies', '380 GSM fleece and French terry hoodies engineered for comfort & drape.', '/images/hd_acidwash_hoodie.png', 5),
-('11111111-1111-1111-1111-111111110006', 'Graphic Drops', 'graphic-drops', 'Artisanal anime, mythology, and dark-aesthetic screen-printed streetwear.', '/images/sungod_luffy_acidwash_front.jpg', 6),
-('11111111-1111-1111-1111-111111110007', 'Jackets & Outerwear', 'jackets-outerwear', 'All-over print bombers and heavyweight varsity streetwear outerwear.', '/images/hd_aop_bomber.png', 7),
-('11111111-1111-1111-1111-111111110008', 'Streetwear Accessories', 'streetwear-accessories', 'Totes, caps, brass-buckle pet collars and utility lifestyle pieces.', '/images/hd_tote_bag.png', 8)
-ON CONFLICT (slug) DO NOTHING;
+-- ============================================================
+-- STEP 2: Insert Products
+-- ============================================================
 
--- Products
-INSERT INTO public.products (
-    id, name, slug, sku, description, short_description, category_name, product_type,
-    price, sale_price, cost_price, discount_percent, sizes, colors, thumbnail, images,
-    is_published, is_featured, is_new_arrival, is_best_seller, stock_quantity, low_stock_threshold,
-    fabric_gsm, material_care, seo_title, seo_description
-) VALUES
-(
-    '22222222-2222-2222-2222-222222220001',
-    'SunGod Luffy Acid Wash Graphic Hoodie',
-    'sungod-luffy-acid-wash-hoodie',
-    'ITH-HD-SGL-01',
-    'The crowning piece of our Gear 5 drop. Features an ultra-heavy 380 GSM loop-knit French Terry with artisanal acid-wash distressing, custom embroidered chest detail, and a massive high-density back print depicting Sun God Luffy in mythological resonance. Ribbed hems, oversized kangaroo pocket, and double-layered heavyweight hood.',
-    '380 GSM Heavyweight French Terry with artisanal acid-wash and mythology high-density screenprint.',
-    'Heavyweight Hoodies',
-    'Heavyweight Hoodie',
-    2499,
-    1999,
-    850,
-    20,
-    ARRAY['S', 'M', 'L', 'XL', 'XXL'],
-    ARRAY['Acid Wash Grey', 'Obsidian Black', 'Chalk White'],
-    '/images/hd_acidwash_hoodie.png',
-    ARRAY['/images/hd_acidwash_hoodie.png', '/images/sungod_luffy_acidwash_front.jpg', '/images/sungod_luffy_acidwash_back.jpg', '/images/sungod_luffy_black_hoodie.jpg'],
-    true, true, true, true, 45, 5, 380,
-    '100% Cotton French Terry. 380 GSM. Pre-shrunk & Acid Washed. Wash cold inside out.',
-    'SunGod Luffy Acid Wash Streetwear Hoodie | InkThread Hub',
-    'Shop the ultra-heavy 380 GSM SunGod Luffy Acid Wash Hoodie with high-density screenprint.'
-),
-(
-    '22222222-2222-2222-2222-222222220002',
-    'Vintage SunGod Graphic Oversized Tee',
-    'vintage-sungod-graphic-oversized-tee',
-    'ITH-TEE-SGC-02',
-    'Crafted with 240 GSM pure combed cotton. Features a relaxed drop-shoulder cut, thick 1.25-inch ribbed crewneck collar, and durable discharge screen-printing that never cracks or peels.',
-    '240 GSM boxy oversized drop with mythological Sun God discharge print.',
-    'Oversized T-Shirts',
-    'Oversized T-Shirt',
-    1299,
-    899,
-    380,
-    30,
-    ARRAY['S', 'M', 'L', 'XL', 'XXL'],
-    ARRAY['Obsidian Black', 'Vintage Off-White'],
-    '/images/sungod_classic_black_front.jpg',
-    ARRAY['/images/sungod_classic_black_front.jpg', '/images/sungod_classic_black_back.jpg', '/images/sungod_classic_white_front.jpg', '/images/sungod_classic_white_back.jpg'],
-    true, true, true, true, 80, 10, 240,
-    '100% Super-Combed Cotton. 240 GSM Heavyweight Jersey. Machine wash cold.',
-    'Vintage SunGod Graphic Oversized Tee | InkThread Hub',
-    'Heavyweight 240 GSM oversized streetwear t-shirt with durable vintage discharge print.'
-),
-(
-    '22222222-2222-2222-2222-222222220003',
-    'All-Over Print Street Bomber Jacket',
-    'all-over-print-street-bomber-jacket',
-    'ITH-JKT-BMB-03',
-    'Engineered for maximum street presence. Premium satin polyester shell with all-over custom artwork sublimated under heat pressure. Diamond-quilted inner insulation lining, heavy brass zipper, and ribbed athletic cuffs.',
-    'Insulated all-over sublimated streetwear bomber with heavy brass hardware.',
-    'Jackets & Outerwear',
-    'Bomber Jacket',
-    3499,
-    2799,
-    1200,
-    20,
-    ARRAY['M', 'L', 'XL', 'XXL'],
-    ARRAY['Cyber Obsidian', 'Neon Abstract'],
-    '/images/hd_aop_bomber.png',
-    ARRAY['/images/hd_aop_bomber.png', '/images/hd_varsity_jacket.png'],
-    true, true, true, false, 28, 4, 320,
-    'Water-resistant poly-satin shell with polyester diamond-quilted fill. Wipe clean or dry clean only.',
-    'All-Over Print Street Bomber Jacket | InkThread Hub',
-    'Elevate your streetwear layering with the insulated AOP Bomber Jacket by InkThread Hub.'
-),
-(
-    '22222222-2222-2222-2222-222222220004',
-    'Mandala Elephant Oversized Boxy Tee',
-    'mandala-elephant-oversized-tee',
-    'ITH-TEE-MDE-04',
-    'A synthesis of Indian artisanal sacred geometry and raw modern streetwear. Intricate mandala elephant back-canvas printed with metallic-fleck and soft matte pigment ink on 240 GSM heavyweight cotton.',
-    'Sacred geometry mandala elephant print on 240 GSM boxy streetwear tee.',
-    'Graphic Drops',
-    'Oversized T-Shirt',
-    1199,
-    799,
-    350,
-    33,
-    ARRAY['S', 'M', 'L', 'XL', 'XXL'],
-    ARRAY['Obsidian Black', 'Forest Sage', 'Chalk White'],
-    '/images/mandala_elephant_front.jpg',
-    ARRAY['/images/mandala_elephant_front.jpg', '/images/mandala_elephant_back.jpg'],
-    true, false, true, true, 60, 8, 240,
-    '100% Combed Cotton. 240 GSM. Gentle machine wash inside out in cold water.',
-    'Mandala Elephant Oversized Boxy Tee | InkThread Hub',
-    'Shop the Mandala Elephant Oversized Streetwear Tee with metallic and matte pigment ink.'
-),
-(
-    '22222222-2222-2222-2222-222222220005',
-    'Essential Minimalist Heavyweight Plain Tee',
-    'essential-minimalist-heavyweight-plain-tee',
-    'ITH-TEE-PLN-05',
-    'The holy grail of streetwear basics. Zero loud branding, pristine tailoring. Cut with extra wide shoulders, elbow-length sleeves, and high-density bio-washed 240 GSM jersey that holds its structural shape wash after wash.',
-    '240 GSM essential plain heavyweight tee with structural boxy fit.',
-    'Oversized T-Shirts',
-    'Oversized T-Shirt',
-    999,
-    699,
-    290,
-    30,
-    ARRAY['S', 'M', 'L', 'XL', 'XXL'],
-    ARRAY['Obsidian Black', 'Chalk White', 'Forest Green', 'Navy Blue', 'Teal Mist'],
-    '/images/plain_oversized_black.jpg',
-    ARRAY['/images/plain_oversized_black.jpg', '/images/plain_oversized_white.jpg', '/images/plain_oversized_green.jpg', '/images/plain_oversized_navy.jpg', '/images/plain_oversized_teal.jpg'],
-    true, true, false, true, 120, 15, 240,
-    '100% Ring-Spun Cotton. 240 GSM. Bio-washed for ultra-soft handfeel. Cold wash.',
-    'Essential Heavyweight Plain Oversized Tee | InkThread Hub',
-    'The cleanest streetwear basic. 240 GSM heavyweight boxy oversized plain t-shirt.'
-),
-(
-    '22222222-2222-2222-2222-222222220006',
-    'Heavy-Duty Canvas Street Tote Bag',
-    'heavy-duty-canvas-street-tote-bag',
-    'ITH-ACC-TOT-06',
-    'Built from ultra-durable 16oz cotton duck canvas with reinforced cross-stitched webbing handles, interior zip organizer pocket for keys and phone, and screenprinted typographic street manifesto.',
-    '16oz Heavyweight Canvas Tote with interior zippered stash pocket.',
-    'Streetwear Accessories',
-    'Accessories',
-    799,
-    499,
-    180,
-    37,
-    ARRAY['One Size'],
-    ARRAY['Natural Canvas', 'Obsidian Black'],
-    '/images/hd_tote_bag.png',
-    ARRAY['/images/hd_tote_bag.png'],
-    true, false, true, false, 50, 5, 450,
-    '100% 16oz Cotton Duck Canvas. Spot clean with damp cloth.',
-    'Heavy-Duty Street Canvas Tote Bag | InkThread Hub',
-    'Heavyweight 16oz canvas tote bag with reinforced handles and interior zip stash pocket.'
-)
-ON CONFLICT (slug) DO NOTHING;
+INSERT INTO products (id, name, slug, sku, short_description, category_id, category_name, product_type, price, sale_price, cost_price, sizes, colors, thumbnail, images, fabric_gsm, is_published, is_featured, is_new_arrival, stock_quantity, weight_grams) VALUES
 
--- Blog Posts
-INSERT INTO public.blog_posts (
-    id, title, slug, excerpt, content, featured_image, category, tags, author, read_time
-) VALUES
-(
-    '33333333-3333-3333-3333-333333330001',
-    'The Anatomy of 240 GSM: Why Heavyweight Cotton Defines Modern Streetwear',
-    'the-anatomy-of-240-gsm-heavyweight-streetwear',
-    'Discover why flimsy 140 GSM tees are obsolete and how 240+ GSM French Terry and heavy jersey create the iconic boxy drape coveted across streetwear culture.',
-    '## The Death of Flimsy Fabrics\n\nFor decades, fast fashion normalized paper-thin 140-160 GSM cotton that lost its structural integrity after two laundry cycles. But the rise of modern Gen-Z streetwear culture flipped the script.\n\n### What Exactly is GSM?\n\nGSM stands for *Grams per Square Meter*. It is the objective metric of textile density. \n- **140 - 160 GSM**: Lightweight, transparent under sunlight, collapses onto the body without structure.\n- **180 - 200 GSM**: Standard commercial t-shirt weight.\n- **240 - 280 GSM (The InkThread Standard)**: Heavyweight, opaque, rigid drape, perfect boxy silhouette.\n- **350 - 400 GSM**: Premium fleece and French Terry used in luxury hoodies.\n\n### Why Structure Matters in Streetwear\n\nA true drop-shoulder oversized tee requires a fabric with enough tensile memory to hold a crisp line from the shoulder seam down to the elbow. When you slip on an InkThread Hub 240 GSM tee, it doesn''t cling—it creates a structured, architectural silhouette.',
-    '/images/plain_oversized_black.jpg',
-    'Streetwear Culture',
-    ARRAY['Streetwear', 'Fabric Guide', 'GSM', 'Oversized Fit'],
-    'Arjun Varma (Creative Lead)',
-    '4 min read'
-),
-(
-    '33333333-3333-3333-3333-333333330002',
-    'Behind the Drop: Reimagining SunGod Mythology Through Acid-Wash Artistry',
-    'behind-the-drop-sungod-acid-wash-artistry',
-    'A look behind the scenes of our signature SunGod drop—from hand-drawn high-density vector illustrations to manual stone-wash distressing.',
-    '## Myth Meets the Concrete Jungle\n\nStreetwear is about storytelling through wearable art. For our SunGod series, our design team spent three months conceptualizing ancient solar deities and manga-inspired warrior awakenings into high-contrast screenprints.\n\n### The Acid Wash Process\n\nNo two pieces from the SunGod collection are identical. Each garment undergoes a hand-applied potassium permanganate spray followed by pumice stone tumbling. This breaks down the surface dye while leaving the 380 GSM cotton fibers resilient and buttery soft.',
-    '/images/sungod_luffy_acidwash_front.jpg',
-    'Lookbook & Design',
-    ARRAY['Design', 'Drop', 'Anime', 'Acid Wash'],
-    'InkThread Atelier',
-    '5 min read'
-)
-ON CONFLICT (slug) DO NOTHING;
+-- ── UNISEX T-SHIRTS ──────────────────────────────────────────
+('prod-001', 'Unisex Classic Crew T-Shirt', 'unisex-classic-crew-t-shirt', 'UC21',
+ '180 GSM combed cotton classic crew neck tee — the essential streetwear base.',
+ 'cat-003', 'Regular T-Shirts', 'T-Shirt',
+ 549, 0, 180, ARRAY['XS','S','M','L','XL','XXL'], ARRAY['White','Black','Navy','Olive','Maroon'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg','/images/plain_oversized_white.jpg'],
+ 180, true, true, true, 100, 200),
 
--- Email Templates
-INSERT INTO public.email_templates (id, name, subject, html_body, variables) VALUES
-(
-    '44444444-4444-4444-4444-444444440001',
-    'order_confirmation',
-    '🔥 InkThread Hub Order Confirmed: #{{order_number}}',
-    '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #0c0d0e; color: #ffffff; padding: 32px; border-radius: 12px; border: 1px solid #222;">
-        <h1 style="color: #00ff88; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">INKTHREAD HUB // ORDER CONFIRMED</h1>
-        <p>Hey <strong>{{customer_name}}</strong>,</p>
-        <p>Your drop is locked in! We have received your order <strong>#{{order_number}}</strong> totaling <strong>₹{{total_amount}}</strong>.</p>
-        <div style="background: #18191c; padding: 20px; border-radius: 8px; margin: 24px 0;">
-            <p style="margin: 0; color: #888;">Delivery Status:</p>
-            <p style="margin: 4px 0 0 0; font-weight: bold; color: #ffffff;">⚡ Preparing for dispatch from Delhi Atelier</p>
-        </div>
-        <p style="color: #aaa; font-size: 14px;">You can track your order live anytime on our portal.</p>
-        <p style="color: #666; font-size: 12px; margin-top: 30px;">InkThread Hub — Heavyweight Streetwear & Artisanal Drops.</p>
-    </div>',
-    ARRAY['customer_name', 'order_number', 'total_amount']
-),
-(
-    '44444444-4444-4444-4444-444444440002',
-    'order_shipped',
-    '🚀 InkThread Hub Order #{{order_number}} is on its way!',
-    '<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; background: #0c0d0e; color: #ffffff; padding: 32px; border-radius: 12px; border: 1px solid #222;">
-        <h1 style="color: #3b82f6; font-size: 24px; text-transform: uppercase; letter-spacing: 2px;">ORDER DISPATCHED</h1>
-        <p>Hey <strong>{{customer_name}}</strong>,</p>
-        <p>Your pieces from order <strong>#{{order_number}}</strong> have been packed in our premium matte black box and handed over to our courier partner.</p>
-        <p>Tracking Courier: <strong>{{tracking_courier}}</strong><br/>AWB Tracking No: <strong>{{tracking_number}}</strong></p>
-    </div>',
-    ARRAY['customer_name', 'order_number', 'tracking_courier', 'tracking_number']
-)
-ON CONFLICT (name) DO NOTHING;
+('prod-002', 'Unisex Standard Crew T-Shirt', 'unisex-standard-crew-t-shirt', 'US21',
+ '200 GSM standard fit crew neck tee with reinforced stitching.',
+ 'cat-003', 'Regular T-Shirts', 'T-Shirt',
+ 599, 0, 200, ARRAY['XS','S','M','L','XL','XXL'], ARRAY['White','Black','Grey','Sky Blue','Mustard'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg','/images/plain_oversized_black.jpg'],
+ 200, true, false, false, 80, 210),
 
--- Announcements
-INSERT INTO public.announcements (id, title, message, type, link_url, is_active, priority) VALUES
-('55555555-5555-5555-5555-555555550001', 'Gear 5 Acid Wash Drop', '⚡ NEW DROP: SunGod Acid Wash 380 GSM Hoodies are live in limited quantities.', 'drop', '/shop?category=heavyweight-hoodies', true, 1),
-('55555555-5555-5555-5555-555555550002', 'Free Shipping Pan-India', '🚚 Free express shipping on all prepaid orders above ₹999.', 'general', '/shop', true, 2)
-ON CONFLICT (id) DO NOTHING;
+('prod-003', 'V-Neck T-Shirt', 'v-neck-t-shirt', 'UV34',
+ '180 GSM soft V-neck tee with a relaxed contemporary silhouette.',
+ 'cat-003', 'Regular T-Shirts', 'T-Shirt',
+ 599, 0, 190, ARRAY['S','M','L','XL','XXL'], ARRAY['White','Black','Grey','Navy'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 180, true, false, false, 60, 195),
+
+('prod-004', 'Basic T-Shirt', 'basic-t-shirt', 'UB73',
+ 'Everyday 160 GSM lightweight basic tee — minimal and clean.',
+ 'cat-003', 'Regular T-Shirts', 'T-Shirt',
+ 449, 399, 150, ARRAY['XS','S','M','L','XL','XXL'], ARRAY['White','Black','Grey'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 160, true, false, false, 120, 170),
+
+('prod-005', 'Supima Cotton T-Shirt', 'supima-cotton-t-shirt', 'UC23',
+ 'Premium Supima cotton tee — ultra-soft, durable and luxuriously smooth.',
+ 'cat-003', 'Regular T-Shirts', 'T-Shirt',
+ 799, 699, 280, ARRAY['XS','S','M','L','XL'], ARRAY['White','Ecru','Slate Grey','Black'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 200, true, true, false, 50, 210),
+
+('prod-006', 'Cotton Stretch T-Shirt', 'cotton-stretch-t-shirt', 'UCX01',
+ '95% cotton 5% elastane stretch tee — moves with you all day.',
+ 'cat-003', 'Regular T-Shirts', 'T-Shirt',
+ 649, 0, 220, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','Navy','Charcoal'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, false, false, 60, 205),
+
+('prod-007', 'Raglan T-Shirt', 'raglan-t-shirt', 'UR37',
+ 'Classic raglan sleeve tee with contrast colour-blocked sleeves.',
+ 'cat-003', 'Regular T-Shirts', 'T-Shirt',
+ 699, 0, 230, ARRAY['S','M','L','XL','XXL'], ARRAY['White/Black','White/Navy','White/Maroon'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 200, true, false, true, 45, 215),
+
+('prod-008', 'Oversized Classic T-Shirt', 'oversized-classic-t-shirt', 'UC22',
+ '240 GSM heavyweight boxy drop-shoulder oversized tee — the streetwear essential.',
+ 'cat-002', 'Oversized T-Shirts', 'Oversized T-Shirt',
+ 799, 699, 270, ARRAY['S','M','L','XL','XXL','3XL'], ARRAY['Black','White','Beige','Olive Green','Maroon','Navy'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg','/images/plain_oversized_white.jpg','/images/plain_oversized_navy.jpg'],
+ 240, true, true, true, 150, 280),
+
+('prod-009', 'Oversized Standard T-Shirt', 'oversized-standard-t-shirt', 'US22',
+ '220 GSM standard oversized fit with relaxed shoulder drop.',
+ 'cat-002', 'Oversized T-Shirts', 'Oversized T-Shirt',
+ 749, 649, 250, ARRAY['S','M','L','XL','XXL','3XL'], ARRAY['Black','White','Grey','Teal','Dusty Pink'],
+ '/images/plain_oversized_teal.jpg', ARRAY['/images/plain_oversized_teal.jpg','/images/plain_oversized_black.jpg'],
+ 220, true, true, false, 120, 265),
+
+('prod-010', 'Terry Oversized Tee', 'terry-oversized-tee', 'UT27',
+ '280 GSM French terry oversized tee — ultra-thick, premium drape.',
+ 'cat-002', 'Oversized T-Shirts', 'Oversized T-Shirt',
+ 999, 849, 350, ARRAY['S','M','L','XL','XXL'], ARRAY['Ecru','Black','Brown','Slate'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 280, true, true, true, 80, 320),
+
+('prod-011', 'Acid Wash Oversized Tee', 'acid-wash-oversized-tee', 'UC61',
+ 'Artisanal acid wash distressed 240 GSM oversized tee — every piece is unique.',
+ 'cat-004', 'Acid Wash T-Shirts', 'Acid Wash T-Shirt',
+ 1099, 899, 380, ARRAY['S','M','L','XL','XXL'], ARRAY['Acid Grey','Acid Black','Acid Blue','Acid Green'],
+ '/images/sungod_luffy_acidwash_front.jpg', ARRAY['/images/sungod_luffy_acidwash_front.jpg','/images/sungod_luffy_acidwash_back.jpg'],
+ 240, true, true, true, 70, 285),
+
+('prod-012', 'Tie Dye Oversized T-Shirt', 'tie-dye-oversized-t-shirt', 'UTDYE01',
+ 'Handcrafted tie-dye oversized tee — vibrant street-art spirals.',
+ 'cat-002', 'Oversized T-Shirts', 'Oversized T-Shirt',
+ 999, 849, 340, ARRAY['S','M','L','XL','XXL'], ARRAY['Blue/White','Purple/White','Pink/Yellow','Green/White'],
+ '/images/plain_oversized_teal.jpg', ARRAY['/images/plain_oversized_teal.jpg'],
+ 240, true, false, true, 50, 275),
+
+('prod-013', 'Oversized Shirt', 'oversized-shirt', 'UC28',
+ 'Relaxed fit woven oversized shirt — streetwear meets casual luxury.',
+ 'cat-002', 'Oversized T-Shirts', 'Oversized Shirt',
+ 1199, 999, 420, ARRAY['S','M','L','XL','XXL'], ARRAY['White','Black','Stripe White/Blue'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 200, true, false, false, 40, 310),
+
+('prod-014', 'AOP T-Shirt', 'aop-t-shirt', 'UA31',
+ 'All-over print custom graphic tee — your art on every inch.',
+ 'cat-007', 'AOP T-Shirts', 'AOP T-Shirt',
+ 1299, 1099, 450, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, true, true, 60, 220),
+
+('prod-015', 'AOP Oversized T-Shirt', 'aop-oversized-t-shirt', 'UA22',
+ 'All-over print on a heavyweight 240 GSM oversized drop-shoulder silhouette.',
+ 'cat-007', 'AOP T-Shirts', 'AOP Oversized T-Shirt',
+ 1499, 1299, 520, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/sungod_classic_black_front.jpg', ARRAY['/images/sungod_classic_black_front.jpg'],
+ 240, true, true, true, 50, 290),
+
+('prod-016', 'AOP Sports T-Shirt', 'aop-sports-t-shirt', 'UASP01',
+ 'Breathable polyester AOP sports tee for training and streetwear.',
+ 'cat-007', 'AOP T-Shirts', 'Sports T-Shirt',
+ 999, 849, 340, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 160, true, false, false, 55, 190),
+
+-- ── HOODIES & SWEATSHIRTS ──────────────────────────────────
+('prod-017', 'Unisex Hoodie', 'unisex-hoodie', 'UH01',
+ '320 GSM pullover hoodie with kangaroo pocket and double-layered hood.',
+ 'cat-008', 'Hoodies', 'Hoodie',
+ 1699, 1499, 580, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','White','Grey','Navy','Maroon'],
+ '/images/sungod_luffy_black_hoodie.jpg', ARRAY['/images/sungod_luffy_black_hoodie.jpg'],
+ 320, true, true, false, 80, 560),
+
+('prod-018', 'Pullover Hoodie', 'pullover-hoodie', 'UPH01',
+ '300 GSM fleece pullover hoodie — warm, heavy and street-ready.',
+ 'cat-008', 'Hoodies', 'Hoodie',
+ 1599, 1399, 540, ARRAY['S','M','L','XL','XXL','3XL'], ARRAY['Black','Grey','Navy','Olive'],
+ '/images/sungod_luffy_white_hoodie.jpg', ARRAY['/images/sungod_luffy_white_hoodie.jpg'],
+ 300, true, false, false, 70, 540),
+
+('prod-019', 'Oversized Hoodie', 'oversized-hoodie', 'UH32',
+ '380 GSM heavyweight drop-shoulder oversized hoodie — boxy and commanding.',
+ 'cat-008', 'Hoodies', 'Oversized Hoodie',
+ 2199, 1899, 750, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','Ecru','Charcoal','Forest Green'],
+ '/images/hd_acidwash_hoodie.png', ARRAY['/images/hd_acidwash_hoodie.png'],
+ 380, true, true, true, 60, 680),
+
+('prod-020', 'Acid Wash Hoodie', 'acid-wash-hoodie', 'UH62',
+ '380 GSM artisanal acid wash heavyweight hoodie — unique on every piece.',
+ 'cat-010', 'Acid Wash Hoodies', 'Acid Wash Hoodie',
+ 2499, 2199, 880, ARRAY['S','M','L','XL','XXL'], ARRAY['Acid Grey','Acid Black','Acid Blue'],
+ '/images/hd_acidwash_hoodie.png', ARRAY['/images/hd_acidwash_hoodie.png'],
+ 380, true, true, true, 40, 700),
+
+('prod-021', 'Zip Hoodie', 'zip-hoodie', 'UH38',
+ '320 GSM full-zip heavyweight hoodie with side pockets.',
+ 'cat-008', 'Hoodies', 'Zip Hoodie',
+ 1999, 1699, 680, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','Grey','Navy'],
+ '/images/sungod_luffy_black_hoodie.jpg', ARRAY['/images/sungod_luffy_black_hoodie.jpg'],
+ 320, true, false, false, 50, 600),
+
+('prod-022', 'Sweatshirt', 'sweatshirt', 'UH26',
+ '280 GSM crewneck sweatshirt — clean, minimal and warm.',
+ 'cat-009', 'Sweatshirts', 'Sweatshirt',
+ 1499, 1299, 500, ARRAY['S','M','L','XL','XXL','3XL'], ARRAY['Black','White','Grey','Navy','Maroon','Dusty Pink'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 280, true, true, false, 90, 480),
+
+('prod-023', 'Oversized Sweatshirt', 'oversized-sweatshirt', 'UH35',
+ '320 GSM heavyweight oversized crewneck sweatshirt with drop shoulders.',
+ 'cat-009', 'Sweatshirts', 'Oversized Sweatshirt',
+ 1799, 1599, 620, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','Ecru','Charcoal','Olive'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 320, true, true, true, 65, 540),
+
+('prod-024', 'AOP Sweatshirt', 'aop-sweatshirt', 'UA26',
+ 'All-over print 280 GSM crewneck sweatshirt — bold from front to back.',
+ 'cat-009', 'Sweatshirts', 'AOP Sweatshirt',
+ 2199, 1899, 760, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 280, true, false, true, 35, 495),
+
+-- ── JACKETS ──────────────────────────────────────────────
+('prod-025', 'Varsity Jacket', 'varsity-jacket', 'UJ31',
+ 'Classic varsity jacket with contrast sleeves, ribbed cuffs and embroidered patches.',
+ 'cat-013', 'Jackets', 'Varsity Jacket',
+ 3499, 2999, 1200, ARRAY['S','M','L','XL','XXL'], ARRAY['Black/Gold','Navy/White','Maroon/White'],
+ '/images/hd_varsity_jacket.png', ARRAY['/images/hd_varsity_jacket.png'],
+ 400, true, true, true, 30, 900),
+
+('prod-026', 'AOP Bomber Jacket', 'aop-bomber-jacket', 'UA30',
+ 'All-over print satin bomber jacket with brass zip and ribbed hem.',
+ 'cat-013', 'Jackets', 'Bomber Jacket',
+ 3999, 3499, 1400, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/hd_aop_bomber.png', ARRAY['/images/hd_aop_bomber.png'],
+ 0, true, true, true, 25, 850),
+
+-- ── MEN'S CLOTHING ──────────────────────────────────────
+('prod-027', 'Polo T-Shirt', 'polo-t-shirt', 'MP25',
+ '220 GSM pique cotton polo with ribbed collar and placket.',
+ 'cat-006', 'Polo T-Shirts', 'Polo T-Shirt',
+ 849, 749, 290, ARRAY['S','M','L','XL','XXL'], ARRAY['White','Black','Navy','Maroon','Bottle Green'],
+ '/images/primitive_polo_maroon_front.jpg', ARRAY['/images/primitive_polo_maroon_front.jpg','/images/primitive_polo_maroon_back.jpg'],
+ 220, true, true, false, 70, 240),
+
+('prod-028', 'Full Sleeve T-Shirt', 'full-sleeve-t-shirt', 'MF31',
+ '200 GSM full sleeve crew neck tee — layering essential for all seasons.',
+ 'cat-005', 'Full Sleeve T-Shirts', 'Full Sleeve T-Shirt',
+ 749, 649, 250, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','White','Navy','Maroon','Olive'],
+ '/images/tribal_sun_fullsleeve_front.jpg', ARRAY['/images/tribal_sun_fullsleeve_front.jpg','/images/tribal_sun_fullsleeve_back.jpg'],
+ 200, true, true, true, 80, 240),
+
+('prod-029', 'Sleeveless T-Shirt', 'sleeveless-t-shirt', 'MS36',
+ '180 GSM muscle-fit sleeveless tee — gym to street.',
+ 'cat-024', 'Tank Tops & Sleeveless', 'Sleeveless T-Shirt',
+ 549, 449, 180, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','White','Grey'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 180, true, false, false, 60, 165),
+
+('prod-030', 'AOP Sleeveless T-Shirt', 'aop-sleeveless-t-shirt', 'MA29',
+ 'All-over print sleeveless muscle tee.',
+ 'cat-024', 'Tank Tops & Sleeveless', 'AOP Sleeveless',
+ 849, 749, 290, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 180, true, false, false, 40, 170),
+
+('prod-031', 'Bike Rider T-Shirt', 'bike-rider-t-shirt', 'MA39',
+ 'Moto-inspired AOP crew neck tee with racing graphics.',
+ 'cat-007', 'AOP T-Shirts', 'Graphic T-Shirt',
+ 999, 849, 340, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','White'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, false, true, 45, 215),
+
+('prod-032', 'AOP Full Sleeve T-Shirt', 'aop-full-sleeve-t-shirt', 'MA27',
+ 'All-over print 200 GSM full sleeve tee.',
+ 'cat-005', 'Full Sleeve T-Shirts', 'AOP Full Sleeve',
+ 1199, 999, 420, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/tribal_sun_fullsleeve_front.jpg', ARRAY['/images/tribal_sun_fullsleeve_front.jpg'],
+ 200, true, false, false, 35, 245),
+
+('prod-033', 'Terry Shorts', 'terry-shorts', 'MT45',
+ '280 GSM French terry shorts with elastic waistband and drawstring.',
+ 'cat-011', 'Bottomwear', 'Shorts',
+ 899, 799, 300, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','Grey','Beige','Navy'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 280, true, false, false, 55, 290),
+
+('prod-034', 'AOP Shorts', 'aop-shorts', 'MA45',
+ 'All-over print terry shorts with elastic waistband.',
+ 'cat-011', 'Bottomwear', 'AOP Shorts',
+ 1199, 999, 420, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 280, true, false, false, 35, 295),
+
+-- ── BOTTOMWEAR ──────────────────────────────────────────
+('prod-035', 'Joggers', 'joggers', 'UJ29',
+ '320 GSM heavyweight joggers with tapered legs, side pockets and elastic waist.',
+ 'cat-011', 'Bottomwear', 'Joggers',
+ 1499, 1299, 520, ARRAY['S','M','L','XL','XXL','3XL'], ARRAY['Black','Grey','Navy','Olive','Maroon'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 320, true, true, true, 90, 480),
+
+('prod-036', 'Sweatpants', 'sweatpants', 'USP01',
+ '300 GSM fleece sweatpants with wide-leg relaxed fit.',
+ 'cat-011', 'Bottomwear', 'Sweatpants',
+ 1399, 1199, 480, ARRAY['S','M','L','XL','XXL'], ARRAY['Black','Grey','Charcoal'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 300, true, false, false, 60, 460),
+
+('prod-037', 'Tie Dye Shorts', 'tie-dye-shorts', 'UTDS01',
+ 'Handcrafted tie-dye shorts — vibrant and one-of-a-kind.',
+ 'cat-011', 'Bottomwear', 'Shorts',
+ 899, 799, 300, ARRAY['S','M','L','XL','XXL'], ARRAY['Blue/White','Pink/Yellow','Green/White'],
+ '/images/plain_oversized_teal.jpg', ARRAY['/images/plain_oversized_teal.jpg'],
+ 240, true, false, true, 30, 270),
+
+('prod-038', 'AOP Sports Shorts', 'aop-sports-shorts', 'UA52',
+ 'All-over print quick-dry sports shorts.',
+ 'cat-011', 'Bottomwear', 'AOP Shorts',
+ 999, 849, 340, ARRAY['S','M','L','XL','XXL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 160, true, false, false, 40, 200),
+
+-- ── WOMEN'S TOPS ──────────────────────────────────────
+('prod-039', 'Women Classic T-Shirt', 'womens-classic-t-shirt', 'WCT01',
+ '180 GSM women''s classic fit crew neck tee.',
+ 'cat-012', 'Women', 'Women T-Shirt',
+ 549, 0, 180, ARRAY['XS','S','M','L','XL'], ARRAY['White','Black','Pink','Lavender','Mint'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 180, true, false, false, 70, 175),
+
+('prod-040', 'Crop Top', 'crop-top', 'FC39',
+ '200 GSM cropped crew neck top with clean hemline — streetwear staple.',
+ 'cat-012', 'Women', 'Crop Top',
+ 699, 599, 230, ARRAY['XS','S','M','L','XL'], ARRAY['White','Black','Grey','Beige','Dusty Pink'],
+ '/images/hd_womens_crop_top.png', ARRAY['/images/hd_womens_crop_top.png'],
+ 200, true, true, true, 80, 180),
+
+('prod-041', 'Crop Tank', 'crop-tank', 'FC40',
+ '180 GSM women''s crop tank — sleeveless and minimal.',
+ 'cat-012', 'Women', 'Crop Tank',
+ 599, 499, 195, ARRAY['XS','S','M','L','XL'], ARRAY['White','Black','Beige','Sage Green'],
+ '/images/hd_womens_crop_top.png', ARRAY['/images/hd_womens_crop_top.png'],
+ 180, true, false, false, 65, 155),
+
+('prod-042', 'Women Tank Top', 'womens-tank-top', 'FT37',
+ '180 GSM women''s fitted tank top.',
+ 'cat-024', 'Tank Tops & Sleeveless', 'Tank Top',
+ 549, 0, 178, ARRAY['XS','S','M','L','XL'], ARRAY['White','Black','Grey','Navy'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 180, true, false, false, 55, 150),
+
+('prod-043', 'Baby Tee', 'baby-tee', 'WBT01',
+ '160 GSM form-fitting baby tee — the Y2K streetwear staple.',
+ 'cat-012', 'Women', 'Baby Tee',
+ 649, 549, 210, ARRAY['XS','S','M','L'], ARRAY['White','Black','Baby Pink','Lavender','Butter Yellow'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 160, true, true, true, 70, 155),
+
+('prod-044', 'AOP Women T-Shirt', 'aop-womens-t-shirt', 'FA21',
+ 'All-over print women''s classic tee.',
+ 'cat-007', 'AOP T-Shirts', 'AOP Women T-Shirt',
+ 999, 849, 340, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 180, true, false, false, 40, 180),
+
+('prod-045', 'AOP Tank Top', 'aop-tank-top', 'FA37',
+ 'All-over print women''s tank top.',
+ 'cat-007', 'AOP T-Shirts', 'AOP Tank Top',
+ 899, 749, 300, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 180, true, false, false, 35, 155),
+
+('prod-046', 'AOP Crop Top', 'aop-crop-top', 'FA32',
+ 'All-over print women''s crop top.',
+ 'cat-007', 'AOP T-Shirts', 'AOP Crop Top',
+ 1099, 899, 380, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/hd_womens_crop_top.png', ARRAY['/images/hd_womens_crop_top.png'],
+ 200, true, false, true, 30, 185),
+
+('prod-047', 'AOP Crop Tank', 'aop-crop-tank', 'FA33',
+ 'All-over print women''s crop tank.',
+ 'cat-007', 'AOP T-Shirts', 'AOP Crop Tank',
+ 999, 849, 340, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/hd_womens_crop_top.png', ARRAY['/images/hd_womens_crop_top.png'],
+ 180, true, false, false, 30, 155),
+
+('prod-048', 'AOP Tube Top', 'aop-tube-top', 'FATB01',
+ 'All-over print strapless tube top.',
+ 'cat-007', 'AOP T-Shirts', 'AOP Tube Top',
+ 849, 749, 285, ARRAY['XS','S','M','L'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 180, true, false, true, 25, 130),
+
+('prod-049', 'AOP Full Sleeve Crop Top', 'aop-full-sleeve-crop-top', 'FAFSC01',
+ 'All-over print full sleeve women''s crop top.',
+ 'cat-007', 'AOP T-Shirts', 'AOP Full Sleeve Crop',
+ 1199, 999, 420, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/hd_womens_crop_top.png', ARRAY['/images/hd_womens_crop_top.png'],
+ 200, true, false, false, 25, 210),
+
+-- ── WOMEN'S HOODIES & JACKETS ────────────────────────
+('prod-050', 'Women Crop Hoodie', 'womens-crop-hoodie', 'FC32',
+ '320 GSM cropped hoodie for women — cozy meets street.',
+ 'cat-012', 'Women', 'Women Hoodie',
+ 1899, 1699, 650, ARRAY['XS','S','M','L','XL'], ARRAY['Black','Grey','Pink','Lavender','Ecru'],
+ '/images/sungod_luffy_white_hoodie.jpg', ARRAY['/images/sungod_luffy_white_hoodie.jpg'],
+ 320, true, true, true, 55, 480),
+
+('prod-051', 'Women AOP Bomber Jacket', 'womens-aop-bomber-jacket', 'FA30',
+ 'All-over print satin bomber jacket — women''s cut.',
+ 'cat-013', 'Jackets', 'Bomber Jacket',
+ 3499, 2999, 1200, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/hd_aop_bomber.png', ARRAY['/images/hd_aop_bomber.png'],
+ 0, true, false, true, 20, 750),
+
+-- ── WOMEN'S ACTIVEWEAR ──────────────────────────────
+('prod-052', 'AOP Gym Leggings', 'aop-gym-leggings', 'FA41',
+ 'All-over print high-waist gym leggings.',
+ 'cat-012', 'Women', 'Gym Leggings',
+ 1499, 1299, 510, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, false, false, 35, 280),
+
+('prod-053', 'AOP Sports Bra', 'aop-sports-bra', 'FA50',
+ 'All-over print medium-support sports bra.',
+ 'cat-012', 'Women', 'Sports Bra',
+ 999, 849, 340, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 180, true, false, false, 30, 150),
+
+('prod-054', 'AOP Pencil Skirt', 'aop-pencil-skirt', 'FAPS01',
+ 'All-over print fitted midi pencil skirt.',
+ 'cat-012', 'Women', 'Skirt',
+ 1299, 1099, 445, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, false, false, 25, 260),
+
+('prod-055', 'Mini Skirt', 'mini-skirt', 'FAMS01',
+ 'Stretchy mini skirt — street style staple.',
+ 'cat-012', 'Women', 'Skirt',
+ 899, 799, 295, ARRAY['XS','S','M','L','XL'], ARRAY['Black','White','Denim Blue'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, false, true, 30, 220),
+
+-- ── WOMEN'S DRESSES ──────────────────────────────────
+('prod-056', 'T-Shirt Dress', 't-shirt-dress', 'FC43',
+ '200 GSM women''s relaxed fit T-shirt dress.',
+ 'cat-012', 'Women', 'T-Shirt Dress',
+ 999, 849, 340, ARRAY['XS','S','M','L','XL'], ARRAY['Black','White','Grey','Sage Green'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, false, false, 40, 320),
+
+('prod-057', 'Maternity Dress', 'maternity-dress', 'FM44',
+ 'Soft stretch maternity dress — comfortable and stylish.',
+ 'cat-012', 'Women', 'Maternity Dress',
+ 1499, 1299, 510, ARRAY['XS','S','M','L','XL','XXL'], ARRAY['Black','Navy','Grey Marl'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, false, false, 25, 380),
+
+('prod-058', 'AOP T-Shirt Dress', 'aop-t-shirt-dress', 'FA35',
+ 'All-over print women''s T-shirt dress.',
+ 'cat-012', 'Women', 'AOP Dress',
+ 1499, 1299, 510, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 200, true, false, true, 30, 330),
+
+('prod-059', 'AOP A-Line Dress', 'aop-a-line-dress', 'FAALINE01',
+ 'All-over print A-line flared dress.',
+ 'cat-012', 'Women', 'AOP Dress',
+ 1699, 1499, 580, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 200, true, false, false, 25, 350),
+
+('prod-060', 'AOP Bodycon Dress', 'aop-bodycon-dress', 'FABDY01',
+ 'All-over print stretch bodycon midi dress.',
+ 'cat-012', 'Women', 'AOP Dress',
+ 1599, 1399, 545, ARRAY['XS','S','M','L','XL'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 200, true, false, false, 20, 310),
+
+('prod-061', 'Kaftan', 'kaftan', 'FKFT01',
+ 'Flowy printed kaftan dress — resort to streetwear crossover.',
+ 'cat-012', 'Women', 'Kaftan',
+ 1899, 1699, 650, ARRAY['XS','S','M','L','XL','XXL'], ARRAY['Printed Pattern'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 160, true, false, false, 20, 290),
+
+-- ── KIDS & BABY ──────────────────────────────────────
+('prod-062', 'Boy Crew Neck T-Shirt', 'boys-crew-neck-t-shirt', 'BC21',
+ 'Premium kids crew neck tee — soft 160 GSM combed cotton.',
+ 'cat-020', 'Kids', 'Kids T-Shirt',
+ 399, 349, 130, ARRAY['2-4Y','4-6Y','6-8Y','8-10Y','10-12Y'], ARRAY['White','Black','Navy','Red'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 160, true, false, false, 50, 130),
+
+('prod-063', 'Girl Crew Neck T-Shirt', 'girls-crew-neck-t-shirt', 'GC21',
+ 'Premium girls crew neck tee — soft 160 GSM combed cotton.',
+ 'cat-020', 'Kids', 'Kids T-Shirt',
+ 399, 349, 130, ARRAY['2-4Y','4-6Y','6-8Y','8-10Y','10-12Y'], ARRAY['White','Pink','Lavender','Mint'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 160, true, false, false, 50, 120),
+
+('prod-064', 'Kids Hoodie', 'kids-hoodie', 'KH63',
+ '280 GSM kids hoodie with kangaroo pocket.',
+ 'cat-020', 'Kids', 'Kids Hoodie',
+ 999, 849, 340, ARRAY['2-4Y','4-6Y','6-8Y','8-10Y','10-12Y'], ARRAY['Black','Grey','Navy','Red'],
+ '/images/sungod_luffy_black_hoodie.jpg', ARRAY['/images/sungod_luffy_black_hoodie.jpg'],
+ 280, true, false, false, 35, 320),
+
+('prod-065', 'Baby Romper', 'baby-romper', 'KR23',
+ 'Soft cotton baby romper — comfortable and adorable.',
+ 'cat-020', 'Kids', 'Baby Romper',
+ 599, 499, 195, ARRAY['0-3M','3-6M','6-12M','12-18M'], ARRAY['White','Beige','Sky Blue','Pink'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 160, true, false, true, 30, 100),
+
+('prod-066', 'Kids AOP Bomber Jacket', 'kids-aop-bomber-jacket', 'KA30',
+ 'Kids all-over print satin bomber jacket.',
+ 'cat-020', 'Kids', 'Kids Jacket',
+ 1999, 1699, 680, ARRAY['4-6Y','6-8Y','8-10Y','10-12Y'], ARRAY['Custom AOP'],
+ '/images/hd_aop_bomber.png', ARRAY['/images/hd_aop_bomber.png'],
+ 0, true, false, true, 20, 450),
+
+('prod-067', 'Kids AOP Sports T-Shirt', 'kids-aop-sports-t-shirt', 'KA51',
+ 'All-over print kids sports tee.',
+ 'cat-020', 'Kids', 'Kids Sports T-Shirt',
+ 599, 499, 195, ARRAY['4-6Y','6-8Y','8-10Y','10-12Y'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 160, true, false, false, 30, 140),
+
+('prod-068', 'Kids AOP Sports Shorts', 'kids-aop-sports-shorts', 'KA52',
+ 'All-over print kids quick-dry sports shorts.',
+ 'cat-020', 'Kids', 'Kids Shorts',
+ 599, 499, 195, ARRAY['4-6Y','6-8Y','8-10Y','10-12Y'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 160, true, false, false, 30, 130),
+
+('prod-069', 'Kids AOP Sweatshirt', 'kids-aop-sweatshirt', 'KA35',
+ 'All-over print kids crewneck sweatshirt.',
+ 'cat-020', 'Kids', 'Kids Sweatshirt',
+ 999, 849, 340, ARRAY['4-6Y','6-8Y','8-10Y','10-12Y'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 260, true, false, false, 25, 290),
+
+('prod-070', 'Kids AOP T-Shirt', 'kids-aop-t-shirt', 'KA71',
+ 'All-over print kids classic tee.',
+ 'cat-020', 'Kids', 'Kids AOP T-Shirt',
+ 699, 599, 230, ARRAY['4-6Y','6-8Y','8-10Y','10-12Y'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 180, true, false, false, 30, 145),
+
+-- ── BAGS ──────────────────────────────────────────────
+('prod-071', 'Tote Bag', 'tote-bag', 'TB01',
+ '12oz canvas tote bag — sturdy, spacious and minimal.',
+ 'cat-015', 'Tote Bags', 'Tote Bag',
+ 499, 399, 165, ARRAY['One Size'], ARRAY['Natural','Black','Navy'],
+ '/images/hd_tote_bag.png', ARRAY['/images/hd_tote_bag.png'],
+ 0, true, true, false, 100, 280),
+
+('prod-072', 'AOP Tote Bag', 'aop-tote-bag', 'AOP-TB01',
+ 'All-over print 12oz canvas tote bag.',
+ 'cat-015', 'Tote Bags', 'AOP Tote Bag',
+ 799, 699, 270, ARRAY['One Size'], ARRAY['Custom AOP'],
+ '/images/hd_tote_bag.png', ARRAY['/images/hd_tote_bag.png'],
+ 0, true, false, true, 60, 285),
+
+('prod-073', 'Everyday Large Tote Bag', 'everyday-large-tote-bag', 'LTB01',
+ 'XL heavyweight canvas tote with inner pocket — carry everything.',
+ 'cat-015', 'Tote Bags', 'Large Tote Bag',
+ 899, 799, 300, ARRAY['One Size'], ARRAY['Natural','Black'],
+ '/images/hd_tote_bag.png', ARRAY['/images/hd_tote_bag.png'],
+ 0, true, false, false, 45, 380),
+
+('prod-074', 'Drawstring Bag', 'drawstring-bag', 'DB01',
+ 'Lightweight 210D polyester drawstring cinch bag.',
+ 'cat-015', 'Tote Bags', 'Drawstring Bag',
+ 399, 349, 130, ARRAY['One Size'], ARRAY['Black','White','Navy','Grey'],
+ '/images/hd_tote_bag.png', ARRAY['/images/hd_tote_bag.png'],
+ 0, true, false, false, 80, 120),
+
+('prod-075', 'AOP Drawstring Bag', 'aop-drawstring-bag', 'AOP-DB01',
+ 'All-over print drawstring bag.',
+ 'cat-015', 'Tote Bags', 'AOP Drawstring Bag',
+ 599, 499, 195, ARRAY['One Size'], ARRAY['Custom AOP'],
+ '/images/hd_tote_bag.png', ARRAY['/images/hd_tote_bag.png'],
+ 0, true, false, false, 50, 125),
+
+-- ── HEADWEAR ──────────────────────────────────────────
+('prod-076', 'Baseball Cap', 'baseball-cap', 'BC33',
+ '6-panel structured baseball cap with embroidered front.',
+ 'cat-014', 'Caps & Headwear', 'Baseball Cap',
+ 699, 599, 230, ARRAY['One Size'], ARRAY['Black','White','Navy','Maroon','Olive'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, true, false, 80, 120),
+
+('prod-077', 'Snapback Cap', 'snapback-cap', 'SB30',
+ 'Flat-brim snapback cap with adjustable snap closure.',
+ 'cat-014', 'Caps & Headwear', 'Snapback Cap',
+ 799, 699, 265, ARRAY['One Size'], ARRAY['Black','White','Grey','Navy'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, true, true, 65, 130),
+
+('prod-078', 'Bucket Hat', 'bucket-hat', 'BH35',
+ 'Classic bucket hat in washed cotton — streetwear essential.',
+ 'cat-014', 'Caps & Headwear', 'Bucket Hat',
+ 699, 599, 230, ARRAY['S/M','L/XL'], ARRAY['Black','Beige','Olive','Navy'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, true, 55, 110),
+
+('prod-079', 'Trucker Cap', 'trucker-cap', 'TC55',
+ 'Foam front trucker cap with mesh back.',
+ 'cat-014', 'Caps & Headwear', 'Trucker Cap',
+ 649, 549, 215, ARRAY['One Size'], ARRAY['Black/Black','White/Black','Navy/White'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 50, 105),
+
+('prod-080', 'Sports Cap', 'sports-cap', 'SP45',
+ 'Moisture-wicking performance sports cap.',
+ 'cat-014', 'Caps & Headwear', 'Sports Cap',
+ 599, 499, 195, ARRAY['One Size'], ARRAY['Black','Navy','Grey'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 40, 95),
+
+('prod-081', 'Ottoman Cap', 'ottoman-cap', 'BC50',
+ 'Structured 5-panel Ottoman rib cap with metal buckle strap.',
+ 'cat-014', 'Caps & Headwear', 'Ottoman Cap',
+ 749, 649, 248, ARRAY['One Size'], ARRAY['Black','Camel','Navy'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 35, 115),
+
+('prod-082', 'Balaclava', 'balaclava', 'BLCV01',
+ 'Fleece balaclava face cover — cold weather streetwear essential.',
+ 'cat-014', 'Caps & Headwear', 'Balaclava',
+ 699, 599, 230, ARRAY['One Size'], ARRAY['Black','Grey','Camo'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, true, 45, 80),
+
+-- ── DRINKWARE ──────────────────────────────────────────
+('prod-083', 'White Coffee Mug', 'white-coffee-mug', 'MUG-W01',
+ '11oz ceramic white mug — perfect for custom prints.',
+ 'cat-017', 'Mugs & Drinkware', 'Coffee Mug',
+ 399, 349, 130, ARRAY['One Size'], ARRAY['White'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 0, true, false, false, 100, 350),
+
+('prod-084', 'Colour Coffee Mug', 'colour-coffee-mug', 'MUG-C01',
+ '11oz ceramic mug with colour inner and handle.',
+ 'cat-017', 'Mugs & Drinkware', 'Coffee Mug',
+ 449, 399, 148, ARRAY['One Size'], ARRAY['Red','Blue','Green','Yellow','Black'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 80, 360),
+
+('prod-085', 'Black Coffee Mug', 'black-coffee-mug', 'MUG-B01',
+ '11oz all-black matte ceramic mug — dark and minimal.',
+ 'cat-017', 'Mugs & Drinkware', 'Coffee Mug',
+ 449, 399, 148, ARRAY['One Size'], ARRAY['Black'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 80, 350),
+
+('prod-086', 'Magic Mug', 'magic-mug', 'MUG-M01',
+ 'Heat-sensitive magic mug — image reveals when hot liquid is added.',
+ 'cat-017', 'Mugs & Drinkware', 'Magic Mug',
+ 699, 599, 230, ARRAY['One Size'], ARRAY['Black to White'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, true, true, 50, 365),
+
+('prod-087', 'Enamel Mug', 'enamel-mug', 'MUG-E01',
+ 'Vintage enamel camping mug — durable and nostalgic.',
+ 'cat-017', 'Mugs & Drinkware', 'Enamel Mug',
+ 599, 499, 195, ARRAY['One Size'], ARRAY['White/Navy Rim','White/Black Rim'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 0, true, false, true, 45, 280),
+
+('prod-088', 'Sipper Bottle', 'sipper-bottle', 'BTL-S01',
+ '600ml BPA-free plastic sipper bottle with custom print.',
+ 'cat-017', 'Mugs & Drinkware', 'Water Bottle',
+ 699, 599, 230, ARRAY['One Size'], ARRAY['White','Black','Clear'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 0, true, false, false, 60, 200),
+
+('prod-089', 'Steel Water Bottle', 'steel-water-bottle', 'BTL-ST01',
+ '750ml double-wall insulated stainless steel water bottle.',
+ 'cat-017', 'Mugs & Drinkware', 'Water Bottle',
+ 999, 849, 340, ARRAY['One Size'], ARRAY['Silver','Black','White'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, true, false, 50, 280),
+
+('prod-090', 'Tumbler Bottle', 'tumbler-bottle', 'BTL-T01',
+ '500ml stainless steel tumbler with handle and straw lid.',
+ 'cat-017', 'Mugs & Drinkware', 'Tumbler',
+ 1199, 999, 420, ARRAY['One Size'], ARRAY['Black','White','Rose Gold'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, true, 40, 310),
+
+-- ── PHONE & DESK ACCESSORIES ──────────────────────────
+('prod-091', 'Phone Case', 'phone-case', 'PC01',
+ 'Custom printed hard phone case — durable and slim.',
+ 'cat-016', 'Phone Cases', 'Phone Case',
+ 499, 399, 165, ARRAY['iPhone 14','iPhone 15','Samsung S23','Samsung S24','Pixel 8'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 80, 45),
+
+('prod-092', 'Glass Phone Case', 'glass-phone-case', 'GPC01',
+ 'Tempered glass back phone case with custom UV print.',
+ 'cat-016', 'Phone Cases', 'Glass Phone Case',
+ 699, 599, 230, ARRAY['iPhone 14','iPhone 15','Samsung S23','Samsung S24'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 55, 50),
+
+('prod-093', 'Mousepad', 'mousepad', 'MP01',
+ 'Extended gaming mousepad with custom print — smooth tracking surface.',
+ 'cat-018', 'Home & Lifestyle', 'Mousepad',
+ 599, 499, 195, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 60, 400),
+
+('prod-094', 'Gaming Pad', 'gaming-pad', 'GP01',
+ 'XXL custom gaming pad with stitched edges.',
+ 'cat-018', 'Home & Lifestyle', 'Gaming Pad',
+ 799, 699, 265, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 40, 550),
+
+('prod-095', 'Coaster', 'coaster', 'CST01',
+ 'MDF wooden coaster with custom print.',
+ 'cat-018', 'Home & Lifestyle', 'Coaster',
+ 299, 249, 98, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 100, 50),
+
+('prod-096', 'Acrylic Coaster', 'acrylic-coaster', 'ACST01',
+ 'Crystal clear acrylic coaster with UV printed design.',
+ 'cat-018', 'Home & Lifestyle', 'Acrylic Coaster',
+ 349, 299, 115, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 80, 60),
+
+-- ── WALL ART & HOME DECOR ──────────────────────────
+('prod-097', 'Poster', 'poster', 'PST01',
+ 'High-quality matte photo poster — A3/A2 sizes.',
+ 'cat-018', 'Home & Lifestyle', 'Poster',
+ 349, 299, 115, ARRAY['A4','A3','A2'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 150, 80),
+
+('prod-098', 'Framed Poster', 'framed-poster', 'FPST01',
+ 'Custom print with wooden frame — wall-ready art.',
+ 'cat-018', 'Home & Lifestyle', 'Framed Poster',
+ 799, 699, 265, ARRAY['A4','A3'], ARRAY['Black Frame','White Frame','Natural Frame'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 60, 450),
+
+('prod-099', 'Metal Poster', 'metal-poster', 'MPST01',
+ 'Aluminium metal print — vibrant, durable wall art.',
+ 'cat-018', 'Home & Lifestyle', 'Metal Poster',
+ 999, 849, 340, ARRAY['A4','A3'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 40, 600),
+
+('prod-100', 'Acrylic Poster', 'acrylic-poster', 'APST01',
+ 'Glass-clear acrylic wall art with UV print.',
+ 'cat-018', 'Home & Lifestyle', 'Acrylic Poster',
+ 1299, 1099, 445, ARRAY['A4','A3'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 30, 550),
+
+('prod-101', 'Canvas Print', 'canvas-print', 'CNVS01',
+ 'Gallery-wrapped canvas print — fade-resistant and premium.',
+ 'cat-018', 'Home & Lifestyle', 'Canvas Print',
+ 1499, 1299, 510, ARRAY['12x12','16x16','12x18','18x24'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, true, false, 25, 700),
+
+('prod-102', 'Tapestry', 'tapestry', 'TPST01',
+ 'Large woven polyester tapestry — wall hanging statement piece.',
+ 'cat-018', 'Home & Lifestyle', 'Tapestry',
+ 1999, 1699, 680, ARRAY['60x80 cm','90x120 cm'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 20, 400),
+
+('prod-103', 'AOP Pillow Cover', 'aop-pillow-cover', 'APLW01',
+ 'All-over print cushion cover — soft and vibrant.',
+ 'cat-018', 'Home & Lifestyle', 'Pillow Cover',
+ 699, 599, 230, ARRAY['12x12','16x16','18x18'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, true, 50, 180),
+
+('prod-104', 'AOP Cushion Cover', 'aop-cushion-cover', 'ACES01',
+ 'All-over print cushion cover with zip closure.',
+ 'cat-018', 'Home & Lifestyle', 'Cushion Cover',
+ 749, 649, 248, ARRAY['12x12','16x16','18x18','20x20'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 45, 190),
+
+('prod-105', 'Placemat', 'placemat', 'PLCMT01',
+ 'Custom printed table placemat.',
+ 'cat-018', 'Home & Lifestyle', 'Placemat',
+ 349, 299, 115, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 60, 90),
+
+-- ── STATIONERY ──────────────────────────────────────
+('prod-110', 'Notepad', 'notepad', 'NP01',
+ 'Custom printed A5 notepad — 50 tear-off sheets.',
+ 'cat-018', 'Home & Lifestyle', 'Notepad',
+ 299, 249, 98, ARRAY['A5'], ARRAY['Custom Print'],
+ '/images/plain_oversized_white.jpg', ARRAY['/images/plain_oversized_white.jpg'],
+ 0, true, false, false, 100, 150),
+
+('prod-111', 'Notebook', 'notebook', 'NB01',
+ 'A5 hardcover notebook with 120 pages.',
+ 'cat-018', 'Home & Lifestyle', 'Notebook',
+ 499, 399, 165, ARRAY['A5','A4'], ARRAY['Custom Cover'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 80, 320),
+
+-- ── MERCH & ACCESSORIES ──────────────────────────────
+('prod-118', 'Button Badge', 'button-badge', 'BBDG01',
+ '58mm custom button badge — ideal for bags and jackets.',
+ 'cat-019', 'Stickers & Badges', 'Button Badge',
+ 149, 99, 48, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 300, 20),
+
+('prod-119', 'Black Badge', 'black-badge', 'BLKBDG01',
+ '58mm matte black custom badge.',
+ 'cat-019', 'Stickers & Badges', 'Black Badge',
+ 149, 99, 48, ARRAY['One Size'], ARRAY['Black Custom'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 200, 20),
+
+('prod-120', 'Laminated Stickers', 'laminated-stickers', 'LSTK01',
+ 'Custom die-cut laminated stickers — waterproof and vibrant.',
+ 'cat-019', 'Stickers & Badges', 'Stickers',
+ 199, 149, 65, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, true, true, 500, 5),
+
+('prod-121', 'Temporary Tattoos', 'temporary-tattoos', 'TTAT01',
+ 'Safe skin-transfer temporary tattoos — party and event staple.',
+ 'cat-019', 'Stickers & Badges', 'Temporary Tattoos',
+ 249, 199, 82, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 200, 10),
+
+('prod-122', 'Embroidered Patches', 'embroidered-patches', 'EMBD01',
+ 'Iron-on custom embroidered patches.',
+ 'cat-019', 'Stickers & Badges', 'Patches',
+ 299, 249, 98, ARRAY['One Size'], ARRAY['Custom Embroidery'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, true, 150, 15),
+
+('prod-123', 'Keychain', 'keychain', 'KCH01',
+ 'Custom acrylic or metal keychain.',
+ 'cat-019', 'Stickers & Badges', 'Keychain',
+ 249, 199, 82, ARRAY['One Size'], ARRAY['Custom Print'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, false, 200, 25),
+
+-- ── FASHION ACCESSORIES ──────────────────────────────
+('prod-128', 'AOP Bandana', 'aop-bandana', 'FABD01',
+ 'All-over print square bandana — wear as headband, neckerchief or pocket square.',
+ 'cat-014', 'Caps & Headwear', 'Bandana',
+ 499, 399, 165, ARRAY['One Size'], ARRAY['Custom AOP'],
+ '/images/plain_oversized_black.jpg', ARRAY['/images/plain_oversized_black.jpg'],
+ 0, true, false, true, 80, 55),
+
+-- ── PET PRODUCTS ──────────────────────────────────────
+('prod-134', 'Dog T-Shirt', 'dog-t-shirt', 'DT59',
+ 'Soft cotton dog tee — stylish streetwear for your pet.',
+ 'cat-021', 'Pet Products', 'Dog T-Shirt',
+ 599, 499, 195, ARRAY['XS','S','M','L','XL'], ARRAY['Black','White','Grey'],
+ '/images/hd_pet_hoodie.png', ARRAY['/images/hd_pet_hoodie.png'],
+ 180, true, true, true, 50, 80),
+
+('prod-135', 'Pet Tag', 'pet-tag', 'PTAG01',
+ 'Personalised engraved pet ID tag — stainless steel.',
+ 'cat-021', 'Pet Products', 'Pet Tag',
+ 349, 299, 115, ARRAY['One Size'], ARRAY['Silver','Gold','Rose Gold'],
+ '/images/hd_pet_collar.png', ARRAY['/images/hd_pet_collar.png'],
+ 0, true, false, false, 100, 15),
+
+('prod-136', 'Dog Tag', 'dog-tag', 'DTAG01',
+ 'Customised brass dog ID tag with engraved name.',
+ 'cat-021', 'Pet Products', 'Dog Tag',
+ 399, 349, 130, ARRAY['One Size'], ARRAY['Brass','Silver','Black'],
+ '/images/hd_pet_collar.png', ARRAY['/images/hd_pet_collar.png'],
+ 0, true, false, false, 80, 20)
+
+ON CONFLICT (id) DO UPDATE SET
+  name = EXCLUDED.name,
+  slug = EXCLUDED.slug,
+  sku = EXCLUDED.sku,
+  short_description = EXCLUDED.short_description,
+  category_id = EXCLUDED.category_id,
+  category_name = EXCLUDED.category_name,
+  product_type = EXCLUDED.product_type,
+  price = EXCLUDED.price,
+  sale_price = EXCLUDED.sale_price,
+  cost_price = EXCLUDED.cost_price,
+  sizes = EXCLUDED.sizes,
+  colors = EXCLUDED.colors,
+  thumbnail = EXCLUDED.thumbnail,
+  images = EXCLUDED.images,
+  fabric_gsm = EXCLUDED.fabric_gsm,
+  is_published = EXCLUDED.is_published,
+  is_featured = EXCLUDED.is_featured,
+  is_new_arrival = EXCLUDED.is_new_arrival,
+  stock_quantity = EXCLUDED.stock_quantity,
+  weight_grams = EXCLUDED.weight_grams;
+
+-- STEP 3: Mark priority bestsellers
+UPDATE products SET is_featured = true, is_new_arrival = true
+WHERE id IN ('prod-008','prod-009','prod-011','prod-019','prod-020','prod-028','prod-035','prod-040','prod-043','prod-071','prod-076','prod-077');
+
+SELECT 'Seed complete! Categories: ' || (SELECT count(*) FROM categories) || ', Products: ' || (SELECT count(*) FROM products) AS result;
