@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 
 const ADMIN_LOGIN_EMAIL = 'theinkthreadhub@gmail.com';
 const ADMIN_LOGIN_ID = 'inkthread';
+const ADMIN_RESET_URL = 'https://www.inkthreadhub.in/admin/reset-password';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -15,11 +16,14 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [recoveryMsg, setRecoveryMsg] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setRecoveryMsg('');
     setLoading(true);
 
     try {
@@ -62,6 +66,31 @@ export default function AdminLoginPage() {
     }
   };
 
+  const handleRecovery = async () => {
+    setErrorMsg('');
+    setRecoveryMsg('');
+    setRecoveryLoading(true);
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(ADMIN_LOGIN_EMAIL, {
+        redirectTo: ADMIN_RESET_URL,
+      });
+
+      if (error) throw error;
+      setRecoveryMsg('Recovery email sent. Open the latest email and use the reset link.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unable to send recovery email';
+      if (msg.toLowerCase().includes('rate limit')) {
+        setErrorMsg('Recovery email limit reached. Please wait for the Supabase cooldown, then try once.');
+      } else {
+        setErrorMsg(msg);
+      }
+    } finally {
+      setRecoveryLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md bg-card border border-street-800 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
@@ -81,6 +110,12 @@ export default function AdminLoginPage() {
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3.5 rounded-xl flex items-center gap-2 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
+          </div>
+        )}
+
+        {recoveryMsg && (
+          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 p-3.5 rounded-xl text-xs">
+            {recoveryMsg}
           </div>
         )}
 
@@ -120,14 +155,19 @@ export default function AdminLoginPage() {
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
                 tabIndex={-1}
               >
-                {showPassword ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
+
+          <button
+            type="button"
+            onClick={handleRecovery}
+            disabled={recoveryLoading}
+            className="w-full text-right text-[11px] font-mono text-brand-neon hover:text-brand-neonHover disabled:opacity-50"
+          >
+            {recoveryLoading ? 'SENDING RESET LINK...' : 'Forgot password? Send reset link'}
+          </button>
 
           <button
             type="submit"
