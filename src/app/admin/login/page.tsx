@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { Lock, UserRound, Shield, ArrowRight, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
-const ADMIN_LOGIN_EMAIL = 'inkthread@inkthreadhub.in';
+const ADMIN_LOGIN_EMAIL = 'theinkthreadhub@gmail.com';
+const ADMIN_LOGIN_ID = 'inkthread';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('inkthread');
+  const [username, setUsername] = useState(ADMIN_LOGIN_ID);
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -21,7 +22,7 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      if (username.trim().toLowerCase() !== 'inkthread') {
+      if (username.trim().toLowerCase() !== ADMIN_LOGIN_ID) {
         throw new Error('Invalid administrator ID or password');
       }
 
