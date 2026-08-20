@@ -36,11 +36,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group relative flex flex-col bg-card border border-street-800 rounded-2xl overflow-hidden hover:border-street-700 hover:shadow-2xl transition-all duration-300">
+    <div className="group relative flex flex-col bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:border-zinc-400 hover:shadow-lg transition-all duration-300">
       {/* Top Image Container */}
       <Link
         href={`/product/${product.slug}`}
-        className="relative aspect-[4/5] w-full bg-street-950 overflow-hidden block"
+        className="relative aspect-[4/5] w-full bg-zinc-100 overflow-hidden block"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -55,7 +55,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Badges Overlay */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           {product.is_new_arrival && (
-            <span className="bg-brand-neon text-black text-[10px] font-black uppercase px-2 py-0.5 rounded tracking-wider shadow-glow-neon">
+            <span className="bg-black text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
               NEW DROP
             </span>
           )}
@@ -96,33 +96,33 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
 
-          <Link href={`/product/${product.slug}`} className="block group-hover:text-brand-neon transition-colors">
-            <h3 className="text-sm sm:text-base font-bold text-white tracking-tight line-clamp-1">
+          <Link href={`/product/${product.slug}`} className="block group-hover:text-zinc-600 transition-colors">
+            <h3 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight line-clamp-1">
               {product.name}
             </h3>
           </Link>
 
           {product.short_description && (
-            <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-zinc-500 mt-1 line-clamp-2 leading-relaxed">
               {product.short_description}
             </p>
           )}
         </div>
 
         {/* Price & Size Pills */}
-        <div className="mt-4 pt-3 border-t border-street-800/80 flex items-end justify-between">
+        <div className="mt-4 pt-3 border-t border-zinc-200 flex items-end justify-between">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-2">
-              <span className="text-base sm:text-lg font-mono font-black text-brand-neon">
+              <span className="text-base sm:text-lg font-mono font-black text-zinc-900">
                 {formatPrice(currentPrice)}
               </span>
               {hasDiscount && (
-                <span className="text-xs font-mono text-zinc-500 line-through">
+                <span className="text-xs font-mono text-zinc-400 line-through">
                   {formatPrice(product.price)}
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-zinc-500">Tax Included</span>
+            <span className="text-[10px] text-zinc-400">Tax Included</span>
           </div>
 
           {/* Size Pill Selection */}
@@ -136,8 +136,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                 }}
                 className={`text-[10px] font-mono px-1.5 py-0.5 rounded border transition-colors ${
                   selectedSize === size
-                    ? 'border-brand-neon text-brand-neon bg-brand-neon/10 font-bold'
-                    : 'border-street-800 text-zinc-400 hover:border-zinc-600'
+                    ? 'border-black text-black bg-zinc-100 font-bold'
+                    : 'border-zinc-200 text-zinc-500 hover:border-zinc-400'
                 }`}
               >
                 {size.split(' ')[0]}

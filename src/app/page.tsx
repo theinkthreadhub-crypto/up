@@ -15,70 +15,98 @@ export default function HomePage() {
 
   return (
     <div className="space-y-16 sm:space-y-24 pb-20">
-      {/* 1. HERO SECTION */}
-      <section className="relative min-h-[85vh] sm:min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-street-800 bg-gradient-to-b from-street-950 via-background to-background">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/hero_banner.png"
-            alt="InkThread Hub Streetwear Hero Banner"
-            fill
-            priority
-            className="object-cover object-center opacity-30 scale-105 transform animate-pulse-glow"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-          <div className="absolute inset-0 bg-radial from-brand-neon/5 via-transparent to-transparent" />
+      {/* 1. HERO SECTION (Stitch AI Craftsmanship Edition) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="bg-[#efeded] border border-zinc-200 rounded-3xl p-8 sm:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative overflow-hidden shadow-sm">
+          {/* Left Content Column */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2 bg-white border border-zinc-300 text-zinc-800 px-3.5 py-1 rounded-full text-xs font-mono shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>STITCH AI CRAFTSMANSHIP EDITION</span>
+            </div>
+
+            <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal text-zinc-900 leading-[1.08] tracking-tight">
+              Slow Fashion & <br className="hidden sm:inline" />
+              Tactile Craftsmanship
+            </h1>
+
+            <p className="text-zinc-600 text-sm sm:text-base leading-relaxed max-w-xl">
+              Crafted from 240 GSM organic bio-washed cotton, heavy acid-wash fleece, and genuine leather pet collar brackets. Built for silhouette permanence and tactile comfort.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
+              <Link
+                href="/shop"
+                className="bg-zinc-900 hover:bg-black text-white px-7 py-3.5 rounded-xl font-medium text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all shadow-sm"
+              >
+                EXPLORE FULL CATALOG →
+              </Link>
+              <Link
+                href="/category/pet"
+                className="bg-transparent border border-zinc-900 hover:bg-zinc-200/60 text-zinc-900 px-7 py-3.5 rounded-xl font-medium text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all"
+              >
+                PET HARDWARE COLLECTION
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Card Column */}
+          <div className="lg:col-span-5 relative">
+            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-md border border-zinc-300 group">
+              <Image
+                src="/images/sungod_classic_black_front.jpg"
+                alt="240 GSM Stacked Heavyweight Cotton Streetwear"
+                fill
+                priority
+                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+              {/* Card Footer Overlay */}
+              <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-4 rounded-xl flex items-center justify-between border border-zinc-200 shadow-sm">
+                <div>
+                  <p className="text-[10px] font-mono uppercase text-zinc-500 tracking-wider">FEATURED CRAFT</p>
+                  <p className="text-xs font-serif font-bold text-zinc-900">240 GSM Stacked Heavyweight Cotton</p>
+                </div>
+                <Link
+                  href="/shop"
+                  className="bg-black hover:bg-zinc-800 text-white text-xs font-medium px-3.5 py-2 rounded-lg transition-colors shrink-0"
+                >
+                  VIEW DETAILS
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-8 pb-16">
-          <div className="inline-flex items-center gap-2 bg-street-900/90 border border-brand-neon/30 text-brand-neon px-3.5 py-1.5 rounded-full text-xs font-mono font-bold tracking-widest uppercase mb-6 shadow-glow-neon animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <Flame className="w-3.5 h-3.5 text-brand-neon animate-bounce" />
-            <span>DROP 04: SUN GOD & HEAVYWEIGHT ESSENTIALS</span>
-          </div>
-
-          <h1 className="font-display font-black text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tighter text-white uppercase leading-[0.95] mb-6">
-            HEAVYWEIGHT <br className="hidden sm:inline" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-neon via-emerald-400 to-brand-cyan">
-              STREET CULTURE
-            </span>
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-sm sm:text-base md:text-lg text-zinc-300 font-normal leading-relaxed mb-8 sm:mb-10">
-            Engineered with bespoke 240 GSM bio-washed cotton and 380 GSM French Terry. Architectural oversized silhouettes crafted for the concrete underground.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/shop"
-              className="w-full sm:w-auto bg-brand-neon hover:bg-brand-neonHover text-black font-black text-xs sm:text-sm uppercase tracking-wider py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-all shadow-glow-neon group"
-            >
-              SHOP ALL DROPS
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-
-            <Link
-              href="/category/heavyweight-hoodies"
-              className="w-full sm:w-auto bg-street-900/90 hover:bg-street-800 text-white font-bold text-xs sm:text-sm uppercase tracking-wider py-4 px-8 rounded-xl border border-street-700 flex items-center justify-center gap-2 transition-all"
-            >
-              EXPLORE HOODIES
-            </Link>
-          </div>
-
-          {/* Micro stats banner */}
-          <div className="mt-12 pt-8 border-t border-street-800/80 grid grid-cols-3 gap-4 max-w-xl mx-auto text-center font-mono">
+        {/* Feature Icons Bar below Hero */}
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white border border-zinc-200 rounded-2xl shadow-sm text-zinc-800 text-xs font-medium">
+          <div className="flex items-center gap-3">
+            <Shield className="w-5 h-5 text-zinc-900" />
             <div>
-              <p className="text-xl sm:text-2xl font-black text-white">240+</p>
-              <p className="text-[11px] text-zinc-500 uppercase">GSM Textile</p>
+              <p className="font-bold text-zinc-900">Heavyweight Quality</p>
+              <p className="text-[11px] text-zinc-500">240-380 GSM Cotton</p>
             </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Truck className="w-5 h-5 text-zinc-900" />
             <div>
-              <p className="text-xl sm:text-2xl font-black text-brand-neon">100%</p>
-              <p className="text-[11px] text-zinc-500 uppercase">Combed Cotton</p>
+              <p className="font-bold text-zinc-900">Express Delivery</p>
+              <p className="text-[11px] text-zinc-500">Pan-India Express Shipping</p>
             </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Sparkles className="w-5 h-5 text-zinc-900" />
             <div>
-              <p className="text-xl sm:text-2xl font-black text-brand-cyan">PAN-IN</p>
-              <p className="text-[11px] text-zinc-500 uppercase">Free Express</p>
+              <p className="font-bold text-zinc-900">Pet Hardware</p>
+              <p className="text-[11px] text-zinc-500">Brass Buckle Leather Belts</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <RefreshCw className="w-5 h-5 text-zinc-900" />
+            <div>
+              <p className="font-bold text-zinc-900">Easy Returns</p>
+              <p className="text-[11px] text-zinc-500">7-Day Hassle Free Exchange</p>
             </div>
           </div>
         </div>

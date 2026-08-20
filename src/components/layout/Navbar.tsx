@@ -28,13 +28,12 @@ export default function Navbar() {
   if (isAdminRoute) return null;
 
   const navLinks = [
-    { name: 'DROP / SHOP', href: '/shop', highlight: true },
+    { name: 'HOME', href: '/' },
+    { name: 'CATALOG', href: '/shop' },
+    { name: 'JOURNAL', href: '/blog' },
     { name: 'MEN', href: '/category/men' },
     { name: 'WOMEN', href: '/category/women' },
     { name: 'PETS', href: '/category/pet' },
-    { name: 'TEES', href: '/category/oversized-t-shirts' },
-    { name: 'HOODIES', href: '/category/heavyweight-hoodies' },
-    { name: 'OUTERWEAR', href: '/category/jackets-outerwear' },
   ];
 
   return (
@@ -42,79 +41,75 @@ export default function Navbar() {
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
           isScrolled
-            ? 'bg-background/90 backdrop-blur-md border-b border-street-800 shadow-glass'
-            : 'bg-background/60 backdrop-blur-sm border-b border-white/5'
+            ? 'bg-white/95 backdrop-blur-md border-b border-zinc-200 shadow-sm'
+            : 'bg-white/80 backdrop-blur-sm border-b border-zinc-100'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
-            {/* Left: Mobile menu toggle + Desktop Logo */}
-            <div className="flex items-center gap-4">
+            {/* Left: Desktop Links / Mobile Menu Toggle */}
+            <div className="flex items-center gap-6">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 text-zinc-300 hover:text-white transition-colors"
+                className="lg:hidden p-2 text-zinc-700 hover:text-black transition-colors"
                 aria-label="Toggle Menu"
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
 
-              {/* Brand Logo */}
-              <Link href="/" className="flex items-center gap-2 group">
-                <span className="font-display font-black text-xl sm:text-2xl tracking-tighter text-white uppercase group-hover:text-brand-neon transition-colors">
-                  INK<span className="text-brand-neon">THREAD</span>
-                  <span className="text-zinc-500 text-xs ml-1 font-mono tracking-normal px-1.5 py-0.5 border border-zinc-700 rounded uppercase">HUB</span>
-                </span>
-              </Link>
+              <nav className="hidden lg:flex items-center gap-6">
+                {navLinks.slice(0, 3).map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`text-xs font-medium tracking-widest transition-colors uppercase relative py-1 ${
+                        isActive ? 'text-black font-bold border-b-2 border-black' : 'text-zinc-600 hover:text-black'
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  );
+                })}
+              </nav>
             </div>
 
-            {/* Middle: Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-7">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`text-xs font-semibold tracking-wider transition-all duration-200 uppercase relative py-1 ${
-                      isActive
-                        ? 'text-brand-neon font-bold'
-                        : 'text-zinc-300 hover:text-white'
-                    } ${link.highlight ? 'flex items-center gap-1 text-brand-neon' : ''}`}
-                  >
-                    {link.highlight && <Flame className="w-3.5 h-3.5 text-brand-neon animate-pulse" />}
-                    {link.name}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand-neon rounded-full" />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
+            {/* Center: Elegant Serif Logo */}
+            <Link href="/" className="flex items-center justify-center">
+              <span className="font-serif text-2xl sm:text-3xl text-zinc-900 tracking-tight hover:opacity-80 transition-opacity">
+                Inkthread Hub
+              </span>
+            </Link>
 
-            {/* Right: Actions (Search, Track Order, Cart, Admin Icon) */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            {/* Right: Actions & Category Quick Links */}
+            <div className="flex items-center gap-3 sm:gap-5">
+              <nav className="hidden xl:flex items-center gap-4 text-xs font-mono text-zinc-600 border-r border-zinc-200 pr-4">
+                <Link href="/category/men" className="hover:text-black">MEN</Link>
+                <Link href="/category/women" className="hover:text-black">WOMEN</Link>
+                <Link href="/category/pet" className="hover:text-black">PETS</Link>
+              </nav>
+
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="p-2 text-zinc-300 hover:text-white hover:bg-street-900 rounded-full transition-colors flex items-center gap-1.5 text-xs font-medium"
-                title="Search Products (Ctrl+K)"
+                className="p-2 text-zinc-700 hover:text-black hover:bg-zinc-100 rounded-full transition-colors"
+                title="Search Products"
               >
-                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="hidden md:inline text-zinc-400">Search</span>
+                <Search className="w-5 h-5" />
               </button>
 
               <Link
-                href="/track-order"
-                className="hidden sm:flex items-center gap-1.5 text-xs text-zinc-300 hover:text-white p-2 hover:bg-street-900 rounded-full transition-colors"
-                title="Track Live Order"
+                href="/admin/login"
+                className="p-2 text-zinc-700 hover:text-black hover:bg-zinc-100 rounded-full transition-colors"
+                title="Admin Access"
               >
-                <Truck className="w-4 h-4 text-brand-cyan" />
-                <span className="hidden md:inline">Track</span>
+                <Shield className="w-5 h-5" />
               </Link>
 
               {/* Cart Drawer Trigger */}
               <button
                 onClick={() => setIsDrawerOpen(true)}
-                className="p-2 text-zinc-200 hover:text-white hover:bg-street-900 rounded-full transition-colors relative flex items-center"
+                className="p-2 text-zinc-900 hover:bg-zinc-100 rounded-full transition-colors relative flex items-center"
                 aria-label="Open Shopping Cart"
               >
                 <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" />

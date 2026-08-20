@@ -22,12 +22,12 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-street-950 border-t border-street-800 text-zinc-400 text-sm">
+    <footer className="bg-zinc-900 border-t border-zinc-800 text-zinc-300 text-sm">
       {/* Brand Value Props Banner */}
-      <div className="border-b border-street-800/80 bg-street-900/40 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="border-b border-zinc-800 bg-zinc-950 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
-          <div className="flex items-center gap-4 justify-center md:justify-start p-3 bg-street-900/50 rounded-xl border border-street-800">
-            <div className="w-10 h-10 rounded-lg bg-brand-neon/10 text-brand-neon flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-4 justify-center md:justify-start p-3 bg-zinc-900 rounded-xl border border-zinc-800">
+            <div className="w-10 h-10 rounded-lg bg-white/10 text-white flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -36,8 +36,8 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 justify-center md:justify-start p-3 bg-street-900/50 rounded-xl border border-street-800">
-            <div className="w-10 h-10 rounded-lg bg-brand-cyan/10 text-brand-cyan flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-4 justify-center md:justify-start p-3 bg-zinc-900 rounded-xl border border-zinc-800">
+            <div className="w-10 h-10 rounded-lg bg-white/10 text-white flex items-center justify-center shrink-0">
               <Truck className="w-5 h-5" />
             </div>
             <div>
@@ -46,8 +46,8 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 justify-center md:justify-start p-3 bg-street-900/50 rounded-xl border border-street-800">
-            <div className="w-10 h-10 rounded-lg bg-brand-purple/10 text-brand-purple flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-4 justify-center md:justify-start p-3 bg-zinc-900 rounded-xl border border-zinc-800">
+            <div className="w-10 h-10 rounded-lg bg-white/10 text-white flex items-center justify-center shrink-0">
               <RefreshCw className="w-5 h-5" />
             </div>
             <div>
@@ -64,20 +64,19 @@ export default function Footer() {
           {/* Col 1: Brand & Newsletter */}
           <div className="md:col-span-2 space-y-4">
             <Link href="/" className="inline-block">
-              <span className="font-display font-black text-2xl tracking-tighter text-white uppercase">
-                INK<span className="text-brand-neon">THREAD</span>
-                <span className="text-zinc-500 text-xs ml-1 font-mono tracking-normal px-1.5 py-0.5 border border-zinc-700 rounded uppercase">HUB</span>
+              <span className="font-serif text-2xl sm:text-3xl text-white tracking-tight">
+                Inkthread Hub
               </span>
             </Link>
             <p className="text-xs text-zinc-400 leading-relaxed max-w-sm">
-              Artisanal streetwear and heavy-density oversized apparel designed for the concrete avant-garde. Bio-washed, drop-shoulder silhouettes engineered in New Delhi.
+              Slow fashion & tactile craftsmanship. Organic bio-washed cotton, heavy acid-wash fleece, and genuine leather pet collar hardware.
             </p>
 
             {/* Newsletter Form */}
             <div className="pt-2">
               <p className="text-xs font-bold text-white uppercase tracking-wider mb-2">JOIN THE PRIVATE DROP LIST</p>
               {subscribed ? (
-                <div className="bg-brand-neon/10 border border-brand-neon/30 text-brand-neon p-3 rounded-xl text-xs font-semibold">
+                <div className="bg-white/10 border border-white/20 text-white p-3 rounded-xl text-xs font-semibold">
                   ⚡ Welcome to the underground. Look out for drop alerts!
                 </div>
               ) : (
@@ -88,11 +87,11 @@ export default function Footer() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="flex-1 bg-street-900 border border-street-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-brand-neon"
+                    className="flex-1 bg-zinc-950 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-white"
                   />
                   <button
                     type="submit"
-                    className="bg-brand-neon hover:bg-brand-neonHover text-black font-black text-xs uppercase px-4 py-2.5 rounded-xl transition-all shadow-glow-neon flex items-center gap-1"
+                    className="bg-white hover:bg-zinc-200 text-black font-bold text-xs uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1 shrink-0"
                   >
                     JOIN <ArrowRight className="w-3.5 h-3.5" />
                   </button>

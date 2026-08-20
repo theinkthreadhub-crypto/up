@@ -1,56 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  /* ─── Stitch InkThread Hub Premium Theme Colors ─── */
-  --color-brand-gold: #C9A84C;
-  --color-brand-goldHover: #B39238;
-  --color-brand-goldLight: #E6C66D;
-
-  /* Aliased to brand-neon for instant backwards compatibility across all components */
-  --color-brand-neon: #C9A84C;
-  --color-brand-neonHover: #B39238;
-  --color-brand-cyan: #E6C66D;
-  --color-brand-purple: #9d4edd;
-  --color-brand-amber: #E6C66D;
-  --color-brand-red: #ff3366;
+  /* ─── Stitch Minimalist Luxury Light Theme ─── */
+  --color-brand-neon: #111111;
+  --color-brand-neonHover: #222222;
+  --color-brand-cyan: #444444;
+  --color-brand-purple: #111111;
+  --color-brand-amber: #c9a84c;
+  --color-brand-red: #ba1a1a;
 
   /* ─── Background / Foreground ─── */
-  --color-background: #080808;
-  --color-foreground: #f3f4f6;
+  --color-background: #fbf9f9;
+  --color-foreground: #1b1c1c;
 
   /* ─── Card ─── */
-  --color-card: #121212;
-  --color-card-foreground: #f3f4f6;
-  --color-card-border: rgba(201, 168, 76, 0.2);
+  --color-card: #ffffff;
+  --color-card-foreground: #1b1c1c;
+  --color-card-border: #e4e2e2;
 
-  /* ─── Street Palette ─── */
-  --color-street-50:  #f6f7f9;
-  --color-street-100: #eceef2;
-  --color-street-200: #d5d9e2;
-  --color-street-300: #b1b9c9;
-  --color-street-400: #8693ab;
-  --color-street-500: #66738f;
-  --color-street-600: #505b75;
-  --color-street-700: #414a60;
-  --color-street-800: #1a1a1a;
-  --color-street-900: #121212;
-  --color-street-950: #080808;
+  /* ─── Neutral Palette ─── */
+  --color-street-50:  #ffffff;
+  --color-street-100: #f5f3f3;
+  --color-street-200: #efeded;
+  --color-street-300: #e4e2e2;
+  --color-street-400: #c4c7c7;
+  --color-street-500: #747878;
+  --color-street-600: #5e5e5b;
+  --color-street-700: #444748;
+  --color-street-800: #303031;
+  --color-street-900: #1b1c1c;
+  --color-street-950: #111111;
 
   /* ─── Shadows / Glows ─── */
-  --shadow-glow-neon:    0 0 25px -5px rgba(201, 168, 76, 0.4);
-  --shadow-glow-gold:    0 0 25px -5px rgba(201, 168, 76, 0.4);
-  --shadow-glow-cyan:    0 0 25px -5px rgba(230, 198, 109, 0.35);
-  --shadow-glow-purple:  0 0 25px -5px rgba(157, 78, 221, 0.3);
-  --shadow-glass:        0 8px 32px 0 rgba(0, 0, 0, 0.6);
+  --shadow-glow-neon:    0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  --shadow-glass:        0 8px 32px 0 rgba(0, 0, 0, 0.06);
 
   /* ─── Font Families ─── */
-  --font-sans:    system-ui, -apple-system, sans-serif;
-  --font-display: system-ui, -apple-system, sans-serif;
+  --font-serif:   'Bodoni Moda', Didot, 'Playfair Display', Georgia, serif;
+  --font-sans:    'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-display: 'Bodoni Moda', Didot, 'Playfair Display', Georgia, serif;
   --font-mono:    ui-monospace, 'Cascadia Code', monospace;
 
   /* ─── Animations ─── */
   --animate-marquee: marquee 25s linear infinite;
-  --animate-pulse-glow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @keyframes marquee {
@@ -70,69 +62,40 @@ html {
 }
 
 body {
-  background-color: #080808;
-  color: #f3f4f6;
-  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #fbf9f9;
+  color: #1b1c1c;
+  font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.font-serif {
+  font-family: 'Bodoni Moda', Didot, 'Playfair Display', Georgia, serif;
 }
 
 /* ─────────────────────────────────────────────
    CUSTOM SCROLLBAR
 ───────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
-::-webkit-scrollbar-track  { background: #080808; }
-::-webkit-scrollbar-thumb  { background: #1a1a1a; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #C9A84C; }
+::-webkit-scrollbar-track  { background: #fbf9f9; }
+::-webkit-scrollbar-thumb  { background: #c4c7c7; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #111111; }
 
 /* ─────────────────────────────────────────────
-   GLASSMORPHISM UTILITIES (STITCH DESIGN)
+   GLASSMORPHISM / CONTAINER UTILITIES
 ───────────────────────────────────────────── */
 .glass-card {
-  background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(201, 168, 76, 0.25);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-/* ─────────────────────────────────────────────
-   GLOW UTILITY CLASSES
-───────────────────────────────────────────── */
-.shadow-glow-neon   { box-shadow: 0 0 25px -5px rgba(201, 168, 76, 0.4); }
-.shadow-glow-gold   { box-shadow: 0 0 25px -5px rgba(201, 168, 76, 0.4); }
-.shadow-glow-cyan   { box-shadow: 0 0 25px -5px rgba(230, 198, 109, 0.35); }
-.shadow-glow-purple { box-shadow: 0 0 25px -5px rgba(157, 78, 221, 0.35); }
-
-/* ─────────────────────────────────────────────
-   ANIMATE MARQUEE UTILITY
-───────────────────────────────────────────── */
-.animate-marquee {
-  animation: marquee 25s linear infinite;
-}
-
-/* ─────────────────────────────────────────────
-   TEXT GRADIENT UTILITIES (GOLD & METALLIC)
-───────────────────────────────────────────── */
-.text-gradient-neon {
-  background: linear-gradient(135deg, #C9A84C, #E6C66D);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.text-gradient-gold {
-  background: linear-gradient(135deg, #C9A84C, #E6C66D);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.text-gradient-purple {
-  background: linear-gradient(135deg, #9d4edd, #E6C66D);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.stitch-hero-box {
+  background-color: #efeded;
+  border-radius: 1.5rem;
+  border: 1px solid #e4e2e2;
 }
 
 /* ─────────────────────────────────────────────
@@ -142,9 +105,6 @@ button, [role="button"] {
   cursor: pointer;
 }
 
-/* ─────────────────────────────────────────────
-   IMAGE DEFAULTS
-───────────────────────────────────────────── */
 img {
   max-width: 100%;
   height: auto;
