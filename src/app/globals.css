@@ -1,22 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  /* ─── Brand Colors ─── */
-  --color-brand-neon: #00ff87;
-  --color-brand-neonHover: #00e077;
-  --color-brand-cyan: #60efff;
+  /* ─── Stitch InkThread Hub Premium Theme Colors ─── */
+  --color-brand-gold: #C9A84C;
+  --color-brand-goldHover: #B39238;
+  --color-brand-goldLight: #E6C66D;
+
+  /* Aliased to brand-neon for instant backwards compatibility across all components */
+  --color-brand-neon: #C9A84C;
+  --color-brand-neonHover: #B39238;
+  --color-brand-cyan: #E6C66D;
   --color-brand-purple: #9d4edd;
-  --color-brand-amber: #ffb703;
+  --color-brand-amber: #E6C66D;
   --color-brand-red: #ff3366;
 
   /* ─── Background / Foreground ─── */
-  --color-background: #090a0f;
+  --color-background: #080808;
   --color-foreground: #f3f4f6;
 
   /* ─── Card ─── */
-  --color-card: #111319;
+  --color-card: #121212;
   --color-card-foreground: #f3f4f6;
-  --color-card-border: #1f2430;
+  --color-card-border: rgba(201, 168, 76, 0.2);
 
   /* ─── Street Palette ─── */
   --color-street-50:  #f6f7f9;
@@ -27,15 +32,16 @@
   --color-street-500: #66738f;
   --color-street-600: #505b75;
   --color-street-700: #414a60;
-  --color-street-800: #383f51;
-  --color-street-900: #1a1d24;
-  --color-street-950: #0c0d12;
+  --color-street-800: #1a1a1a;
+  --color-street-900: #121212;
+  --color-street-950: #080808;
 
   /* ─── Shadows / Glows ─── */
-  --shadow-glow-neon:    0 0 25px -5px rgba(0, 255, 135, 0.3);
-  --shadow-glow-cyan:    0 0 25px -5px rgba(96, 239, 255, 0.3);
+  --shadow-glow-neon:    0 0 25px -5px rgba(201, 168, 76, 0.4);
+  --shadow-glow-gold:    0 0 25px -5px rgba(201, 168, 76, 0.4);
+  --shadow-glow-cyan:    0 0 25px -5px rgba(230, 198, 109, 0.35);
   --shadow-glow-purple:  0 0 25px -5px rgba(157, 78, 221, 0.3);
-  --shadow-glass:        0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --shadow-glass:        0 8px 32px 0 rgba(0, 0, 0, 0.6);
 
   /* ─── Font Families ─── */
   --font-sans:    system-ui, -apple-system, sans-serif;
@@ -64,7 +70,7 @@ html {
 }
 
 body {
-  background-color: #090a0f;
+  background-color: #080808;
   color: #f3f4f6;
   font-family: system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
@@ -76,25 +82,26 @@ body {
    CUSTOM SCROLLBAR
 ───────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
-::-webkit-scrollbar-track  { background: #090a0f; }
-::-webkit-scrollbar-thumb  { background: #383f51; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #00ff87; }
+::-webkit-scrollbar-track  { background: #080808; }
+::-webkit-scrollbar-thumb  { background: #1a1a1a; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #C9A84C; }
 
 /* ─────────────────────────────────────────────
-   GLASSMORPHISM UTILITIES
+   GLASSMORPHISM UTILITIES (STITCH DESIGN)
 ───────────────────────────────────────────── */
 .glass-card {
-  background: rgba(17, 19, 25, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(18, 18, 18, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(201, 168, 76, 0.25);
 }
 
 /* ─────────────────────────────────────────────
    GLOW UTILITY CLASSES
 ───────────────────────────────────────────── */
-.shadow-glow-neon   { box-shadow: 0 0 25px -5px rgba(0, 255, 135, 0.35); }
-.shadow-glow-cyan   { box-shadow: 0 0 25px -5px rgba(96, 239, 255, 0.35); }
+.shadow-glow-neon   { box-shadow: 0 0 25px -5px rgba(201, 168, 76, 0.4); }
+.shadow-glow-gold   { box-shadow: 0 0 25px -5px rgba(201, 168, 76, 0.4); }
+.shadow-glow-cyan   { box-shadow: 0 0 25px -5px rgba(230, 198, 109, 0.35); }
 .shadow-glow-purple { box-shadow: 0 0 25px -5px rgba(157, 78, 221, 0.35); }
 
 /* ─────────────────────────────────────────────
@@ -105,17 +112,24 @@ body {
 }
 
 /* ─────────────────────────────────────────────
-   TEXT GRADIENT UTILITIES
+   TEXT GRADIENT UTILITIES (GOLD & METALLIC)
 ───────────────────────────────────────────── */
 .text-gradient-neon {
-  background: linear-gradient(135deg, #00ff87, #60efff);
+  background: linear-gradient(135deg, #C9A84C, #E6C66D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #C9A84C, #E6C66D);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-purple {
-  background: linear-gradient(135deg, #9d4edd, #60efff);
+  background: linear-gradient(135deg, #9d4edd, #E6C66D);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
