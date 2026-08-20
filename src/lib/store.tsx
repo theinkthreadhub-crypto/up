@@ -48,11 +48,7 @@ function loadCart(): CartItem[] {
   }
 }
 
-function persistCart(items: CartItem[]) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
-  window.dispatchEvent(new CustomEvent('ith_cart_changed'));
-}
+// Removed persistCart function as we'll use useEffect
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -70,15 +66,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (saved === 'STREET20') { setCouponCode('STREET20'); setDiscountPercent(20); }
     else if (saved === 'INKDROP10') { setCouponCode('INKDROP10'); setDiscountPercent(10); }
 
-    // Sync across tabs
-    const sync = () => setItems(loadCart());
-    window.addEventListener('ith_cart_changed', sync);
+    // Sync across tabs (only fires when other tabs change localStorage)
+    const sync = (e: StorageEvent) => {
+      if (e.key === CART_KEY) setItems(loadCart());
+    };
     window.addEventListener('storage', sync);
     return () => {
-      window.removeEventListener('ith_cart_changed', sync);
       window.removeEventListener('storage', sync);
     };
   }, []);
+
+  // Persist cart state to localStorage whenever it changes
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem(CART_KEY, JSON.stringify(items));
+    }
+  }, [items, mounted]);
 
   const addToCart = useCallback((product: Product, size: string, color: string, quantity = 1) => {
     const key = `${product.id}-${size}-${color}`;
@@ -86,42 +89,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     setItems(prev => {
       const existing = prev.findIndex(i => i.id === key);
-      let next: CartItem[];
       if (existing > -1) {
-        next = prev.map((item, idx) =>
+        return prev.map((item, idx) =>
           idx === existing ? { ...item, quantity: item.quantity + quantity } : item
         );
-      } else {
-        next = [...prev, { id: key, product, size, color, quantity, price }];
       }
-      persistCart(next);
-      return next;
+      return [...prev, { id: key, product, size, color, quantity, price }];
     });
 
     setIsDrawerOpen(true);
   }, []);
 
   const updateQuantity = useCallback((id: string, delta: number) => {
-    setItems(prev => {
-      const next = prev
+    setItems(prev => 
+      prev
         .map(item => item.id === id ? { ...item, quantity: item.quantity + delta } : item)
-        .filter(item => item.quantity > 0);
-      persistCart(next);
-      return next;
-    });
+        .filter(item => item.quantity > 0)
+    );
   }, []);
 
   const removeFromCart = useCallback((id: string) => {
-    setItems(prev => {
-      const next = prev.filter(item => item.id !== id);
-      persistCart(next);
-      return next;
-    });
+    setItems(prev => prev.filter(item => item.id !== id));
   }, []);
 
   const clearCart = useCallback(() => {
     setItems([]);
-    persistCart([]);
   }, []);
 
   const applyCoupon = useCallback((code: string): { success: boolean; message: string } => {
