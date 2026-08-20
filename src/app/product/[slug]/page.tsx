@@ -26,6 +26,8 @@ import ProductGallery from '@/components/product/ProductGallery';
 import SizeGuideModal from '@/components/product/SizeGuideModal';
 import ProductCard from '@/components/product/ProductCard';
 
+import { Loader2 } from 'lucide-react';
+
 export default function ProductDetailPage({
   params,
 }: {
@@ -34,8 +36,18 @@ export default function ProductDetailPage({
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
 
-  const { products } = useLiveProducts();
-  const product = products.find((p) => p.slug === slug) || initialProducts.find((p) => p.slug === slug);
+  const { products, loading } = useLiveProducts();
+  const product = products.find((p) => p.slug === slug);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center py-20 text-zinc-400 font-mono text-xs gap-2">
+        <Loader2 className="w-6 h-6 animate-spin text-brand-neon" />
+        <span>Loading product details from Supabase...</span>
+      </div>
+    );
+  }
+
   if (!product) {
     notFound();
   }

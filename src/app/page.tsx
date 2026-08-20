@@ -1,49 +1,78 @@
 'use client';
 
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Flame, ArrowRight, Sparkles, Shield, Truck, RefreshCw, Star } from 'lucide-react';
+import { Flame, ArrowRight, Sparkles, Shield, Truck, RefreshCw, Star, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
-import { initialCategories } from '@/lib/mock-data';
 import { useLiveProducts } from '@/lib/useLiveProducts';
+import { createClient } from '@/lib/supabase/client';
+import { Category } from '@/types/database';
 
 export default function HomePage() {
-  const { products } = useLiveProducts();
-  const featuredProducts = products.filter((p) => p.is_featured || p.is_new_arrival).slice(0, 6);
-  const hoodies = products.filter((p) => p.category_name?.includes('Hoodies'));
-  const oversizedTees = products.filter((p) => p.category_name?.includes('Oversized'));
+  const { products, loading: productsLoading } = useLiveProducts();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('categories')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order')
+          .limit(4);
+        if (data) setCategories(data as Category[]);
+      } catch (e) {
+        console.error('Error fetching home categories:', e);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    }
+    void loadCategories();
+  }, []);
+
+  const featuredProducts = useMemo(() => {
+    return products.filter((p) => p.is_published && (p.is_featured || p.is_new_arrival)).slice(0, 6);
+  }, [products]);
 
   return (
     <div className="space-y-16 sm:space-y-24 pb-20">
       {/* 1. HERO SECTION (Stitch AI Craftsmanship Edition) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="bg-[#efeded] border border-zinc-200 rounded-3xl p-8 sm:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative overflow-hidden shadow-sm">
+        <div className="relative bg-street-900 border border-street-700 rounded-3xl p-8 sm:p-12 lg:p-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center overflow-hidden" style={{background: 'linear-gradient(135deg, #1E1C19 0%, #141210 60%, #0C0C0D 100%)'}}>
+          {/* Decorative glow blob */}
+          <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none" style={{background: 'radial-gradient(circle, #FF5C1A 0%, transparent 70%)'}} />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 rounded-full opacity-15 blur-3xl pointer-events-none" style={{background: 'radial-gradient(circle, #C6F135 0%, transparent 70%)'}} />
+
           {/* Left Content Column */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="inline-flex items-center gap-2 bg-white border border-zinc-300 text-zinc-800 px-3.5 py-1 rounded-full text-xs font-mono shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="lg:col-span-7 space-y-6 relative z-10">
+            <div className="inline-flex items-center gap-2 bg-street-800 border border-street-600 text-brand-neon px-3.5 py-1 rounded-full text-xs font-mono">
+              <span className="w-2 h-2 rounded-full bg-brand-neon animate-pulse" />
               <span>STITCH AI CRAFTSMANSHIP EDITION</span>
             </div>
 
-            <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal text-zinc-900 leading-[1.08] tracking-tight">
+            <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal text-white leading-[1.08] tracking-tight">
               Slow Fashion & <br className="hidden sm:inline" />
-              Tactile Craftsmanship
+              <span className="text-brand-neon">Tactile Craftsmanship</span>
             </h1>
 
-            <p className="text-zinc-600 text-sm sm:text-base leading-relaxed max-w-xl">
+            <p className="text-street-300 text-sm sm:text-base leading-relaxed max-w-xl">
               Crafted from 240 GSM organic bio-washed cotton, heavy acid-wash fleece, and genuine leather pet collar brackets. Built for silhouette permanence and tactile comfort.
             </p>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
               <Link
                 href="/shop"
-                className="bg-zinc-900 hover:bg-black text-white px-7 py-3.5 rounded-xl font-medium text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all shadow-sm"
+                className="bg-brand-neon hover:bg-brand-neonHover text-white px-7 py-3.5 rounded-xl font-bold text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all shadow-glow-neon"
               >
                 EXPLORE FULL CATALOG →
               </Link>
               <Link
                 href="/category/pet"
-                className="bg-transparent border border-zinc-900 hover:bg-zinc-200/60 text-zinc-900 px-7 py-3.5 rounded-xl font-medium text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all"
+                className="bg-transparent border border-street-500 hover:border-brand-cyan text-street-200 hover:text-brand-cyan px-7 py-3.5 rounded-xl font-medium text-xs sm:text-sm inline-flex items-center justify-center gap-2 transition-all"
               >
                 PET HARDWARE COLLECTION
               </Link>
@@ -51,8 +80,8 @@ export default function HomePage() {
           </div>
 
           {/* Right Card Column */}
-          <div className="lg:col-span-5 relative">
-            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-md border border-zinc-300 group">
+          <div className="lg:col-span-5 relative z-10">
+            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-glass border border-street-700 group">
               <Image
                 src="/images/sungod_classic_black_front.jpg"
                 alt="240 GSM Stacked Heavyweight Cotton Streetwear"
@@ -60,17 +89,17 @@ export default function HomePage() {
                 priority
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
               {/* Card Footer Overlay */}
-              <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-md p-4 rounded-xl flex items-center justify-between border border-zinc-200 shadow-sm">
+              <div className="absolute bottom-4 left-4 right-4 bg-black/80 backdrop-blur-md p-4 rounded-xl flex items-center justify-between border border-street-700">
                 <div>
-                  <p className="text-[10px] font-mono uppercase text-zinc-500 tracking-wider">FEATURED CRAFT</p>
-                  <p className="text-xs font-serif font-bold text-zinc-900">240 GSM Stacked Heavyweight Cotton</p>
+                  <p className="text-[10px] font-mono uppercase text-brand-neon tracking-wider">FEATURED CRAFT</p>
+                  <p className="text-xs font-serif font-bold text-white">240 GSM Stacked Heavyweight Cotton</p>
                 </div>
                 <Link
                   href="/shop"
-                  className="bg-black hover:bg-zinc-800 text-white text-xs font-medium px-3.5 py-2 rounded-lg transition-colors shrink-0"
+                  className="bg-brand-neon hover:bg-brand-neonHover text-white text-xs font-bold px-3.5 py-2 rounded-lg transition-colors shrink-0"
                 >
                   VIEW DETAILS
                 </Link>
@@ -80,33 +109,33 @@ export default function HomePage() {
         </div>
 
         {/* Feature Icons Bar below Hero */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-white border border-zinc-200 rounded-2xl shadow-sm text-zinc-800 text-xs font-medium">
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-street-900 border border-street-700 rounded-2xl text-xs font-medium">
           <div className="flex items-center gap-3">
-            <Shield className="w-5 h-5 text-zinc-900" />
+            <Shield className="w-5 h-5 text-brand-neon" />
             <div>
-              <p className="font-bold text-zinc-900">Heavyweight Quality</p>
-              <p className="text-[11px] text-zinc-500">240-380 GSM Cotton</p>
+              <p className="font-bold text-white">Heavyweight Quality</p>
+              <p className="text-[11px] text-street-400">240-380 GSM Cotton</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Truck className="w-5 h-5 text-zinc-900" />
+            <Truck className="w-5 h-5 text-brand-cyan" />
             <div>
-              <p className="font-bold text-zinc-900">Express Delivery</p>
-              <p className="text-[11px] text-zinc-500">Pan-India Express Shipping</p>
+              <p className="font-bold text-white">Express Delivery</p>
+              <p className="text-[11px] text-street-400">Pan-India Express Shipping</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Sparkles className="w-5 h-5 text-zinc-900" />
+            <Sparkles className="w-5 h-5 text-brand-purple" />
             <div>
-              <p className="font-bold text-zinc-900">Pet Hardware</p>
-              <p className="text-[11px] text-zinc-500">Brass Buckle Leather Belts</p>
+              <p className="font-bold text-white">Pet Hardware</p>
+              <p className="text-[11px] text-street-400">Brass Buckle Leather Belts</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <RefreshCw className="w-5 h-5 text-zinc-900" />
+            <RefreshCw className="w-5 h-5 text-brand-amber" />
             <div>
-              <p className="font-bold text-zinc-900">Easy Returns</p>
-              <p className="text-[11px] text-zinc-500">7-Day Hassle Free Exchange</p>
+              <p className="font-bold text-white">Easy Returns</p>
+              <p className="text-[11px] text-street-400">7-Day Hassle Free Exchange</p>
             </div>
           </div>
         </div>
@@ -126,31 +155,42 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          {initialCategories.slice(0, 4).map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/category/${cat.slug}`}
-              className="group relative aspect-[3/4] bg-street-900 rounded-2xl overflow-hidden border border-street-800 hover:border-brand-neon transition-all duration-300"
-            >
-              <Image
-                src={cat.image_url || '/images/plain_oversized_black.jpg'}
-                alt={cat.name}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4">
-                <span className="text-[10px] font-mono text-brand-neon uppercase font-bold tracking-widest">
-                  COLLECTION
-                </span>
-                <h3 className="text-sm sm:text-base font-bold text-white uppercase group-hover:text-brand-neon transition-colors">
-                  {cat.name}
-                </h3>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {categoriesLoading ? (
+          <div className="flex items-center justify-center py-12 text-zinc-400 font-mono text-xs gap-2">
+            <Loader2 className="w-5 h-5 animate-spin text-brand-neon" />
+            <span>Loading curated collections...</span>
+          </div>
+        ) : categories.length === 0 ? (
+          <div className="text-center py-12 bg-street-900 border border-street-800 rounded-2xl">
+            <p className="text-zinc-500 font-mono text-xs">No active collections found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {categories.slice(0, 4).map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/category/${cat.slug}`}
+                className="group relative aspect-[3/4] bg-street-900 rounded-2xl overflow-hidden border border-street-800 hover:border-brand-neon transition-all duration-300"
+              >
+                <Image
+                  src={cat.image_url || '/images/plain_oversized_black.jpg'}
+                  alt={cat.name}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <span className="text-[10px] font-mono text-brand-neon uppercase font-bold tracking-widest">
+                    COLLECTION
+                  </span>
+                  <h3 className="text-sm sm:text-base font-bold text-white uppercase group-hover:text-brand-neon transition-colors">
+                    {cat.name}
+                  </h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* 3. FEATURED DROPS (CURRENT UNDERGROUND DROPS) */}

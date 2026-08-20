@@ -36,11 +36,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group relative flex flex-col bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:border-zinc-400 hover:shadow-lg transition-all duration-300">
+    <div className="group relative flex flex-col bg-card border border-street-700 rounded-2xl overflow-hidden hover:border-brand-neon hover:shadow-glow-neon transition-all duration-300">
       {/* Top Image Container */}
       <Link
         href={`/product/${product.slug}`}
-        className="relative aspect-[4/5] w-full bg-zinc-100 overflow-hidden block"
+        className="relative aspect-[4/5] w-full bg-street-900 overflow-hidden block"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -55,17 +55,17 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Badges Overlay */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
           {product.is_new_arrival && (
-            <span className="bg-black text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
+            <span className="bg-brand-neon text-white text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
               NEW DROP
             </span>
           )}
           {hasDiscount && (
-            <span className="bg-red-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded tracking-wider">
+            <span className="bg-brand-red text-white text-[10px] font-black uppercase px-2 py-0.5 rounded tracking-wider">
               {product.discount_percent || Math.round(((product.price - (product.sale_price || product.price)) / product.price) * 100)}% OFF
             </span>
           )}
           {product.fabric_gsm && product.fabric_gsm > 0 ? (
-            <span className="bg-black/70 backdrop-blur-md text-zinc-300 text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-white/10">
+            <span className="bg-black/70 backdrop-blur-md text-brand-cyan text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-brand-cyan/30">
               {product.fabric_gsm} GSM
             </span>
           ) : null}
@@ -75,7 +75,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="absolute inset-x-3 bottom-3 z-10 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
           <button
             onClick={handleQuickAdd}
-            className="w-full bg-white/95 hover:bg-brand-neon text-black font-black uppercase text-xs tracking-wider py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-lg backdrop-blur-sm transition-all duration-200"
+            className="w-full bg-brand-neon hover:bg-brand-neonHover text-white font-black uppercase text-xs tracking-wider py-2.5 px-3 rounded-xl flex items-center justify-center gap-2 shadow-glow-neon backdrop-blur-sm transition-all duration-200"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
             QUICK ADD ({selectedSize})
@@ -86,43 +86,43 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Card Body */}
       <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
         <div>
-          <div className="flex items-center justify-between text-xs text-zinc-500 mb-1 font-mono">
+          <div className="flex items-center justify-between text-xs text-street-400 mb-1 font-mono">
             <span>{product.category_name || product.product_type}</span>
             {product.stock_quantity <= 5 && product.stock_quantity > 0 && (
-              <span className="text-amber-400 font-semibold animate-pulse">Low Stock</span>
+              <span className="text-brand-amber font-semibold animate-pulse">Low Stock</span>
             )}
             {product.stock_quantity === 0 && (
-              <span className="text-red-400 font-semibold">Sold Out</span>
+              <span className="text-brand-red font-semibold">Sold Out</span>
             )}
           </div>
 
-          <Link href={`/product/${product.slug}`} className="block group-hover:text-zinc-600 transition-colors">
-            <h3 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight line-clamp-1">
+          <Link href={`/product/${product.slug}`} className="block group-hover:text-brand-neon transition-colors">
+            <h3 className="text-sm sm:text-base font-bold text-white tracking-tight line-clamp-1">
               {product.name}
             </h3>
           </Link>
 
           {product.short_description && (
-            <p className="text-xs text-zinc-500 mt-1 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-street-400 mt-1 line-clamp-2 leading-relaxed">
               {product.short_description}
             </p>
           )}
         </div>
 
         {/* Price & Size Pills */}
-        <div className="mt-4 pt-3 border-t border-zinc-200 flex items-end justify-between">
+        <div className="mt-4 pt-3 border-t border-street-700 flex items-end justify-between">
           <div className="flex flex-col">
             <div className="flex items-baseline gap-2">
-              <span className="text-base sm:text-lg font-mono font-black text-zinc-900">
+              <span className="text-base sm:text-lg font-mono font-black text-white">
                 {formatPrice(currentPrice)}
               </span>
               {hasDiscount && (
-                <span className="text-xs font-mono text-zinc-400 line-through">
+                <span className="text-xs font-mono text-street-400 line-through">
                   {formatPrice(product.price)}
                 </span>
               )}
             </div>
-            <span className="text-[10px] text-zinc-400">Tax Included</span>
+            <span className="text-[10px] text-street-500">Tax Included</span>
           </div>
 
           {/* Size Pill Selection */}
@@ -136,8 +136,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                 }}
                 className={`text-[10px] font-mono px-1.5 py-0.5 rounded border transition-colors ${
                   selectedSize === size
-                    ? 'border-black text-black bg-zinc-100 font-bold'
-                    : 'border-zinc-200 text-zinc-500 hover:border-zinc-400'
+                    ? 'border-brand-neon text-brand-neon bg-brand-neon/10 font-bold'
+                    : 'border-street-600 text-street-400 hover:border-brand-neon hover:text-brand-neon'
                 }`}
               >
                 {size.split(' ')[0]}

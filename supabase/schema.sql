@@ -417,6 +417,7 @@ CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE sql
 SECURITY DEFINER
+SET search_path = public
 STABLE
 AS $$
     SELECT EXISTS (
@@ -473,10 +474,10 @@ CREATE POLICY "Admin manage customers" ON public.customers FOR ALL USING (public
 CREATE POLICY "Admin manage email templates" ON public.email_templates FOR ALL USING (public.is_admin());
 CREATE POLICY "Admin manage email logs" ON public.email_logs FOR ALL USING (public.is_admin());
 
--- ADMIN USERS: Super Admin manage
-CREATE POLICY "Admin can view admin users" ON public.admin_users FOR SELECT USING (public.is_admin());
+-- ADMIN USERS: Non-recursive policies
+CREATE POLICY "Admin can view admin users" ON public.admin_users FOR SELECT USING (auth_user_id = auth.uid() AND is_active = true);
 CREATE POLICY "Super admin can manage admin users" ON public.admin_users FOR ALL USING (
-    EXISTS (SELECT 1 FROM public.admin_users WHERE auth_user_id = auth.uid() AND role = 'super_admin')
+    auth_user_id = auth.uid() AND is_active = true
 );
 
 -- ============================================================================

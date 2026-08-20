@@ -1,13 +1,14 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect, useState, useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { initialCategories } from '@/lib/mock-data';
+import { createClient } from '@/lib/supabase/client';
 import { useLiveProducts } from '@/lib/useLiveProducts';
 import ProductCard from '@/components/product/ProductCard';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Category } from '@/types/database';
 
 export default function CategoryPage({
   params,
@@ -16,16 +17,53 @@ export default function CategoryPage({
 }) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
-  const { products } = useLiveProducts();
+  const { products, loading: productsLoading } = useLiveProducts();
+  const [category, setCategory] = useState<Category | null>(null);
+  const [categoryLoading, setCategoryLoading] = useState(true);
 
-  const category = initialCategories.find((c) => c.slug === slug);
+  useEffect(() => {
+    async function loadCategory() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('categories')
+          .select('*')
+          .eq('slug', slug)
+          .maybeSingle();
+
+        if (!error && data) {
+          setCategory(data as Category);
+        }
+      } catch (e) {
+        console.error('Error fetching category:', e);
+      } finally {
+        setCategoryLoading(false);
+      }
+    }
+    void loadCategory();
+  }, [slug]);
+
+  const loading = productsLoading || categoryLoading;
+
+  const categoryProducts = useMemo(() => {
+    if (!category) return [];
+    return products.filter(
+      (p) => p.category_name === category.name || p.category_id === category.id
+    );
+  }, [products, category]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center py-20 text-zinc-400 font-mono text-xs gap-2">
+        <Loader2 className="w-6 h-6 animate-spin text-brand-neon" />
+        <span>Loading collection drop...</span>
+      </div>
+    );
+  }
+
   if (!category) {
     notFound();
   }
-
-  const categoryProducts = products.filter(
-    (p) => p.category_name === category.name || p.category_id === category.id
-  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-12">

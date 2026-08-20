@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
-import { initialProducts, initialCategories, initialBlogPosts } from '@/lib/mock-data';
+import { createAdminClient } from '@/lib/supabase/admin';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://inkthreadhub.com';
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -13,26 +13,48 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
   ];
 
-  const productRoutes: MetadataRoute.Sitemap = initialProducts.map((p) => ({
-    url: `${baseUrl}/product/${p.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.9,
-  }));
+  let productRoutes: MetadataRoute.Sitemap = [];
+  let categoryRoutes: MetadataRoute.Sitemap = [];
+  let blogRoutes: MetadataRoute.Sitemap = [];
 
-  const categoryRoutes: MetadataRoute.Sitemap = initialCategories.map((c) => ({
-    url: `${baseUrl}/category/${c.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.85,
-  }));
+  try {
+    const supabase = createAdminClient();
 
-  const blogRoutes: MetadataRoute.Sitemap = initialBlogPosts.map((b) => ({
-    url: `${baseUrl}/blog/${b.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'monthly',
-    priority: 0.75,
-  }));
+    const [productsRes, categoriesRes, blogRes] = await Promise.all([
+      supabase.from('products').select('slug, updated_at').eq('is_published', true),
+      supabase.from('categories').select('slug, updated_at').eq('is_active', true),
+      supabase.from('blog_posts').select('slug, updated_at').eq('is_published', true),
+    ]);
+
+    if (productsRes.data) {
+      productRoutes = productsRes.data.map((p) => ({
+        url: `${baseUrl}/product/${p.slug}`,
+        lastModified: p.updated_at ? new Date(p.updated_at) : new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.9,
+      }));
+    }
+
+    if (categoriesRes.data) {
+      categoryRoutes = categoriesRes.data.map((c) => ({
+        url: `${baseUrl}/category/${c.slug}`,
+        lastModified: c.updated_at ? new Date(c.updated_at) : new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.85,
+      }));
+    }
+
+    if (blogRes.data) {
+      blogRoutes = blogRes.data.map((b) => ({
+        url: `${baseUrl}/blog/${b.slug}`,
+        lastModified: b.updated_at ? new Date(b.updated_at) : new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.75,
+      }));
+    }
+  } catch (err) {
+    console.error('Error generating dynamic sitemap:', err);
+  }
 
   return [...staticRoutes, ...productRoutes, ...categoryRoutes, ...blogRoutes];
 }

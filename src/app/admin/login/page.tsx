@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
       });
 
       if (error || !data.user || !data.session) {
-        throw new Error('Invalid administrator ID or password');
+        throw new Error(error?.message || 'Invalid administrator ID or password');
       }
 
       const { data: adminRecord, error: adminError } = await supabase
@@ -44,9 +44,12 @@ export default function AdminLoginPage() {
         .eq('is_active', true)
         .maybeSingle();
 
-      if (adminError || !adminRecord) {
-        await supabase.auth.signOut();
-        throw new Error('This account is not authorized for admin access');
+      if (adminError) {
+        throw new Error(`Admin Authorization Failed: ${adminError.message}`);
+      }
+
+      if (!adminRecord) {
+        throw new Error('This account is not authorized as an active admin user in admin_users.');
       }
 
       router.replace('/admin');

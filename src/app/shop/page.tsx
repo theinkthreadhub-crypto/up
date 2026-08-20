@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { initialCategories } from '@/lib/mock-data';
+import { useState, useMemo, useEffect } from 'react';
 import { useLiveProducts } from '@/lib/useLiveProducts';
 import ProductCard from '@/components/product/ProductCard';
 import { Filter, SlidersHorizontal, ArrowUpDown, X, Check } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { Category } from '@/types/database';
 
 export default function ShopPage() {
   const { products } = useLiveProducts();
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSize, setSelectedSize] = useState<string>('all');
   const [selectedColor, setSelectedColor] = useState<string>('all');
@@ -16,6 +18,19 @@ export default function ShopPage() {
   const [inStockOnly, setInStockOnly] = useState<boolean>(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState<boolean>(false);
 
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.from('categories').select('*').eq('is_active', true).order('display_order');
+        if (data) setCategories(data as Category[]);
+      } catch (e) {
+        console.error('Error fetching categories:', e);
+      }
+    }
+    void loadCategories();
+  }, []);
+
   const allSizes = ['S', 'M', 'L', 'XL', 'XXL', 'One Size'];
   const allColors = ['Obsidian Black', 'Chalk White', 'Acid Wash Grey', 'Forest Sage', 'Navy Blue', 'Cyber Obsidian'];
 
@@ -23,8 +38,13 @@ export default function ShopPage() {
     return products.filter((product) => {
       // Category filter
       if (selectedCategory !== 'all') {
-        const cat = initialCategories.find((c) => c.slug === selectedCategory);
-        if (cat && product.category_name !== cat.name) return false;
+        const cat = categories.find((c) => c.slug === selectedCategory);
+        if (cat) {
+          if (product.category_id && product.category_id !== cat.id && product.category_name !== cat.name) return false;
+          if (!product.category_id && product.category_name !== cat.name) return false;
+        } else {
+          if (product.category_name?.toLowerCase() !== selectedCategory.toLowerCase()) return false;
+        }
       }
 
       // Size filter
@@ -149,7 +169,7 @@ export default function ShopPage() {
                 <span>All Streetwear</span>
                 <span className="font-mono text-[10px]">{products.length}</span>
               </button>
-              {initialCategories.map((cat) => (
+              {categories.map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.slug)}
@@ -305,7 +325,7 @@ export default function ShopPage() {
                 >
                   All Streetwear
                 </button>
-                {initialCategories.map((cat) => (
+                {categories.map((cat: Category) => (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.slug)}

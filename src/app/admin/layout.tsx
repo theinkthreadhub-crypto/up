@@ -24,6 +24,7 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [checkedAuth, setCheckedAuth] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const isLoginPage = pathname === '/admin/login';
 
@@ -37,6 +38,7 @@ export default function AdminLayout({
 
     const verifyAdmin = async () => {
       try {
+        setAuthError(null);
         const supabase = createClient();
         const {
           data: { user },
@@ -55,15 +57,19 @@ export default function AdminLayout({
           .eq('is_active', true)
           .maybeSingle();
 
-        if (adminError || !adminRecord) {
-          await supabase.auth.signOut();
-          if (active) router.replace('/admin/login');
+        if (adminError) {
+          if (active) setAuthError(`Supabase Admin Authorization Error: ${adminError.message}`);
+          return;
+        }
+
+        if (!adminRecord) {
+          if (active) setAuthError(`User ${user.email} is authenticated but does not have an active record in admin_users.`);
           return;
         }
 
         if (active) setAdminUser(adminRecord as AdminUser);
-      } catch {
-        if (active) router.replace('/admin/login');
+      } catch (err) {
+        if (active) setAuthError(err instanceof Error ? err.message : 'Authentication verification failed');
       } finally {
         if (active) setCheckedAuth(true);
       }
@@ -78,10 +84,47 @@ export default function AdminLayout({
 
   if (isLoginPage) return <>{children}</>;
 
-  if (!checkedAuth || !adminUser) {
+  if (!checkedAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-zinc-400 font-mono text-xs">
-        Authenticating Admin Portal...
+        <div className="flex items-center gap-2">
+          <span className="w-4 h-4 border-2 border-brand-neon border-t-transparent rounded-full animate-spin" />
+          <span>Authenticating Admin Portal...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (authError || !adminUser) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-white p-6">
+        <div className="max-w-md w-full bg-card border border-red-500/40 rounded-2xl p-6 text-center space-y-4 shadow-xl">
+          <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto text-red-400">
+            <ShieldCheck className="w-6 h-6" />
+          </div>
+          <h2 className="font-display font-bold text-lg text-red-400">Admin Authorization Error</h2>
+          <p className="text-xs text-zinc-300 font-mono bg-street-950 p-3 rounded-xl border border-street-800 break-words">
+            {authError || 'Could not verify admin permissions.'}
+          </p>
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={() => window.location.reload()}
+              className="flex-1 bg-street-800 hover:bg-street-700 text-white font-mono text-xs py-2.5 rounded-xl border border-street-700"
+            >
+              Retry Connection
+            </button>
+            <button
+              onClick={async () => {
+                const supabase = createClient();
+                await supabase.auth.signOut();
+                router.replace('/admin/login');
+              }}
+              className="flex-1 bg-red-500/20 hover:bg-red-500/30 text-red-300 font-mono text-xs py-2.5 rounded-xl border border-red-500/40"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

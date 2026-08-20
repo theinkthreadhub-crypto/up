@@ -1,12 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { Megaphone, Plus, Edit2, Trash2, X, Check } from 'lucide-react';
-import { initialAnnouncements } from '@/lib/mock-data';
+import { useEffect, useMemo, useState } from 'react';
+import { Plus, Edit2, Trash2, X, Loader2, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 import { Announcement } from '@/types/database';
 
 export default function AdminAnnouncementsPage() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements);
+  const supabase = useMemo(() => createClient(), []);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAnn, setEditingAnn] = useState<Announcement | null>(null);
 
@@ -16,6 +20,26 @@ export default function AdminAnnouncementsPage() {
   const [formLink, setFormLink] = useState('/shop');
   const [formIsActive, setFormIsActive] = useState(true);
 
+  const loadAnnouncements = async () => {
+    setLoading(true);
+    setError('');
+    const { data, error: dbError } = await supabase
+      .from('announcements')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (dbError) {
+      setError(dbError.message);
+    } else {
+      setAnnouncements((data || []) as Announcement[]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    void loadAnnouncements();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const openAdd = () => {
     setEditingAnn(null);
     setFormTitle('');
@@ -23,6 +47,7 @@ export default function AdminAnnouncementsPage() {
     setFormType('sale');
     setFormLink('/shop');
     setFormIsActive(true);
+    setError('');
     setIsModalOpen(true);
   };
 
@@ -30,47 +55,48 @@ export default function AdminAnnouncementsPage() {
     setEditingAnn(a);
     setFormTitle(a.title);
     setFormMessage(a.message);
-    setFormType(a.type);
+    setFormType(a.type as any);
     setFormLink(a.link_url || '/shop');
     setFormIsActive(a.is_active);
+    setError('');
     setIsModalOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingAnn) {
-      setAnnouncements((prev) =>
-        prev.map((a) =>
-          a.id === editingAnn.id
-            ? {
-                ...a,
-                title: formTitle,
-                message: formMessage,
-                type: formType,
-                link_url: formLink,
-                is_active: formIsActive,
-              }
-            : a
-        )
-      );
+    setSaving(true);
+    setError('');
+
+    const payload = {
+      title: formTitle.trim(),
+      message: formMessage.trim(),
+      type: formType,
+      link_url: formLink.trim() || null,
+      is_active: formIsActive,
+      updated_at: new Date().toISOString(),
+    };
+
+    const result = editingAnn
+      ? await supabase.from('announcements').update(payload).eq('id', editingAnn.id)
+      : await supabase.from('announcements').insert({ ...payload, priority: announcements.length + 1 });
+
+    if (result.error) {
+      setError(result.error.message);
     } else {
-      const newAnn: Announcement = {
-        id: crypto.randomUUID(),
-        title: formTitle,
-        message: formMessage,
-        type: formType,
-        link_url: formLink,
-        is_active: formIsActive,
-        priority: announcements.length + 1,
-      };
-      setAnnouncements((prev) => [newAnn, ...prev]);
+      setIsModalOpen(false);
+      await loadAnnouncements();
     }
-    setIsModalOpen(false);
+    setSaving(false);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Delete this announcement?')) {
-      setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('Delete this announcement?')) return;
+    setError('');
+    const { error: deleteError } = await supabase.from('announcements').delete().eq('id', id);
+    if (deleteError) {
+      setError(deleteError.message);
+    } else {
+      await loadAnnouncements();
     }
   };
 
@@ -94,50 +120,74 @@ export default function AdminAnnouncementsPage() {
         </button>
       </div>
 
-      <div className="space-y-4">
-        {announcements.map((ann) => (
-          <div
-            key={ann.id}
-            className="bg-card border border-street-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-2xl flex items-center gap-3 text-xs">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20 text-zinc-400 font-mono text-xs gap-2">
+          <Loader2 className="w-5 h-5 animate-spin text-brand-neon" />
+          <span>Loading announcements from Supabase...</span>
+        </div>
+      ) : announcements.length === 0 ? (
+        <div className="text-center py-20 bg-card border border-street-800 rounded-3xl p-8 space-y-4">
+          <p className="text-sm text-zinc-400 font-mono">No announcements found in Supabase.</p>
+          <button
+            onClick={openAdd}
+            className="bg-brand-neon text-black font-bold uppercase text-xs px-5 py-2.5 rounded-xl shadow-glow-neon inline-flex items-center gap-2"
           >
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-brand-cyan uppercase bg-brand-cyan/10 px-2 py-0.5 rounded">
-                  {ann.type}
-                </span>
-                <h3 className="font-bold text-white text-sm">{ann.title}</h3>
+            <Plus className="w-4 h-4" /> Create First Announcement
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {announcements.map((ann) => (
+            <div
+              key={ann.id}
+              className="bg-card border border-street-800 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold text-brand-cyan uppercase bg-brand-cyan/10 px-2 py-0.5 rounded">
+                    {ann.type}
+                  </span>
+                  <h3 className="font-bold text-white text-sm">{ann.title}</h3>
+                </div>
+                <p className="text-xs text-zinc-300">{ann.message}</p>
+                {ann.link_url && (
+                  <p className="text-[11px] text-zinc-500 font-mono">Target: {ann.link_url}</p>
+                )}
               </div>
-              <p className="text-xs text-zinc-300">{ann.message}</p>
-              {ann.link_url && (
-                <p className="text-[11px] text-zinc-500 font-mono">Target: {ann.link_url}</p>
-              )}
-            </div>
 
-            <div className="flex items-center gap-3">
-              <span
-                className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                  ann.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-zinc-800 text-zinc-500'
-                }`}
-              >
-                {ann.is_active ? 'ACTIVE' : 'INACTIVE'}
-              </span>
+              <div className="flex items-center gap-3">
+                <span
+                  className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                    ann.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-zinc-800 text-zinc-500'
+                  }`}
+                >
+                  {ann.is_active ? 'ACTIVE' : 'INACTIVE'}
+                </span>
 
-              <button
-                onClick={() => openEdit(ann)}
-                className="p-1.5 text-zinc-400 hover:text-white bg-street-900 rounded-lg"
-              >
-                <Edit2 className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => handleDelete(ann.id)}
-                className="p-1.5 text-zinc-400 hover:text-red-400 bg-street-900 rounded-lg"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+                <button
+                  onClick={() => openEdit(ann)}
+                  className="p-1.5 text-zinc-400 hover:text-white bg-street-900 rounded-lg"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(ann.id)}
+                  className="p-1.5 text-zinc-400 hover:text-red-400 bg-street-900 rounded-lg"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && (
@@ -222,9 +272,16 @@ export default function AdminAnnouncementsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="bg-brand-neon text-black font-bold uppercase px-5 py-2 rounded-xl"
+                  disabled={saving}
+                  className="bg-brand-neon text-black font-bold uppercase px-5 py-2 rounded-xl disabled:opacity-50 flex items-center gap-2"
                 >
-                  Save
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...
+                    </>
+                  ) : (
+                    'Save'
+                  )}
                 </button>
               </div>
             </form>

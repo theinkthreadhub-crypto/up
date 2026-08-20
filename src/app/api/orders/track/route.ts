@@ -19,38 +19,24 @@ export async function POST(req: Request) {
     const supabase = createAdminClient();
     let order = null;
 
-    // Try Supabase first
-    try {
-      const { data } = await supabase
-        .from('orders')
-        .select('*, order_items(*)')
-        .eq('order_number', cleanOrderNum)
-        .single();
+    const { data, error: dbError } = await supabase
+      .from('orders')
+      .select('*, order_items(*)')
+      .eq('order_number', cleanOrderNum)
+      .maybeSingle();
 
-      if (data) {
-        const matchesEmail = data.customer_email.toLowerCase() === cleanContact;
-        const matchesPhone = data.customer_phone.replace(/[\s-]/g, '').includes(cleanContact.replace(/[\s-]/g, ''));
-        if (matchesEmail || matchesPhone) {
-          order = {
-            ...data,
-            items: data.order_items || [],
-          };
-        }
-      }
-    } catch {
-      // Fallback
+    if (dbError) {
+      return NextResponse.json({ error: dbError.message }, { status: 500 });
     }
 
-    // Fallback to local memory orders
-    if (!order) {
-      const found = initialOrders.find(
-        (o) =>
-          o.order_number.toUpperCase() === cleanOrderNum &&
-          (o.customer_email.toLowerCase() === cleanContact ||
-            o.customer_phone.replace(/[\s-]/g, '').includes(cleanContact.replace(/[\s-]/g, '')))
-      );
-      if (found) {
-        order = found;
+    if (data) {
+      const matchesEmail = data.customer_email.toLowerCase() === cleanContact;
+      const matchesPhone = data.customer_phone.replace(/[\s-]/g, '').includes(cleanContact.replace(/[\s-]/g, ''));
+      if (matchesEmail || matchesPhone) {
+        order = {
+          ...data,
+          items: data.order_items || [],
+        };
       }
     }
 

@@ -23,26 +23,15 @@ export async function POST(req: Request) {
     const supabase = createAdminClient();
 
     for (const cartItem of items) {
-      // Look up product in Supabase or fallback mock data
-      let product = null;
-      try {
-        const { data } = await supabase
-          .from('products')
-          .select('*')
-          .eq('id', cartItem.product.id)
-          .single();
-        if (data) product = data;
-      } catch {
-        // fallback
-      }
+      const { data: product, error: dbError } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', cartItem.product.id)
+        .maybeSingle();
 
-      if (!product) {
-        product = initialProducts.find((p) => p.id === cartItem.product.id);
-      }
-
-      if (!product) {
+      if (dbError || !product) {
         return NextResponse.json(
-          { error: `Product "${cartItem.product.name}" is no longer available.` },
+          { error: `Product "${cartItem.product.name}" is no longer available or database query failed.` },
           { status: 400 }
         );
       }

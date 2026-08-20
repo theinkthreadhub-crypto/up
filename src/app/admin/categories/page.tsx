@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Layers, Plus, Edit2, Trash2, X, Check } from 'lucide-react';
-import { initialCategories } from '@/lib/mock-data';
+import { Plus, Edit2, Trash2, X, Loader2, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 import { slugify } from '@/lib/utils';
 import { Category } from '@/types/database';
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const supabase = useMemo(() => createClient(), []);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCat, setEditingCat] = useState<Category | null>(null);
 
@@ -17,12 +21,33 @@ export default function AdminCategoriesPage() {
   const [formDesc, setFormDesc] = useState('');
   const [formImage, setFormImage] = useState('/images/plain_oversized_black.jpg');
 
+  const loadCategories = async () => {
+    setLoading(true);
+    setError('');
+    const { data, error: dbError } = await supabase
+      .from('categories')
+      .select('*')
+      .order('display_order', { ascending: true });
+
+    if (dbError) {
+      setError(dbError.message);
+    } else {
+      setCategories((data || []) as Category[]);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    void loadCategories();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const openAdd = () => {
     setEditingCat(null);
     setFormName('');
     setFormSlug('');
     setFormDesc('');
     setFormImage('/images/plain_oversized_black.jpg');
+    setError('');
     setIsModalOpen(true);
   };
 
@@ -32,43 +57,46 @@ export default function AdminCategoriesPage() {
     setFormSlug(cat.slug);
     setFormDesc(cat.description || '');
     setFormImage(cat.image_url || '/images/plain_oversized_black.jpg');
+    setError('');
     setIsModalOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingCat) {
-      setCategories((prev) =>
-        prev.map((c) =>
-          c.id === editingCat.id
-            ? {
-                ...c,
-                name: formName,
-                slug: formSlug || slugify(formName),
-                description: formDesc,
-                image_url: formImage,
-              }
-            : c
-        )
-      );
+    setSaving(true);
+    setError('');
+
+    const payload = {
+      name: formName.trim(),
+      slug: formSlug.trim() || slugify(formName),
+      description: formDesc.trim() || null,
+      image_url: formImage.trim() || null,
+      is_active: true,
+      display_order: editingCat ? editingCat.display_order : categories.length + 1,
+      updated_at: new Date().toISOString(),
+    };
+
+    const result = editingCat
+      ? await supabase.from('categories').update(payload).eq('id', editingCat.id)
+      : await supabase.from('categories').insert(payload);
+
+    if (result.error) {
+      setError(result.error.message);
     } else {
-      const newCat: Category = {
-        id: crypto.randomUUID(),
-        name: formName,
-        slug: formSlug || slugify(formName),
-        description: formDesc,
-        image_url: formImage,
-        is_active: true,
-        display_order: categories.length + 1,
-      };
-      setCategories((prev) => [...prev, newCat]);
+      setIsModalOpen(false);
+      await loadCategories();
     }
-    setIsModalOpen(false);
+    setSaving(false);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this category?')) {
-      setCategories((prev) => prev.filter((c) => c.id !== id));
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+    setError('');
+    const { error: deleteError } = await supabase.from('categories').delete().eq('id', id);
+    if (deleteError) {
+      setError(deleteError.message);
+    } else {
+      await loadCategories();
     }
   };
 
@@ -92,51 +120,77 @@ export default function AdminCategoriesPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map((cat) => (
-          <div
-            key={cat.id}
-            className="bg-card border border-street-800 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between"
-          >
-            <div className="relative aspect-[16/9] w-full bg-street-950">
-              <Image
-                src={cat.image_url || '/images/plain_oversized_black.jpg'}
-                alt={cat.name}
-                fill
-                className="object-cover"
-              />
-            </div>
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-2xl flex items-center gap-3 text-xs">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
 
-            <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
-              <div>
-                <span className="text-[10px] font-mono text-zinc-500 uppercase">Slug: /{cat.slug}</span>
-                <h3 className="font-bold text-white text-base uppercase mt-0.5">{cat.name}</h3>
-                <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
-                  {cat.description || 'No description provided.'}
-                </p>
+      {loading ? (
+        <div className="flex items-center justify-center py-20 text-zinc-400 font-mono text-xs gap-2">
+          <Loader2 className="w-5 h-5 animate-spin text-brand-neon" />
+          <span>Loading categories from Supabase...</span>
+        </div>
+      ) : categories.length === 0 ? (
+        <div className="text-center py-20 bg-card border border-street-800 rounded-3xl p-8 space-y-4">
+          <p className="text-sm text-zinc-400 font-mono">No categories found in Supabase database.</p>
+          <button
+            onClick={openAdd}
+            className="bg-brand-neon text-black font-bold uppercase text-xs px-5 py-2.5 rounded-xl shadow-glow-neon inline-flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> Create First Category
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map((cat) => (
+            <div
+              key={cat.id}
+              className="bg-card border border-street-800 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-between"
+            >
+              <div className="relative aspect-[16/9] w-full bg-street-950">
+                <Image
+                  src={cat.image_url || '/images/plain_oversized_black.jpg'}
+                  alt={cat.name}
+                  fill
+                  className="object-cover"
+                />
               </div>
 
-              <div className="pt-4 border-t border-street-800 flex items-center justify-between">
-                <span className="text-[11px] font-mono text-emerald-400 font-bold">Active Collection</span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => openEdit(cat)}
-                    className="p-1.5 text-zinc-400 hover:text-white hover:bg-street-900 rounded-lg"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(cat.id)}
-                    className="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-street-900 rounded-lg"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+              <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                <div>
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase">Slug: /{cat.slug}</span>
+                  <h3 className="font-bold text-white text-base uppercase mt-0.5">{cat.name}</h3>
+                  <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+                    {cat.description || 'No description provided.'}
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-street-800 flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-emerald-400 font-bold">
+                    {cat.is_active ? 'Active Collection' : 'Hidden'}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openEdit(cat)}
+                      className="p-1.5 text-zinc-400 hover:text-white hover:bg-street-900 rounded-lg"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(cat.id)}
+                      className="p-1.5 text-zinc-400 hover:text-red-400 hover:bg-street-900 rounded-lg"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && (
@@ -207,9 +261,16 @@ export default function AdminCategoriesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="bg-brand-neon text-black font-bold uppercase px-5 py-2 rounded-xl"
+                  disabled={saving}
+                  className="bg-brand-neon text-black font-bold uppercase px-5 py-2 rounded-xl disabled:opacity-50 flex items-center gap-2"
                 >
-                  Save
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...
+                    </>
+                  ) : (
+                    'Save'
+                  )}
                 </button>
               </div>
             </form>

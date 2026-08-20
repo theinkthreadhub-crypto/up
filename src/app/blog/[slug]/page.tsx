@@ -1,10 +1,13 @@
-import { use } from 'react';
+'use client';
+
+import { use, useEffect, useMemo, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { initialBlogPosts } from '@/lib/mock-data';
 import { formatDate } from '@/lib/utils';
-import { ArrowLeft, Clock, User, Tag, Share2 } from 'lucide-react';
+import { ArrowLeft, Clock, User, Loader2 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { BlogPost } from '@/types/database';
 
 export default function BlogPostPage({
   params,
@@ -13,8 +16,40 @@ export default function BlogPostPage({
 }) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
+  const supabase = useMemo(() => createClient(), []);
+  const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const post = initialBlogPosts.find((p) => p.slug === slug);
+  useEffect(() => {
+    async function loadPost() {
+      try {
+        const { data, error } = await supabase
+          .from('blog_posts')
+          .select('*')
+          .eq('slug', slug)
+          .maybeSingle();
+
+        if (!error && data) {
+          setPost(data as BlogPost);
+        }
+      } catch (e) {
+        console.error('Error fetching blog post:', e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    void loadPost();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center py-20 text-zinc-400 font-mono text-xs gap-2">
+        <Loader2 className="w-6 h-6 animate-spin text-brand-neon" />
+        <span>Loading journal dispatch...</span>
+      </div>
+    );
+  }
+
   if (!post) {
     notFound();
   }
@@ -37,19 +72,21 @@ export default function BlogPostPage({
           </span>
           <span className="text-zinc-500">•</span>
           <span className="text-zinc-400 flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" /> {post.read_time}
+            <Clock className="w-3.5 h-3.5" /> {post.read_time || '4 min read'}
           </span>
           <span className="text-zinc-500">•</span>
-          <span className="text-zinc-400">{formatDate(post.published_at)}</span>
+          <span className="text-zinc-400">{formatDate(post.published_at || post.created_at)}</span>
         </div>
 
         <h1 className="font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight leading-tight">
           {post.title}
         </h1>
 
-        <p className="text-sm sm:text-base text-zinc-300 italic border-l-2 border-brand-neon pl-4 py-1">
-          {post.excerpt}
-        </p>
+        {post.excerpt && (
+          <p className="text-sm sm:text-base text-zinc-300 italic border-l-2 border-brand-neon pl-4 py-1">
+            {post.excerpt}
+          </p>
+        )}
 
         <div className="flex items-center gap-3 pt-2 text-xs text-zinc-400 font-mono">
           <User className="w-4 h-4 text-brand-cyan" />
@@ -91,17 +128,19 @@ export default function BlogPostPage({
 
       {/* Tags & Footer CTA */}
       <div className="border-t border-street-800 pt-8 space-y-6">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-mono text-zinc-500 mr-2">Tags:</span>
-          {post.tags.map((tag) => (
-            <span
-              key={tag}
-              className="text-xs font-mono bg-street-900 text-zinc-300 px-3 py-1 rounded-full border border-street-800"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
+        {post.tags && post.tags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-mono text-zinc-500 mr-2">Tags:</span>
+            {post.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-xs font-mono bg-street-900 text-zinc-300 px-3 py-1 rounded-full border border-street-800"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Shop Drop CTA banner */}
         <div className="bg-street-900/60 border border-street-800 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">

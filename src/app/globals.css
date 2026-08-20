@@ -1,39 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  /* ─── Stitch Minimalist Luxury Light Theme ─── */
-  --color-brand-neon: #111111;
-  --color-brand-neonHover: #222222;
-  --color-brand-cyan: #444444;
-  --color-brand-purple: #111111;
-  --color-brand-amber: #c9a84c;
-  --color-brand-red: #ba1a1a;
+  /* ─── InkThread Hub — Premium Streetwear Palette ─── */
+
+  /* PRIMARY ACCENT: Electric Orange Coral (Hype / Energy) */
+  --color-brand-neon:      #FF5C1A;
+  --color-brand-neonHover: #E04A10;
+
+  /* SECONDARY ACCENT: Neon Lime (Street Credibility) */
+  --color-brand-cyan:   #C6F135;
+
+  /* TERTIARY: Electric Purple (Creative / Exclusive) */
+  --color-brand-purple: #8B5CF6;
+
+  /* STATUS */
+  --color-brand-amber: #F59E0B;
+  --color-brand-red:   #EF4444;
 
   /* ─── Background / Foreground ─── */
-  --color-background: #fbf9f9;
-  --color-foreground: #1b1c1c;
+  --color-background: #0C0C0D;
+  --color-foreground: #F5F3EF;
 
   /* ─── Card ─── */
-  --color-card: #ffffff;
-  --color-card-foreground: #1b1c1c;
-  --color-card-border: #e4e2e2;
+  --color-card: #161618;
+  --color-card-foreground: #F5F3EF;
+  --color-card-border: #2A2A2D;
 
-  /* ─── Neutral Palette ─── */
-  --color-street-50:  #ffffff;
-  --color-street-100: #f5f3f3;
-  --color-street-200: #efeded;
-  --color-street-300: #e4e2e2;
-  --color-street-400: #c4c7c7;
-  --color-street-500: #747878;
-  --color-street-600: #5e5e5b;
-  --color-street-700: #444748;
-  --color-street-800: #303031;
-  --color-street-900: #1b1c1c;
-  --color-street-950: #111111;
+  /* ─── Street Neutral Scale (Dark) ─── */
+  --color-street-50:  #F5F3EF;
+  --color-street-100: #E8E5E0;
+  --color-street-200: #D2CEC9;
+  --color-street-300: #A8A4A0;
+  --color-street-400: #78756F;
+  --color-street-500: #58554F;
+  --color-street-600: #3E3B36;
+  --color-street-700: #2A2825;
+  --color-street-800: #1E1C19;
+  --color-street-900: #141210;
+  --color-street-950: #0C0C0D;
 
   /* ─── Shadows / Glows ─── */
-  --shadow-glow-neon:    0 10px 30px -10px rgba(0, 0, 0, 0.1);
-  --shadow-glass:        0 8px 32px 0 rgba(0, 0, 0, 0.06);
+  --shadow-glow-neon:  0 0 30px -5px rgba(255, 92, 26, 0.55), 0 10px 40px -10px rgba(255, 92, 26, 0.3);
+  --shadow-glow-lime:  0 0 25px -5px rgba(198, 241, 53, 0.4);
+  --shadow-glass:      0 8px 32px 0 rgba(0, 0, 0, 0.45);
 
   /* ─── Font Families ─── */
   --font-serif:   'Bodoni Moda', Didot, 'Playfair Display', Georgia, serif;
@@ -62,8 +71,8 @@ html {
 }
 
 body {
-  background-color: #fbf9f9;
-  color: #1b1c1c;
+  background-color: #0C0C0D;
+  color: #F5F3EF;
   font-family: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -78,24 +87,24 @@ body {
    CUSTOM SCROLLBAR
 ───────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
-::-webkit-scrollbar-track  { background: #fbf9f9; }
-::-webkit-scrollbar-thumb  { background: #c4c7c7; border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: #111111; }
+::-webkit-scrollbar-track  { background: #0C0C0D; }
+::-webkit-scrollbar-thumb  { background: #3E3B36; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #FF5C1A; }
 
 /* ─────────────────────────────────────────────
    GLASSMORPHISM / CONTAINER UTILITIES
 ───────────────────────────────────────────── */
 .glass-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(22, 22, 24, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 92, 26, 0.15);
 }
 
 .stitch-hero-box {
-  background-color: #efeded;
+  background: linear-gradient(135deg, #1E1C19 0%, #141210 100%);
   border-radius: 1.5rem;
-  border: 1px solid #e4e2e2;
+  border: 1px solid #2A2825;
 }
 
 /* ─────────────────────────────────────────────
