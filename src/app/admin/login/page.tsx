@@ -3,13 +3,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Lock, Mail, Shield, ArrowRight, AlertCircle, Sparkles } from 'lucide-react';
+import { Lock, UserRound, Shield, ArrowRight, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+
+const ADMIN_LOGIN_EMAIL = 'inkthread@inkthreadhub.in';
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@inkthreadhub.com');
-  const [password, setPassword] = useState('admin123456');
+  const [username, setUsername] = useState('inkthread');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -19,46 +21,34 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
+      if (username.trim().toLowerCase() !== 'inkthread') {
+        throw new Error('Invalid administrator ID or password');
+      }
+
       const supabase = createClient();
-      // Try Supabase Auth
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
+        email: ADMIN_LOGIN_EMAIL,
+        password,
       });
 
-      if (error) {
-        // If external Supabase auth is unconfigured or returns invalid in dev mode, check admin credentials
-        if (
-          (email.trim().toLowerCase() === 'admin@inkthreadhub.com' && password === 'admin123456') ||
-          (email.trim().toLowerCase() === 'superadmin@inkthreadhub.com')
-        ) {
-          localStorage.setItem(
-            'ith_admin_auth',
-            JSON.stringify({
-              email: email.trim(),
-              name: 'Super Admin',
-              role: 'super_admin',
-              authenticated_at: new Date().toISOString(),
-            })
-          );
-          router.push('/admin');
-          return;
-        }
-        throw new Error(error.message || 'Invalid administrator credentials');
+      if (error || !data.user || !data.session) {
+        throw new Error('Invalid administrator ID or password');
       }
 
-      if (data?.session) {
-        localStorage.setItem(
-          'ith_admin_auth',
-          JSON.stringify({
-            email: data.user.email,
-            name: 'Authorized Admin',
-            role: 'super_admin',
-            authenticated_at: new Date().toISOString(),
-          })
-        );
-        router.push('/admin');
+      const { data: adminRecord, error: adminError } = await supabase
+        .from('admin_users')
+        .select('id, email, name, role, is_active')
+        .eq('auth_user_id', data.user.id)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (adminError || !adminRecord) {
+        await supabase.auth.signOut();
+        throw new Error('This account is not authorized for admin access');
       }
+
+      router.replace('/admin');
+      router.refresh();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Login failed';
       setErrorMsg(msg);
@@ -70,7 +60,6 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <div className="w-full max-w-md bg-card border border-street-800 rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden">
-        {/* Glow accent */}
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand-neon/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="text-center space-y-2">
@@ -80,9 +69,7 @@ export default function AdminLoginPage() {
           <h1 className="font-display font-black text-2xl text-white uppercase tracking-tight">
             INK<span className="text-brand-neon">THREAD</span> ADMIN
           </h1>
-          <p className="text-xs text-zinc-400">
-            Authorized Personnel Access Only • 256-Bit RLS Protected
-          </p>
+          <p className="text-xs text-zinc-400">Authorized Personnel Access Only</p>
         </div>
 
         {errorMsg && (
@@ -94,27 +81,29 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-4 text-xs">
           <div className="space-y-1.5">
-            <label className="text-zinc-400 font-mono">Admin Email</label>
+            <label className="text-zinc-400 font-mono">Admin ID</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <UserRound className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
-                type="email"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="w-full bg-street-950 border border-street-800 rounded-xl pl-10 pr-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-neon"
-                placeholder="admin@inkthreadhub.com"
+                placeholder="inkthread"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-zinc-400 font-mono">Master Password</label>
+            <label className="text-zinc-400 font-mono">Password</label>
             <div className="relative">
               <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="password"
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-street-950 border border-street-800 rounded-xl pl-10 pr-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-neon font-mono"
@@ -140,11 +129,6 @@ export default function AdminLoginPage() {
             )}
           </button>
         </form>
-
-        <div className="p-3 bg-street-900/60 rounded-xl border border-street-800 text-[11px] text-zinc-400 text-center font-mono">
-          <span>Demo Admin Pass: </span>
-          <strong className="text-brand-neon">admin123456</strong>
-        </div>
 
         <div className="text-center pt-2">
           <Link href="/" className="text-xs text-zinc-500 hover:text-white font-mono">
