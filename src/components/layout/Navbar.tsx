@@ -29,11 +29,12 @@ export default function Navbar() {
 
   const navLinks = [
     { name: 'DROP / SHOP', href: '/shop', highlight: true },
-    { name: 'OVERSIZED TEES', href: '/category/oversized-t-shirts' },
+    { name: 'MEN', href: '/category/men' },
+    { name: 'WOMEN', href: '/category/women' },
+    { name: 'PETS', href: '/category/pet' },
+    { name: 'TEES', href: '/category/oversized-t-shirts' },
     { name: 'HOODIES', href: '/category/heavyweight-hoodies' },
     { name: 'OUTERWEAR', href: '/category/jackets-outerwear' },
-    { name: 'LOOKBOOK', href: '/blog' },
-    { name: 'ABOUT', href: '/about' },
   ];
 
   return (

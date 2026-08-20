@@ -24,11 +24,14 @@ INSERT INTO public.site_settings (
 
 -- Categories
 INSERT INTO public.categories (id, name, slug, description, image_url, display_order) VALUES
-('11111111-1111-1111-1111-111111110001', 'Oversized T-Shirts', 'oversized-t-shirts', '240 GSM heavyweight boxy fit drops with drop-shoulder silhouettes.', '/images/plain_oversized_black.jpg', 1),
-('11111111-1111-1111-1111-111111110002', 'Heavyweight Hoodies', 'heavyweight-hoodies', '380 GSM fleece and French terry hoodies engineered for comfort & drape.', '/images/hd_acidwash_hoodie.png', 2),
-('11111111-1111-1111-1111-111111110003', 'Graphic Drops', 'graphic-drops', 'Artisanal anime, mythology, and dark-aesthetic screen-printed streetwear.', '/images/sungod_luffy_acidwash_front.jpg', 3),
-('11111111-1111-1111-1111-111111110004', 'Jackets & Outerwear', 'jackets-outerwear', 'All-over print bombers and heavyweight varsity streetwear outerwear.', '/images/hd_aop_bomber.png', 4),
-('11111111-1111-1111-1111-111111110005', 'Streetwear Accessories', 'streetwear-accessories', 'Totes, caps, brass-buckle pet collars and utility lifestyle pieces.', '/images/hd_tote_bag.png', 5)
+('11111111-1111-1111-1111-111111110001', 'Men', 'men', 'Heavyweight streetwear, boxy oversized graphic tees & hoodies for Men.', '/images/sungod_classic_black_front.jpg', 1),
+('11111111-1111-1111-1111-111111110002', 'Women', 'women', 'Oversized crop tees, relaxed streetwear silhouettes & hoodies for Women.', '/images/plain_oversized_white.jpg', 2),
+('11111111-1111-1111-1111-111111110003', 'Pet Accessories', 'pet', 'Genuine leather brass-buckle collars, neck belts & high-street pet gear.', '/images/hd_pet_collar.png', 3),
+('11111111-1111-1111-1111-111111110004', 'Oversized T-Shirts', 'oversized-t-shirts', '240 GSM heavyweight boxy fit drops with drop-shoulder silhouettes.', '/images/plain_oversized_black.jpg', 4),
+('11111111-1111-1111-1111-111111110005', 'Heavyweight Hoodies', 'heavyweight-hoodies', '380 GSM fleece and French terry hoodies engineered for comfort & drape.', '/images/hd_acidwash_hoodie.png', 5),
+('11111111-1111-1111-1111-111111110006', 'Graphic Drops', 'graphic-drops', 'Artisanal anime, mythology, and dark-aesthetic screen-printed streetwear.', '/images/sungod_luffy_acidwash_front.jpg', 6),
+('11111111-1111-1111-1111-111111110007', 'Jackets & Outerwear', 'jackets-outerwear', 'All-over print bombers and heavyweight varsity streetwear outerwear.', '/images/hd_aop_bomber.png', 7),
+('11111111-1111-1111-1111-111111110008', 'Streetwear Accessories', 'streetwear-accessories', 'Totes, caps, brass-buckle pet collars and utility lifestyle pieces.', '/images/hd_tote_bag.png', 8)
 ON CONFLICT (slug) DO NOTHING;
 
 -- Products

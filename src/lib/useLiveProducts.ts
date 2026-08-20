@@ -20,8 +20,13 @@ export function useLiveProducts() {
 
         if (!error && data && data.length > 0) {
           const activeProducts = data.filter((p: Product) => p.is_published !== false);
-          if (isMounted && activeProducts.length > 0) {
-            setProducts(activeProducts as Product[]);
+          const dbSlugs = new Set(activeProducts.map((p: Product) => p.slug));
+          const merged = [
+            ...activeProducts,
+            ...initialProducts.filter((p) => !dbSlugs.has(p.slug)),
+          ];
+          if (isMounted) {
+            setProducts(merged as Product[]);
           }
         }
       } catch (err) {
