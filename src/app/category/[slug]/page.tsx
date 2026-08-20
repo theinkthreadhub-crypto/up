@@ -4,7 +4,8 @@ import { use } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { initialCategories, initialProducts } from '@/lib/mock-data';
+import { initialCategories } from '@/lib/mock-data';
+import { useLiveProducts } from '@/lib/useLiveProducts';
 import ProductCard from '@/components/product/ProductCard';
 import { ArrowLeft } from 'lucide-react';
 
@@ -15,13 +16,14 @@ export default function CategoryPage({
 }) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
+  const { products } = useLiveProducts();
 
   const category = initialCategories.find((c) => c.slug === slug);
   if (!category) {
     notFound();
   }
 
-  const categoryProducts = initialProducts.filter(
+  const categoryProducts = products.filter(
     (p) => p.category_name === category.name || p.category_id === category.id
   );
 

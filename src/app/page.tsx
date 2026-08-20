@@ -1,13 +1,17 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Flame, ArrowRight, Sparkles, Shield, Truck, RefreshCw, Star } from 'lucide-react';
 import ProductCard from '@/components/product/ProductCard';
-import { initialProducts, initialCategories } from '@/lib/mock-data';
+import { initialCategories } from '@/lib/mock-data';
+import { useLiveProducts } from '@/lib/useLiveProducts';
 
 export default function HomePage() {
-  const featuredProducts = initialProducts.filter((p) => p.is_featured || p.is_new_arrival).slice(0, 6);
-  const hoodies = initialProducts.filter((p) => p.category_name?.includes('Hoodies'));
-  const oversizedTees = initialProducts.filter((p) => p.category_name?.includes('Oversized'));
+  const { products } = useLiveProducts();
+  const featuredProducts = products.filter((p) => p.is_featured || p.is_new_arrival).slice(0, 6);
+  const hoodies = products.filter((p) => p.category_name?.includes('Hoodies'));
+  const oversizedTees = products.filter((p) => p.category_name?.includes('Oversized'));
 
   return (
     <div className="space-y-16 sm:space-y-24 pb-20">
@@ -137,7 +141,7 @@ export default function HomePage() {
             href="/shop"
             className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-street-900 hover:bg-street-800 border border-street-700 px-4 py-2.5 rounded-xl uppercase transition-colors"
           >
-            EXPLORE CATALOG ({initialProducts.length}) <ArrowRight className="w-3.5 h-3.5" />
+            EXPLORE CATALOG ({products.length}) <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 

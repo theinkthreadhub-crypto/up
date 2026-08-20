@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { initialProducts, initialCategories } from '@/lib/mock-data';
+import { initialCategories } from '@/lib/mock-data';
+import { useLiveProducts } from '@/lib/useLiveProducts';
 import ProductCard from '@/components/product/ProductCard';
 import { Filter, SlidersHorizontal, ArrowUpDown, X, Check } from 'lucide-react';
 
 export default function ShopPage() {
+  const { products } = useLiveProducts();
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSize, setSelectedSize] = useState<string>('all');
   const [selectedColor, setSelectedColor] = useState<string>('all');
@@ -18,7 +20,7 @@ export default function ShopPage() {
   const allColors = ['Obsidian Black', 'Chalk White', 'Acid Wash Grey', 'Forest Sage', 'Navy Blue', 'Cyber Obsidian'];
 
   const filteredProducts = useMemo(() => {
-    return initialProducts.filter((product) => {
+    return products.filter((product) => {
       // Category filter
       if (selectedCategory !== 'all') {
         const cat = initialCategories.find((c) => c.slug === selectedCategory);
@@ -52,7 +54,7 @@ export default function ShopPage() {
       if (sortBy === 'bestseller') return (b.is_best_seller ? 1 : 0) - (a.is_best_seller ? 1 : 0);
       return (b.is_new_arrival ? 1 : 0) - (a.is_new_arrival ? 1 : 0);
     });
-  }, [selectedCategory, selectedSize, selectedColor, maxPrice, inStockOnly, sortBy]);
+  }, [products, selectedCategory, selectedSize, selectedColor, maxPrice, inStockOnly, sortBy]);
 
   const clearAllFilters = () => {
     setSelectedCategory('all');
@@ -145,7 +147,7 @@ export default function ShopPage() {
                 }`}
               >
                 <span>All Streetwear</span>
-                <span className="font-mono text-[10px]">{initialProducts.length}</span>
+                <span className="font-mono text-[10px]">{products.length}</span>
               </button>
               {initialCategories.map((cat) => (
                 <button

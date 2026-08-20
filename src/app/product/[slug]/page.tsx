@@ -19,6 +19,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { initialProducts } from '@/lib/mock-data';
+import { useLiveProducts } from '@/lib/useLiveProducts';
 import { formatPrice } from '@/lib/utils';
 import { useCart } from '@/lib/store';
 import ProductGallery from '@/components/product/ProductGallery';
@@ -33,7 +34,8 @@ export default function ProductDetailPage({
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
 
-  const product = initialProducts.find((p) => p.slug === slug);
+  const { products } = useLiveProducts();
+  const product = products.find((p) => p.slug === slug) || initialProducts.find((p) => p.slug === slug);
   if (!product) {
     notFound();
   }
@@ -49,7 +51,7 @@ export default function ProductDetailPage({
   const currentPrice = product.sale_price && product.sale_price > 0 ? product.sale_price : product.price;
   const hasDiscount = product.sale_price && product.sale_price > 0 && product.sale_price < product.price;
 
-  const relatedProducts = initialProducts
+  const relatedProducts = products
     .filter((p) => p.id !== product.id && (p.category_name === product.category_name || p.product_type === product.product_type))
     .slice(0, 3);
 

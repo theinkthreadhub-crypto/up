@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import {
   LayoutDashboard,
   Package,
@@ -44,7 +45,13 @@ export default function AdminSidebar({
 }) {
   const pathname = usePathname();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
     localStorage.removeItem('ith_admin_auth');
     window.location.href = '/admin/login';
   };
