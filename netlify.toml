@@ -13,3 +13,5 @@
 
 [build.environment]
   NODE_VERSION = "20"
+
+# Redeploy trigger: 2026-08-21
