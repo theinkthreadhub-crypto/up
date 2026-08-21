@@ -5,5 +5,11 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+[[redirects]]
+  from = "https://inkthreadhub.in/*"
+  to = "https://www.inkthreadhub.in/:splat"
+  status = 301
+  force = true
+
 [build.environment]
   NODE_VERSION = "20"
