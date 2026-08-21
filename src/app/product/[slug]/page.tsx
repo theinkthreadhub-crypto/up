@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useEffect, useState, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -39,6 +39,23 @@ export default function ProductDetailPage({
   const { products, loading } = useLiveProducts();
   const product = products.find((p) => p.slug === slug);
 
+  // Keep every hook above conditional returns so React sees the same hook order
+  // while Supabase changes the page from loading -> loaded.
+  const { addToCart } = useCart();
+  const [selectedSize, setSelectedSize] = useState<string>('M');
+  const [selectedColor, setSelectedColor] = useState<string>('Obsidian Black');
+  const [quantity, setQuantity] = useState<number>(1);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState<boolean>(false);
+  const [openAccordion, setOpenAccordion] = useState<string | null>('fabric');
+  const [addedSuccess, setAddedSuccess] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!product) return;
+    setSelectedSize(product.sizes?.[0] || 'M');
+    setSelectedColor(product.colors?.[0] || 'Obsidian Black');
+    setQuantity(1);
+  }, [product]);
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center py-20 text-zinc-400 font-mono text-xs gap-2">
@@ -51,14 +68,6 @@ export default function ProductDetailPage({
   if (!product) {
     notFound();
   }
-
-  const { addToCart } = useCart();
-  const [selectedSize, setSelectedSize] = useState<string>(product.sizes?.[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState<string>(product.colors?.[0] || 'Obsidian Black');
-  const [quantity, setQuantity] = useState<number>(1);
-  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState<boolean>(false);
-  const [openAccordion, setOpenAccordion] = useState<string | null>('fabric');
-  const [addedSuccess, setAddedSuccess] = useState<boolean>(false);
 
   const currentPrice = product.sale_price && product.sale_price > 0 ? product.sale_price : product.price;
   const hasDiscount = product.sale_price && product.sale_price > 0 && product.sale_price < product.price;
