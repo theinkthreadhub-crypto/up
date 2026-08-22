@@ -51,7 +51,7 @@ export default function HomePage() {
           <div className="lg:col-span-7 space-y-6 relative z-10">
             <div className="inline-flex items-center gap-2 bg-street-800 border border-street-600 text-brand-neon px-3.5 py-1 rounded-full text-xs font-mono">
               <span className="w-2 h-2 rounded-full bg-brand-neon animate-pulse" />
-              <span>STITCH AI CRAFTSMANSHIP EDITION</span>
+              <span>NOT FOR EVERYONE</span>
             </div>
 
             <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal text-white leading-[1.08] tracking-tight">
@@ -83,8 +83,8 @@ export default function HomePage() {
           <div className="lg:col-span-5 relative z-10">
             <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-glass border border-street-700 group">
               <Image
-                src="/images/sungod_classic_black_front.jpg"
-                alt="240 GSM Stacked Heavyweight Cotton Streetwear"
+                src="/images/hero_models.jpg"
+                alt="Not For Everyone Artisanal Streetwear Collection"
                 fill
                 priority
                 className="object-cover object-center group-hover:scale-105 transition-transform duration-700"

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ShoppingBag, Search, Menu, X, Shield, Truck, Compass, ChevronDown } from 'lucide-react';
@@ -115,10 +116,10 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 sm:h-20">
+          <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
 
-            {/* Left: Mobile Toggle + Desktop Nav */}
-            <div className="flex items-center gap-4">
+            {/* Left: Mobile Toggle + Brand Logo */}
+            <div className="flex items-center gap-3 shrink-0">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="lg:hidden p-2 text-street-300 hover:text-brand-neon transition-colors"
@@ -127,81 +128,89 @@ export default function Navbar() {
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
 
-              {/* Quick Links */}
-              <nav className="hidden lg:flex items-center gap-1">
-                {/* NEW DROPS */}
-                <Link
-                  href="/category/new-drops"
-                  className={`text-[11px] font-black tracking-widest uppercase px-3 py-2 rounded-lg transition-colors ${
-                    pathname === '/category/new-drops'
-                      ? 'text-brand-neon bg-brand-neon/10'
-                      : 'text-brand-neon hover:bg-brand-neon/10'
-                  }`}
-                >
-                  NEW DROPS 🔥
-                </Link>
-
-                {/* MEGA MENU ITEMS */}
-                {megaMenu.map((menu) => (
-                  <div
-                    key={menu.label}
-                    className="relative"
-                    onMouseEnter={() => handleMegaEnter(menu.label)}
-                    onMouseLeave={handleMegaLeave}
-                  >
-                    <Link
-                      href={menu.href}
-                      className={`flex items-center gap-1 text-[11px] font-medium tracking-widest uppercase px-3 py-2 rounded-lg transition-colors ${
-                        activeMega === menu.label
-                          ? 'text-brand-neon bg-street-800'
-                          : 'text-street-300 hover:text-brand-neon hover:bg-street-900'
-                      }`}
-                    >
-                      {menu.label}
-                      <ChevronDown className={`w-3 h-3 transition-transform ${activeMega === menu.label ? 'rotate-180' : ''}`} />
-                    </Link>
-
-                    {/* Dropdown */}
-                    {activeMega === menu.label && (
-                      <div
-                        className="absolute top-full left-0 mt-1 w-48 bg-street-900 border border-street-700 rounded-xl shadow-glass overflow-hidden"
-                        onMouseEnter={() => handleMegaEnter(menu.label)}
-                        onMouseLeave={handleMegaLeave}
-                      >
-                        {menu.items.map((item) => (
-                          <Link
-                            key={item.name}
-                            href={item.href}
-                            className="block px-4 py-2.5 text-xs text-street-300 hover:text-brand-neon hover:bg-street-800 transition-colors border-b border-street-800 last:border-0"
-                          >
-                            {item.name}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {/* BESTSELLERS */}
-                <Link
-                  href="/category/bestsellers"
-                  className="text-[11px] font-medium tracking-widest uppercase px-3 py-2 rounded-lg text-brand-amber hover:bg-brand-amber/10 transition-colors"
-                >
-                  BESTSELLERS ⭐
-                </Link>
-              </nav>
+              <Link href="/" className="flex items-center gap-2.5 group">
+                <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-xl overflow-hidden bg-white/5 border border-street-700 group-hover:border-brand-neon transition-colors flex items-center justify-center">
+                  <Image
+                    src="/images/logo.png"
+                    alt="InkThread Hub Spool Logo"
+                    width={36}
+                    height={36}
+                    className="object-contain p-1"
+                  />
+                </div>
+                <span className="font-serif text-lg sm:text-2xl font-bold tracking-tight hover:opacity-90 transition-opacity whitespace-nowrap">
+                  <span className="text-white">Inkthread </span>
+                  <span className="text-brand-neon">Hub</span>
+                </span>
+              </Link>
             </div>
 
-            {/* Center: Logo */}
-            <Link href="/" className="flex items-center justify-center absolute left-1/2 -translate-x-1/2">
-              <span className="font-serif text-xl sm:text-2xl tracking-tight hover:opacity-80 transition-opacity whitespace-nowrap">
-                <span className="text-white">Inkthread </span>
-                <span className="text-brand-neon">Hub</span>
-              </span>
-            </Link>
+            {/* Center: Desktop Menu Links (Cleanly Spaced) */}
+            <nav className="hidden lg:flex items-center gap-1.5 overflow-x-auto py-2">
+              {/* NEW DROPS */}
+              <Link
+                href="/category/new-drops"
+                className={`text-[11px] font-black tracking-widest uppercase px-2.5 py-2 rounded-lg transition-colors whitespace-nowrap ${
+                  pathname === '/category/new-drops'
+                    ? 'text-brand-neon bg-brand-neon/10'
+                    : 'text-brand-neon hover:bg-brand-neon/10'
+                }`}
+              >
+                NEW DROPS 🔥
+              </Link>
+
+              {/* MEGA MENU ITEMS */}
+              {megaMenu.map((menu) => (
+                <div
+                  key={menu.label}
+                  className="relative"
+                  onMouseEnter={() => handleMegaEnter(menu.label)}
+                  onMouseLeave={handleMegaLeave}
+                >
+                  <Link
+                    href={menu.href}
+                    className={`flex items-center gap-1 text-[11px] font-medium tracking-widest uppercase px-2.5 py-2 rounded-lg transition-colors whitespace-nowrap ${
+                      activeMega === menu.label
+                        ? 'text-brand-neon bg-street-800'
+                        : 'text-street-300 hover:text-brand-neon hover:bg-street-900'
+                    }`}
+                  >
+                    {menu.label}
+                    <ChevronDown className={`w-3 h-3 transition-transform ${activeMega === menu.label ? 'rotate-180' : ''}`} />
+                  </Link>
+
+                  {/* Dropdown */}
+                  {activeMega === menu.label && (
+                    <div
+                      className="absolute top-full left-0 mt-1 w-48 bg-street-900 border border-street-700 rounded-xl shadow-glass overflow-hidden z-50"
+                      onMouseEnter={() => handleMegaEnter(menu.label)}
+                      onMouseLeave={handleMegaLeave}
+                    >
+                      {menu.items.map((item) => (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className="block px-4 py-2.5 text-xs text-street-300 hover:text-brand-neon hover:bg-street-800 transition-colors border-b border-street-800 last:border-0"
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {/* BESTSELLERS */}
+              <Link
+                href="/category/bestsellers"
+                className="text-[11px] font-medium tracking-widest uppercase px-2.5 py-2 rounded-lg text-brand-amber hover:bg-brand-amber/10 transition-colors whitespace-nowrap"
+              >
+                BESTSELLERS ⭐
+              </Link>
+            </nav>
 
             {/* Right: Actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="p-2 text-street-300 hover:text-brand-neon hover:bg-street-800 rounded-full transition-colors"
@@ -218,7 +227,7 @@ export default function Navbar() {
                 <Shield className="w-4 h-4" />
               </Link>
 
-              {/* Cart */}
+              {/* Cart Drawer Toggle */}
               <button
                 onClick={() => setIsDrawerOpen(true)}
                 className="p-2 text-street-200 hover:bg-street-800 rounded-full transition-colors relative flex items-center"
