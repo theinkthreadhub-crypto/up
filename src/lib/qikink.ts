@@ -1,5 +1,8 @@
 /**
  * Qikink Print-on-Demand (POD) Automated Order Sync & Fulfillment Service
+ *
+ * Security: the API key is server-only and must come from Vercel's
+ * QIKINK_API_KEY environment variable. Never hardcode or pass it from clients.
  */
 
 interface QikinkOrderItem {
@@ -24,11 +27,14 @@ interface QikinkOrderPayload {
   line_items: QikinkOrderItem[];
 }
 
-export async function sendOrderToQikink(orderData: QikinkOrderPayload, apiKeyOverride?: string): Promise<{ success: boolean; qikinkOrderId?: string; error?: string }> {
-  const apiKey = apiKeyOverride || process.env.QIKINK_API_KEY || '18edc332f4f51381dcc9d41012cdeb9eb3bb43bec5e0b2730b17b5bf6d732196';
+export async function sendOrderToQikink(
+  orderData: QikinkOrderPayload,
+): Promise<{ success: boolean; qikinkOrderId?: string; error?: string }> {
+  const apiKey = process.env.QIKINK_API_KEY;
 
   if (!apiKey) {
-    return { success: false, error: 'Qikink API Key is missing.' };
+    console.error('[Qikink POD] QIKINK_API_KEY is not configured on the server.');
+    return { success: false, error: 'Qikink API configuration is missing.' };
   }
 
   try {
@@ -36,8 +42,8 @@ export async function sendOrderToQikink(orderData: QikinkOrderPayload, apiKeyOve
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'ApiKey': apiKey,
-        'Authorization': `Bearer ${apiKey}`,
+        ApiKey: apiKey,
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify(orderData),
     });
