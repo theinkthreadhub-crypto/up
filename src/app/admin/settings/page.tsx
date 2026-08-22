@@ -25,7 +25,6 @@ const defaultSettings: SiteSettings = {
   facebook_url: 'https://facebook.com/inkthreadhub',
   instagram_url: 'https://instagram.com/inkthreadhub',
   twitter_url: 'https://twitter.com/inkthreadhub',
-  qikink_api_key: '18edc332f4f51381dcc9d41012cdeb9eb3bb43bec5e0b2730b17b5bf6d732196',
   qikink_client_id: '',
   qikink_auto_fulfillment: true,
 };
@@ -87,7 +86,6 @@ export default function AdminSettingsPage() {
       facebook_url: settings.facebook_url?.trim() || null,
       instagram_url: settings.instagram_url?.trim() || null,
       twitter_url: settings.twitter_url?.trim() || null,
-      qikink_api_key: settings.qikink_api_key?.trim() || null,
       qikink_client_id: settings.qikink_client_id?.trim() || null,
       qikink_auto_fulfillment: settings.qikink_auto_fulfillment ?? true,
       updated_at: new Date().toISOString(),
@@ -159,11 +157,15 @@ export default function AdminSettingsPage() {
                 </h2>
               </div>
               <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono px-2.5 py-1 rounded-full flex items-center gap-1 font-bold">
-                <CheckCircle2 className="w-3.5 h-3.5" /> API Connected
+                <CheckCircle2 className="w-3.5 h-3.5" /> SERVER ENV SECURED
               </span>
             </div>
 
             <div className="space-y-4 pt-1">
+              <div className="rounded-xl border border-street-800 bg-street-950 px-4 py-3 text-zinc-400 font-mono text-[11px] leading-relaxed">
+                Qikink secret API key is managed server-side in Vercel as QIKINK_API_KEY and is never displayed or saved from this browser page.
+              </div>
+
               <div className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -177,31 +179,17 @@ export default function AdminSettingsPage() {
                 </label>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-zinc-400 font-mono uppercase text-[11px]">Qikink Secret API Key</label>
-                  <input
-                    type="text"
-                    required
-                    value={settings.qikink_api_key || ''}
-                    onChange={(e) => setSettings({ ...settings, qikink_api_key: e.target.value })}
-                    placeholder="18edc332f4f51381dcc9d41012cdeb9eb3bb43bec5e0b2730b17b5bf6d732196"
-                    className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon text-xs"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-zinc-400 font-mono uppercase text-[11px]">
-                    Qikink Store / Client ID (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={settings.qikink_client_id || ''}
-                    onChange={(e) => setSettings({ ...settings, qikink_client_id: e.target.value })}
-                    placeholder="e.g. QIK-9876"
-                    className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon text-xs"
-                  />
-                </div>
+              <div className="space-y-1.5">
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">
+                  Qikink Store / Client ID (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={settings.qikink_client_id || ''}
+                  onChange={(e) => setSettings({ ...settings, qikink_client_id: e.target.value })}
+                  placeholder="e.g. QIK-9876"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon text-xs"
+                />
               </div>
             </div>
           </div>
