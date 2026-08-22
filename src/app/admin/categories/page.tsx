@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
-import { Plus, Edit2, Trash2, X, Loader2, AlertCircle } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Loader2, AlertCircle, Upload, Image as ImageIcon } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { slugify } from '@/lib/utils';
 import { Category } from '@/types/database';
@@ -12,6 +12,7 @@ export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCat, setEditingCat] = useState<Category | null>(null);
@@ -59,6 +60,44 @@ export default function AdminCategoriesPage() {
     setFormImage(cat.image_url || '/images/plain_oversized_black.jpg');
     setError('');
     setIsModalOpen(true);
+  };
+
+  const handleImageUpload = async (file: File | null) => {
+    if (!file) return;
+    setUploading(true);
+    setError('');
+
+    try {
+      // Try Supabase Storage upload
+      const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, '-');
+      const filePath = `categories/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
+      const { error: uploadErr } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, { upsert: false });
+
+      if (!uploadErr) {
+        const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
+        if (data?.publicUrl) {
+          setFormImage(data.publicUrl);
+          setUploading(false);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn('Storage upload fallback:', e);
+    }
+
+    // Fallback: Convert PNG/JPG directly to Data URL (Base64)
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) setFormImage(reader.result as string);
+      setUploading(false);
+    };
+    reader.onerror = () => {
+      setError('Failed to read image file.');
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -231,14 +270,37 @@ export default function AdminCategoriesPage() {
                 />
               </div>
 
+              {/* Category Image PNG/JPG Direct Upload */}
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Banner Image URL</label>
-                <input
-                  type="text"
-                  value={formImage}
-                  onChange={(e) => setFormImage(e.target.value)}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono"
-                />
+                <label className="text-zinc-400 font-mono">Category Banner Image (PNG / JPG)</label>
+                <div className="flex items-center gap-3 bg-street-950 border border-street-800 p-2.5 rounded-2xl">
+                  {formImage ? (
+                    <img src={formImage} alt="Preview" className="w-14 h-12 object-cover rounded-xl border border-street-800 shrink-0" />
+                  ) : (
+                    <div className="w-14 h-12 bg-street-900 rounded-xl flex items-center justify-center shrink-0 text-zinc-600">
+                      <ImageIcon className="w-5 h-5" />
+                    </div>
+                  )}
+
+                  <label className="flex-1 bg-street-900 border border-street-700 hover:border-brand-neon text-white px-3 py-2 rounded-xl cursor-pointer flex items-center justify-center gap-2 font-bold text-xs transition-colors">
+                    {uploading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-brand-neon" /> Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 text-brand-neon" /> Select PNG / JPG File
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/png, image/jpeg, image/jpg, image/webp"
+                      disabled={uploading}
+                      className="hidden"
+                      onChange={(e) => void handleImageUpload(e.target.files?.[0] || null)}
+                    />
+                  </label>
+                </div>
               </div>
 
               <div className="space-y-1.5">
@@ -261,7 +323,7 @@ export default function AdminCategoriesPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving}
+                  disabled={saving || uploading}
                   className="bg-brand-neon text-black font-bold uppercase px-5 py-2 rounded-xl disabled:opacity-50 flex items-center gap-2"
                 >
                   {saving ? (

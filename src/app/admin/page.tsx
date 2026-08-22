@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Loader2,
   AlertCircle,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { formatPrice } from '@/lib/utils';
@@ -101,6 +102,12 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/admin/products"
+            className="bg-street-900 hover:bg-street-800 text-white font-bold uppercase text-xs px-4 py-2.5 rounded-xl border border-street-700 hover:border-brand-neon flex items-center gap-1.5 transition-all"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-brand-neon" /> Bulk Upload
+          </Link>
           <Link
             href="/admin/products"
             className="bg-brand-neon hover:bg-brand-neonHover text-black font-bold uppercase text-xs px-4 py-2.5 rounded-xl shadow-glow-neon flex items-center gap-1.5 transition-all"
