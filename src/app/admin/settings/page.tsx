@@ -34,8 +34,30 @@ export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [savedSuccess, setSavedSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [testingQikink, setTestingQikink] = useState(false);
+  const [qikinkTestResult, setQikinkTestResult] = useState<{ success: boolean; msg: string } | null>(null);
+
+  const testQikinkConnection = async () => {
+    setTestingQikink(true);
+    setQikinkTestResult(null);
+    try {
+      const res = await fetch('/api/admin/test-qikink', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: settings.qikink_api_key }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setQikinkTestResult({ success: true, msg: '✅ ' + data.message });
+      } else {
+        setQikinkTestResult({ success: false, msg: '❌ ' + (data.error || 'Connection failed') });
+      }
+    } catch (e) {
+      setQikinkTestResult({ success: false, msg: '❌ Connection error' });
+    } finally {
+      setTestingQikink(false);
+    }
+  };
 
   const loadSettings = async () => {
     setLoading(true);
@@ -191,6 +213,38 @@ export default function AdminSettingsPage() {
                   className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon text-xs"
                 />
               </div>
+
+              <div className="flex items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={testQikinkConnection}
+                  disabled={testingQikink}
+                  className="bg-street-800 hover:bg-street-700 text-white font-mono font-bold text-xs px-4 py-2 rounded-xl border border-street-700 hover:border-brand-neon flex items-center gap-2 transition-all disabled:opacity-50"
+                >
+                  {testingQikink ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-neon" /> Pinging Qikink API...
+                    </>
+                  ) : (
+                    <>
+                      <Printer className="w-3.5 h-3.5 text-brand-neon" /> Test Qikink Connection Live
+                    </>
+                  )}
+                </button>
+
+                {qikinkTestResult && (
+                  <span
+                    className={`text-xs font-mono font-bold px-3 py-1.5 rounded-xl border ${
+                      qikinkTestResult.success
+                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                        : 'bg-red-500/10 border-red-500/30 text-red-400'
+                    }`}
+                  >
+                    {qikinkTestResult.msg}
+                  </span>
+                )}
+              </div>
+            </div>
             </div>
           </div>
 
