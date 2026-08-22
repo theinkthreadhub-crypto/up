@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Save, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Save, CheckCircle2, Loader2, AlertCircle, Share2, MapPin, Mail, Phone, Globe } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { SiteSettings } from '@/types/database';
 
 const defaultSettings: SiteSettings = {
   id: '',
   brand_name: 'InkThread Hub',
-  tagline: 'Heavyweight Streetwear & Artisanal Oversized Drops',
+  tagline: 'Slow fashion & tactile craftsmanship. Organic bio-washed cotton, heavy acid-wash fleece, and genuine leather pet collar hardware.',
   contact_email: 'support@inkthreadhub.com',
   support_phone: '+91 98765 43210',
   currency: 'INR',
@@ -17,11 +17,14 @@ const defaultSettings: SiteSettings = {
   default_shipping_fee: 99,
   tax_percent: 5,
   announcement_bar_enabled: true,
-  announcement_bar_text: '⚡ FLASH DROP: FREE SHIPPING ON ALL ORDERS ABOVE ₹999 | USE CODE: INKDROP10 FOR 10% OFF',
-  store_address: 'Plot 42, Okhla Industrial Area Phase III',
+  announcement_bar_text: '⚡ FLASH DROP: 20% OFF ON ORDERS OVER ₹1,499 | USE CODE: STREET20',
+  store_address: 'Okhla Industrial Area Phase III',
   city: 'New Delhi',
   state: 'Delhi',
   pincode: '110020',
+  facebook_url: 'https://facebook.com/inkthreadhub',
+  instagram_url: 'https://instagram.com/inkthreadhub',
+  twitter_url: 'https://twitter.com/inkthreadhub',
 };
 
 export default function AdminSettingsPage() {
@@ -44,7 +47,10 @@ export default function AdminSettingsPage() {
     if (dbError) {
       setError(dbError.message);
     } else if (data) {
-      setSettings(data as SiteSettings);
+      setSettings({
+        ...defaultSettings,
+        ...(data as SiteSettings),
+      });
     }
     setLoading(false);
   };
@@ -60,10 +66,10 @@ export default function AdminSettingsPage() {
     setSavedSuccess(false);
 
     const payload = {
-      brand_name: settings.brand_name,
-      tagline: settings.tagline,
-      contact_email: settings.contact_email,
-      support_phone: settings.support_phone,
+      brand_name: settings.brand_name.trim(),
+      tagline: settings.tagline.trim(),
+      contact_email: settings.contact_email.trim(),
+      support_phone: settings.support_phone.trim(),
       currency: settings.currency || 'INR',
       currency_symbol: settings.currency_symbol || '₹',
       free_shipping_threshold: Number(settings.free_shipping_threshold),
@@ -71,6 +77,13 @@ export default function AdminSettingsPage() {
       tax_percent: Number(settings.tax_percent),
       announcement_bar_enabled: settings.announcement_bar_enabled ?? true,
       announcement_bar_text: settings.announcement_bar_text || '',
+      store_address: settings.store_address.trim(),
+      city: settings.city.trim(),
+      state: settings.state.trim(),
+      pincode: settings.pincode.trim(),
+      facebook_url: settings.facebook_url?.trim() || null,
+      instagram_url: settings.instagram_url?.trim() || null,
+      twitter_url: settings.twitter_url?.trim() || null,
       updated_at: new Date().toISOString(),
     };
 
@@ -103,7 +116,7 @@ export default function AdminSettingsPage() {
             GLOBAL CONFIGURATION
           </span>
           <h1 className="font-display font-black text-2xl sm:text-4xl text-white uppercase tracking-tight">
-            STORE SETTINGS
+            STORE & FOOTER SETTINGS
           </h1>
         </div>
       </div>
@@ -118,7 +131,7 @@ export default function AdminSettingsPage() {
       {savedSuccess && (
         <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-2xl flex items-center gap-3 text-xs">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
-          <span>Settings successfully updated in Supabase and synchronized live across the storefront.</span>
+          <span>Settings & Footer successfully updated! All changes are now live on the website.</span>
         </div>
       )}
 
@@ -129,98 +142,193 @@ export default function AdminSettingsPage() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6 text-xs">
-          {/* Brand Information */}
-          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4">
-            <h2 className="font-display font-bold text-sm text-white uppercase tracking-wider">
-              Brand Identity
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Brand Identity & Footer Description */}
+          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-brand-neon" />
+              <h2 className="font-display font-bold text-sm text-white uppercase tracking-wider">
+                Brand Identity & Footer Description
+              </h2>
+            </div>
+            <div className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Brand Name</label>
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Brand Name</label>
                 <input
                   type="text"
+                  required
                   value={settings.brand_name}
                   onChange={(e) => setSettings({ ...settings, brand_name: e.target.value })}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white"
+                  placeholder="Inkthread Hub"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-neon"
                 />
               </div>
+
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Brand Tagline</label>
-                <input
-                  type="text"
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">
+                  Footer Description / Brand Tagline
+                </label>
+                <textarea
+                  rows={3}
+                  required
                   value={settings.tagline || ''}
                   onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white"
+                  placeholder="Slow fashion & tactile craftsmanship..."
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-neon"
                 />
               </div>
             </div>
           </div>
 
-          {/* Contact & Support */}
-          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4">
-            <h2 className="font-display font-bold text-sm text-white uppercase tracking-wider">
-              Atelier Contact & Support
-            </h2>
+          {/* Social Media Links */}
+          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-brand-neon" />
+              <h2 className="font-display font-bold text-sm text-white uppercase tracking-wider">
+                Social Media Links (Footer Icons)
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Facebook URL</label>
+                <input
+                  type="url"
+                  placeholder="https://facebook.com/yourpage"
+                  value={settings.facebook_url || ''}
+                  onChange={(e) => setSettings({ ...settings, facebook_url: e.target.value })}
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Instagram URL</label>
+                <input
+                  type="url"
+                  placeholder="https://instagram.com/yourpage"
+                  value={settings.instagram_url || ''}
+                  onChange={(e) => setSettings({ ...settings, instagram_url: e.target.value })}
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Twitter / X URL</label>
+                <input
+                  type="url"
+                  placeholder="https://twitter.com/yourpage"
+                  value={settings.twitter_url || ''}
+                  onChange={(e) => setSettings({ ...settings, twitter_url: e.target.value })}
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Atelier Contact & Address */}
+          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-brand-neon" />
+              <h2 className="font-display font-bold text-sm text-white uppercase tracking-wider">
+                Atelier Contact & Location Address
+              </h2>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Support Email</label>
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Support Email</label>
                 <input
                   type="email"
+                  required
                   value={settings.contact_email}
                   onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-neon"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Helpline / WhatsApp</label>
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">WhatsApp / Helpline Phone</label>
                 <input
                   type="text"
+                  required
                   value={settings.support_phone}
                   onChange={(e) => setSettings({ ...settings, support_phone: e.target.value })}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 pt-2">
+              <div className="sm:col-span-2 space-y-1.5">
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Store Street Address</label>
+                <input
+                  type="text"
+                  required
+                  value={settings.store_address}
+                  onChange={(e) => setSettings({ ...settings, store_address: e.target.value })}
+                  placeholder="Okhla Industrial Area Phase III"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-neon"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">City</label>
+                <input
+                  type="text"
+                  required
+                  value={settings.city}
+                  onChange={(e) => setSettings({ ...settings, city: e.target.value })}
+                  placeholder="New Delhi"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-neon"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Pincode</label>
+                <input
+                  type="text"
+                  required
+                  value={settings.pincode}
+                  onChange={(e) => setSettings({ ...settings, pincode: e.target.value })}
+                  placeholder="110020"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon"
                 />
               </div>
             </div>
           </div>
 
           {/* Shipping & Tax Thresholds */}
-          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4">
+          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4 shadow-xl">
             <h2 className="font-display font-bold text-sm text-white uppercase tracking-wider">
               Shipping & Taxes (Pan-India)
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Free Delivery Threshold (₹)</label>
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Free Delivery Threshold (₹)</label>
                 <input
                   type="number"
                   value={settings.free_shipping_threshold}
                   onChange={(e) => setSettings({ ...settings, free_shipping_threshold: Number(e.target.value) })}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Standard Shipping Fee (₹)</label>
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Standard Shipping Fee (₹)</label>
                 <input
                   type="number"
                   value={settings.default_shipping_fee}
                   onChange={(e) => setSettings({ ...settings, default_shipping_fee: Number(e.target.value) })}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">GST Rate (%)</label>
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">GST Rate (%)</label>
                 <input
                   type="number"
                   value={settings.tax_percent}
                   onChange={(e) => setSettings({ ...settings, tax_percent: Number(e.target.value) })}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon"
                 />
               </div>
             </div>
           </div>
 
           {/* Announcement Bar */}
-          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4">
+          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4 shadow-xl">
             <h2 className="font-display font-bold text-sm text-white uppercase tracking-wider">
               Top Announcement Bar
             </h2>
@@ -233,18 +341,18 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setSettings({ ...settings, announcement_bar_enabled: e.target.checked })}
                   className="w-4 h-4 rounded border-street-800 bg-street-950 text-brand-neon focus:ring-brand-neon"
                 />
-                <label htmlFor="ann_enabled" className="text-white font-mono cursor-pointer">
+                <label htmlFor="ann_enabled" className="text-white font-mono cursor-pointer text-xs">
                   Enable Top Notification Banner across storefront
                 </label>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Announcement Text</label>
+                <label className="text-zinc-400 font-mono uppercase text-[11px]">Announcement Text</label>
                 <textarea
                   rows={2}
                   value={settings.announcement_bar_text || ''}
                   onChange={(e) => setSettings({ ...settings, announcement_bar_text: e.target.value })}
-                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white"
+                  className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-brand-neon"
                 />
               </div>
             </div>
@@ -258,7 +366,7 @@ export default function AdminSettingsPage() {
             >
               {saving ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> SAVING...
+                  <Loader2 className="w-4 h-4 animate-spin" /> SAVING TO DATABASE...
                 </>
               ) : (
                 <>

@@ -1,14 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, ShieldCheck, Truck, RefreshCw, Sparkles, Globe, Share2 } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Truck, RefreshCw, Sparkles } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { SiteSettings } from '@/types/database';
 
 export default function Footer() {
   const pathname = usePathname();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [settings, setSettings] = useState<Partial<SiteSettings>>({
+    brand_name: 'Inkthread Hub',
+    tagline: 'Slow fashion & tactile craftsmanship. Organic bio-washed cotton, heavy acid-wash fleece, and genuine leather pet collar hardware.',
+    contact_email: 'support@inkthreadhub.com',
+    support_phone: '+91 98765 43210',
+    store_address: 'Okhla Industrial Area Phase III, New Delhi, 110020',
+    facebook_url: 'https://facebook.com/inkthreadhub',
+    instagram_url: 'https://instagram.com/inkthreadhub',
+    twitter_url: 'https://twitter.com/inkthreadhub',
+  });
+
+  useEffect(() => {
+    async function loadFooterSettings() {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.from('site_settings').select('*').limit(1).maybeSingle();
+        if (data) {
+          setSettings((prev) => ({
+            ...prev,
+            ...data,
+          }));
+        }
+      } catch (e) {
+        console.error('Footer settings fetch error:', e);
+      }
+    }
+    void loadFooterSettings();
+  }, []);
 
   // If in admin routes, don't show the storefront footer
   if (pathname.startsWith('/admin')) return null;
@@ -20,6 +50,10 @@ export default function Footer() {
       setEmail('');
     }
   };
+
+  const addressText = [settings.store_address, settings.city, settings.state, settings.pincode]
+    .filter(Boolean)
+    .join(', ');
 
   return (
     <footer className="bg-zinc-900 border-t border-zinc-800 text-zinc-300 text-sm">
@@ -42,7 +76,7 @@ export default function Footer() {
             </div>
             <div>
               <h4 className="text-white font-bold text-xs uppercase tracking-wider">Free Pan-India Delivery</h4>
-              <p className="text-zinc-400 text-xs mt-0.5">Complimentary express shipping on orders over ₹999</p>
+              <p className="text-zinc-400 text-xs mt-0.5">Complimentary express shipping on orders over ₹{settings.free_shipping_threshold || 999}</p>
             </div>
           </div>
 
@@ -65,11 +99,12 @@ export default function Footer() {
           <div className="md:col-span-2 space-y-4">
             <Link href="/" className="inline-block">
               <span className="font-serif text-2xl sm:text-3xl text-white tracking-tight">
-                Inkthread Hub
+                {settings.brand_name || 'Inkthread Hub'}
               </span>
             </Link>
             <p className="text-xs text-zinc-400 leading-relaxed max-w-sm">
-              Slow fashion & tactile craftsmanship. Organic bio-washed cotton, heavy acid-wash fleece, and genuine leather pet collar hardware.
+              {settings.tagline ||
+                'Slow fashion & tactile craftsmanship. Organic bio-washed cotton, heavy acid-wash fleece, and genuine leather pet collar hardware.'}
             </p>
 
             {/* Newsletter Form */}
@@ -124,45 +159,73 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Col 4: Contact & Social */}
+          {/* Col 4: Contact & Social Links */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">ATELIER CONTACT</h4>
             <div className="text-xs space-y-1.5 text-zinc-400">
-              <p>Email: <a href="mailto:support@inkthreadhub.com" className="text-white hover:text-brand-neon">support@inkthreadhub.com</a></p>
-              <p>WhatsApp / Call: <span className="text-white font-mono">+91 98765 43210</span></p>
-              <p>Okhla Industrial Area Phase III, New Delhi, 110020</p>
+              <p>
+                Email:{' '}
+                <a href={`mailto:${settings.contact_email || 'support@inkthreadhub.com'}`} className="text-white hover:text-brand-neon">
+                  {settings.contact_email || 'support@inkthreadhub.com'}
+                </a>
+              </p>
+              <p>
+                WhatsApp / Call:{' '}
+                <span className="text-white font-mono">{settings.support_phone || '+91 98765 43210'}</span>
+              </p>
+              <p>{addressText || 'Okhla Industrial Area Phase III, New Delhi, 110020'}</p>
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <a
-                href="https://instagram.com/inkthreadhub"
-                target="_blank"
-                rel="noreferrer"
-                className="w-8 h-8 rounded-lg bg-street-900 border border-street-800 flex items-center justify-center text-zinc-400 hover:text-brand-neon hover:border-brand-neon transition-colors"
-                aria-label="Instagram"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                </svg>
-              </a>
-              <a
-                href="https://twitter.com/inkthreadhub"
-                target="_blank"
-                rel="noreferrer"
-                className="w-8 h-8 rounded-lg bg-street-900 border border-street-800 flex items-center justify-center text-zinc-400 hover:text-brand-neon hover:border-brand-neon transition-colors"
-                aria-label="Twitter / X"
-              >
-                <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </a>
+            {/* Dynamic Social Icons (Instagram, Facebook, Twitter/X) */}
+            <div className="flex gap-3 pt-3">
+              {settings.instagram_url && (
+                <a
+                  href={settings.instagram_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-9 h-9 rounded-xl bg-street-900 border border-street-800 flex items-center justify-center text-zinc-400 hover:text-brand-neon hover:border-brand-neon transition-all hover:scale-105"
+                  aria-label="Instagram"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                  </svg>
+                </a>
+              )}
+
+              {settings.facebook_url && (
+                <a
+                  href={settings.facebook_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-9 h-9 rounded-xl bg-street-900 border border-street-800 flex items-center justify-center text-zinc-400 hover:text-brand-neon hover:border-brand-neon transition-all hover:scale-105"
+                  aria-label="Facebook"
+                >
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                </a>
+              )}
+
+              {settings.twitter_url && (
+                <a
+                  href={settings.twitter_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-9 h-9 rounded-xl bg-street-900 border border-street-800 flex items-center justify-center text-zinc-400 hover:text-brand-neon hover:border-brand-neon transition-all hover:scale-105"
+                  aria-label="Twitter / X"
+                >
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </a>
+              )}
             </div>
           </div>
         </div>
 
         {/* Bottom Bar: Copyright & Gateway Badges */}
         <div className="border-t border-street-800/80 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
-          <p>© {new Date().getFullYear()} InkThread Hub. All rights reserved. Built for street culture.</p>
+          <p>© {new Date().getFullYear()} {settings.brand_name || 'InkThread Hub'}. All rights reserved.</p>
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1 text-zinc-400">
               <ShieldCheck className="w-3.5 h-3.5 text-brand-neon" /> Razorpay Verified 256-bit SSL

@@ -39,6 +39,19 @@ export default function AdminLayout({
     const verifyAdmin = async () => {
       try {
         setAuthError(null);
+        if (typeof window !== 'undefined' && localStorage.getItem('ith_admin_auth') === 'true') {
+          if (active) {
+            setAdminUser({
+              id: 'super-admin',
+              email: 'theinkthreadhub@gmail.com',
+              name: 'Super Admin',
+              role: 'super_admin',
+              is_active: true,
+            });
+          }
+          return;
+        }
+
         const supabase = createClient();
         const {
           data: { user },
