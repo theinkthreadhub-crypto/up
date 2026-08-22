@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Save, CheckCircle2, Loader2, AlertCircle, Share2, MapPin, Mail, Phone, Globe } from 'lucide-react';
+import { Save, CheckCircle2, Loader2, AlertCircle, Share2, MapPin, Globe, Printer } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { SiteSettings } from '@/types/database';
 
@@ -25,6 +25,9 @@ const defaultSettings: SiteSettings = {
   facebook_url: 'https://facebook.com/inkthreadhub',
   instagram_url: 'https://instagram.com/inkthreadhub',
   twitter_url: 'https://twitter.com/inkthreadhub',
+  qikink_api_key: '18edc332f4f51381dcc9d41012cdeb9eb3bb43bec5e0b2730b17b5bf6d732196',
+  qikink_client_id: '',
+  qikink_auto_fulfillment: true,
 };
 
 export default function AdminSettingsPage() {
@@ -84,6 +87,9 @@ export default function AdminSettingsPage() {
       facebook_url: settings.facebook_url?.trim() || null,
       instagram_url: settings.instagram_url?.trim() || null,
       twitter_url: settings.twitter_url?.trim() || null,
+      qikink_api_key: settings.qikink_api_key?.trim() || null,
+      qikink_client_id: settings.qikink_client_id?.trim() || null,
+      qikink_auto_fulfillment: settings.qikink_auto_fulfillment ?? true,
       updated_at: new Date().toISOString(),
     };
 
@@ -116,7 +122,7 @@ export default function AdminSettingsPage() {
             GLOBAL CONFIGURATION
           </span>
           <h1 className="font-display font-black text-2xl sm:text-4xl text-white uppercase tracking-tight">
-            STORE & FOOTER SETTINGS
+            STORE & POD INTEGRATION SETTINGS
           </h1>
         </div>
       </div>
@@ -131,7 +137,7 @@ export default function AdminSettingsPage() {
       {savedSuccess && (
         <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-2xl flex items-center gap-3 text-xs">
           <CheckCircle2 className="w-5 h-5 shrink-0" />
-          <span>Settings & Footer successfully updated! All changes are now live on the website.</span>
+          <span>Settings & Qikink POD Integration successfully updated in database!</span>
         </div>
       )}
 
@@ -142,6 +148,64 @@ export default function AdminSettingsPage() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6 text-xs">
+          {/* Qikink Print-on-Demand POD Integration */}
+          <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4 shadow-xl relative overflow-hidden">
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-brand-neon/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Printer className="w-5 h-5 text-brand-neon" />
+                <h2 className="font-display font-bold text-sm text-white uppercase tracking-wider">
+                  Qikink Print-on-Demand (POD) API Integration
+                </h2>
+              </div>
+              <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-mono px-2.5 py-1 rounded-full flex items-center gap-1 font-bold">
+                <CheckCircle2 className="w-3.5 h-3.5" /> API Connected
+              </span>
+            </div>
+
+            <div className="space-y-4 pt-1">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="qikink_auto"
+                  checked={settings.qikink_auto_fulfillment ?? true}
+                  onChange={(e) => setSettings({ ...settings, qikink_auto_fulfillment: e.target.checked })}
+                  className="w-4 h-4 rounded border-street-800 bg-street-950 text-brand-neon focus:ring-brand-neon"
+                />
+                <label htmlFor="qikink_auto" className="text-white font-mono cursor-pointer text-xs">
+                  Enable Automatic Order Sync & Dispatch to Qikink POD
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-zinc-400 font-mono uppercase text-[11px]">Qikink Secret API Key</label>
+                  <input
+                    type="text"
+                    required
+                    value={settings.qikink_api_key || ''}
+                    onChange={(e) => setSettings({ ...settings, qikink_api_key: e.target.value })}
+                    placeholder="18edc332f4f51381dcc9d41012cdeb9eb3bb43bec5e0b2730b17b5bf6d732196"
+                    className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-zinc-400 font-mono uppercase text-[11px]">
+                    Qikink Store / Client ID (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={settings.qikink_client_id || ''}
+                    onChange={(e) => setSettings({ ...settings, qikink_client_id: e.target.value })}
+                    placeholder="e.g. QIK-9876"
+                    className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-2.5 text-white font-mono focus:outline-none focus:border-brand-neon text-xs"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Brand Identity & Footer Description */}
           <div className="bg-card border border-street-800 rounded-3xl p-6 space-y-4 shadow-xl">
             <div className="flex items-center gap-2">

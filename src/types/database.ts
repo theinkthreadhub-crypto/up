@@ -229,6 +229,9 @@ export interface SiteSettings {
   pincode: string;
   announcement_bar_enabled: boolean;
   announcement_bar_text: string;
+  qikink_api_key?: string;
+  qikink_client_id?: string;
+  qikink_auto_fulfillment?: boolean;
   created_at?: string;
   updated_at?: string;
 }
