@@ -1,17 +1,17 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { SiteSettings } from '@/types/database';
 
 export default function AnnouncementBar() {
-  const supabase = useMemo(() => createClient(), []);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadSettings() {
       try {
+        const supabase = createClient();
         const { data } = await supabase
           .from('site_settings')
           .select('*')
