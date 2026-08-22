@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useEffect, useMemo, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,13 +16,13 @@ export default function BlogPostPage({
 }) {
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
-  const supabase = useMemo(() => createClient(), []);
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadPost() {
       try {
+        const supabase = createClient();
         const { data, error } = await supabase
           .from('blog_posts')
           .select('*')
@@ -56,36 +56,23 @@ export default function BlogPostPage({
 
   return (
     <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-10">
-      {/* Back button */}
-      <Link
-        href="/blog"
-        className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-brand-neon transition-colors"
-      >
+      <Link href="/blog" className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-brand-neon transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back to Journal Dispatches
       </Link>
 
-      {/* Header */}
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
-          <span className="bg-brand-neon/10 text-brand-neon px-3 py-1 rounded-full font-bold">
-            {post.category}
-          </span>
+          <span className="bg-brand-neon/10 text-brand-neon px-3 py-1 rounded-full font-bold">{post.category}</span>
           <span className="text-zinc-500">•</span>
-          <span className="text-zinc-400 flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" /> {post.read_time || '4 min read'}
-          </span>
+          <span className="text-zinc-400 flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {post.read_time || '4 min read'}</span>
           <span className="text-zinc-500">•</span>
           <span className="text-zinc-400">{formatDate(post.published_at || post.created_at)}</span>
         </div>
 
-        <h1 className="font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight leading-tight">
-          {post.title}
-        </h1>
+        <h1 className="font-display font-black text-3xl sm:text-5xl text-white uppercase tracking-tight leading-tight">{post.title}</h1>
 
         {post.excerpt && (
-          <p className="text-sm sm:text-base text-zinc-300 italic border-l-2 border-brand-neon pl-4 py-1">
-            {post.excerpt}
-          </p>
+          <p className="text-sm sm:text-base text-zinc-300 italic border-l-2 border-brand-neon pl-4 py-1">{post.excerpt}</p>
         )}
 
         <div className="flex items-center gap-3 pt-2 text-xs text-zinc-400 font-mono">
@@ -94,68 +81,38 @@ export default function BlogPostPage({
         </div>
       </div>
 
-      {/* Featured Banner Image */}
       <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden border border-street-800 bg-street-950">
-        <Image
-          src={post.featured_image || '/images/plain_oversized_black.jpg'}
-          alt={post.title}
-          fill
-          priority
-          className="object-cover"
-        />
+        <Image src={post.featured_image || '/images/plain_oversized_black.jpg'} alt={post.title} fill priority className="object-cover" />
       </div>
 
-      {/* Article Markdown / Body */}
       <div className="prose prose-invert max-w-none text-zinc-300 text-sm sm:text-base leading-relaxed space-y-6">
         {post.content.split('\n\n').map((paragraph, idx) => {
           if (paragraph.startsWith('## ')) {
-            return (
-              <h2 key={idx} className="font-display font-black text-xl sm:text-2xl text-white uppercase tracking-wide pt-4">
-                {paragraph.replace('## ', '')}
-              </h2>
-            );
+            return <h2 key={idx} className="font-display font-black text-xl sm:text-2xl text-white uppercase tracking-wide pt-4">{paragraph.replace('## ', '')}</h2>;
           }
           if (paragraph.startsWith('### ')) {
-            return (
-              <h3 key={idx} className="font-bold text-lg text-brand-neon uppercase pt-2">
-                {paragraph.replace('### ', '')}
-              </h3>
-            );
+            return <h3 key={idx} className="font-bold text-lg text-brand-neon uppercase pt-2">{paragraph.replace('### ', '')}</h3>;
           }
           return <p key={idx}>{paragraph}</p>;
         })}
       </div>
 
-      {/* Tags & Footer CTA */}
       <div className="border-t border-street-800 pt-8 space-y-6">
         {post.tags && post.tags.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-mono text-zinc-500 mr-2">Tags:</span>
             {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-xs font-mono bg-street-900 text-zinc-300 px-3 py-1 rounded-full border border-street-800"
-              >
-                #{tag}
-              </span>
+              <span key={tag} className="text-xs font-mono bg-street-900 text-zinc-300 px-3 py-1 rounded-full border border-street-800">#{tag}</span>
             ))}
           </div>
         )}
 
-        {/* Shop Drop CTA banner */}
         <div className="bg-street-900/60 border border-street-800 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <h3 className="font-display font-bold text-white uppercase text-base">
-              Ready to Upgrade Your Streetwear Rotation?
-            </h3>
+            <h3 className="font-display font-bold text-white uppercase text-base">Ready to Upgrade Your Streetwear Rotation?</h3>
             <p className="text-xs text-zinc-400 mt-1">Explore our 240 GSM heavy drops with pan-India delivery.</p>
           </div>
-          <Link
-            href="/shop"
-            className="bg-brand-neon text-black font-black uppercase text-xs px-6 py-3.5 rounded-xl shadow-glow-neon shrink-0"
-          >
-            SHOP THE DROP →
-          </Link>
+          <Link href="/shop" className="bg-brand-neon text-black font-black uppercase text-xs px-6 py-3.5 rounded-xl shadow-glow-neon shrink-0">SHOP THE DROP →</Link>
         </div>
       </div>
     </article>
