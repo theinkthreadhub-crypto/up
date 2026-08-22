@@ -172,10 +172,16 @@
                 <h1 class="font-serif-headline text-4xl text-primary mb-1">Centralized Product Management</h1>
                 <p class="text-xs text-secondary font-light">All changes published here instantly update Homepage, Catalog, Search, and Product pages on all devices.</p>
             </div>
-            <button onclick="openProductModal()" class="bg-primary text-background label-caps px-6 py-3.5 hover:bg-secondary transition-colors rounded-lg flex items-center space-x-2 text-xs shadow-md">
-                <span class="material-symbols-outlined text-sm">add</span>
-                <span>+ Add New Product</span>
-            </button>
+            <div class="flex flex-wrap gap-3">
+                <button onclick="openBulkUploadModal()" class="bg-surface-container-high border border-outline-variant text-primary label-caps px-5 py-3.5 hover:bg-surface-container transition-colors rounded-lg flex items-center space-x-2 text-xs shadow-sm font-bold">
+                    <span class="material-symbols-outlined text-sm text-primary">upload_file</span>
+                    <span>📊 Bulk Upload Products</span>
+                </button>
+                <button onclick="openProductModal()" class="bg-primary text-background label-caps px-6 py-3.5 hover:bg-secondary transition-colors rounded-lg flex items-center space-x-2 text-xs shadow-md">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    <span>+ Add New Product</span>
+                </button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -928,10 +934,187 @@
         renderAdminProductsTable();
     }
 
+    // BULK UPLOAD MODAL & CSV PARSER
+    let bulkParsedRows = [];
+
+    function openBulkUploadModal() {
+        bulkParsedRows = [];
+        document.getElementById('bulk-preview-area').classList.add('hidden');
+        document.getElementById('bulk-status-msg').innerText = '';
+        document.getElementById('bulk-upload-modal').classList.remove('hidden');
+    }
+
+    function closeBulkUploadModal() {
+        document.getElementById('bulk-upload-modal').classList.add('hidden');
+    }
+
+    function downloadBulkCsvTemplate() {
+        const headers = ['name', 'sku', 'price', 'sale_price', 'category', 'short_description', 'images'];
+        const sampleRow = ['Oversized Acid Wash Tee', 'ITH-TEE-001', '1299', '899', 'Unisex Clothing', 'Heavyweight 240 GSM cotton tee.', '/images/plain_oversized_black.jpg'];
+        const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), sampleRow.map(v=>`"${v}"`).join(',')].join('\n');
+        const link = document.createElement('a');
+        link.href = encodeURI(csvContent);
+        link.download = 'inkthread_bulk_products_template.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function parseCsvString(csvText) {
+        const lines = csvText.trim().split('\n');
+        if (lines.length < 2) return [];
+        const headers = lines[0].split(',').map(h => h.replace(/^["']|["']$/g, '').trim().toLowerCase());
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const values = lines[i].split(',').map(v => v.replace(/^["']|["']$/g, '').trim());
+            const obj = {};
+            headers.forEach((h, idx) => { obj[h] = values[idx] || ''; });
+            rows.push(obj);
+        }
+        return rows;
+    }
+
+    function handleBulkFileSelected(files) {
+        if (!files || files.length === 0) return;
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const content = e.target.result;
+            const rows = parseCsvString(content);
+            processBulkParsedRows(rows);
+        };
+        reader.readAsText(file);
+    }
+
+    function handleBulkPasteParse() {
+        const text = document.getElementById('bulk-paste-text').value;
+        if (!text.trim()) { alert('Please paste CSV text first!'); return; }
+        const rows = parseCsvString(text);
+        processBulkParsedRows(rows);
+    }
+
+    function processBulkParsedRows(rows) {
+        bulkParsedRows = rows.map((r, idx) => {
+            const name = r.name || r.title || r['product name'] || r['product_name'] || '';
+            const sku = r.sku || r.code || `ITH-BULK-${Date.now().toString().slice(-4)}-${idx+1}`;
+            const price = parseFloat(r.price || r.regularprice || r.mrp || 0);
+            const salePrice = parseFloat(r.sale_price || r.saleprice || price);
+            const category = r.category || 'Unisex Clothing';
+            const desc = r.short_description || r.description || name;
+            const img = r.images || r.image || '/images/plain_oversized_black.jpg';
+
+            return {
+                name, sku, category, regularPrice: price, salePrice,
+                shortDescription: desc, fullDescription: desc,
+                images: { front: img, back: img, gallery: [img] },
+                isValid: Boolean(name && price > 0)
+            };
+        });
+
+        const previewContainer = document.getElementById('bulk-preview-table-body');
+        previewContainer.innerHTML = bulkParsedRows.map((p, idx) => `
+            <tr class="border-b border-outline-variant/40">
+                <td class="p-2">${idx+1}</td>
+                <td class="p-2 font-bold">${p.name || '<span class="text-red-500">Missing Name</span>'}</td>
+                <td class="p-2 font-mono">${p.sku}</td>
+                <td class="p-2">${p.category}</td>
+                <td class="p-2">₹${p.salePrice}</td>
+                <td class="p-2">${p.isValid ? '<span class="text-emerald-600 font-bold">✓ Ready</span>' : '<span class="text-red-500 font-bold">✗ Invalid</span>'}</td>
+            </tr>
+        `).join('');
+
+        document.getElementById('bulk-preview-area').classList.remove('hidden');
+        document.getElementById('bulk-status-msg').innerText = `Detected ${bulkParsedRows.length} rows (${bulkParsedRows.filter(x=>x.isValid).length} ready to import)`;
+    }
+
+    function executeBulkImport() {
+        const validItems = bulkParsedRows.filter(x => x.isValid);
+        if (validItems.length === 0) {
+            alert('No valid product rows to import.');
+            return;
+        }
+
+        validItems.forEach(item => {
+            ProductsService.saveProduct(item);
+        });
+
+        closeBulkUploadModal();
+        renderAdminProductsTable();
+        alert(`Successfully imported ${validItems.length} products to database!`);
+    }
+
     window.addEventListener('inkthread_catalog_updated', renderAdminDashboard);
     window.addEventListener('inkthread_sync_status_updated', updateSyncStatusDisplay);
     document.addEventListener('DOMContentLoaded', checkAuth);
 </script>
+
+<!-- BULK PRODUCT UPLOAD MODAL FOR ADMIN.HTML -->
+<div id="bulk-upload-modal" class="fixed inset-0 z-[160] bg-primary/60 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-background border border-outline-variant rounded-2xl w-full max-w-3xl p-6 md:p-8 max-h-[92vh] overflow-y-auto relative shadow-2xl space-y-6">
+        <button onclick="closeBulkUploadModal()" class="absolute top-6 right-6 text-secondary hover:text-primary">
+            <span class="material-symbols-outlined text-2xl">close</span>
+        </button>
+
+        <div>
+            <span class="label-caps text-secondary block mb-1">Mass Catalog Import</span>
+            <h3 class="font-serif-headline text-3xl text-primary">📊 Bulk Product Upload</h3>
+        </div>
+
+        <div class="flex flex-wrap gap-4 items-center justify-between bg-surface p-4 rounded-xl border border-outline-variant/60">
+            <div>
+                <h4 class="font-bold text-xs uppercase">Sample CSV Format Template</h4>
+                <p class="text-[11px] text-secondary">Download CSV format with pre-built headers</p>
+            </div>
+            <button onclick="downloadBulkCsvTemplate()" class="bg-primary text-background label-caps px-4 py-2 rounded-lg text-xs flex items-center space-x-1">
+                <span class="material-symbols-outlined text-sm">download</span>
+                <span>Download Template</span>
+            </button>
+        </div>
+
+        <!-- Upload File / Paste -->
+        <div class="space-y-4 text-xs">
+            <div class="border-2 border-dashed border-outline-variant p-6 rounded-xl text-center bg-surface/50 space-y-2">
+                <span class="material-symbols-outlined text-3xl text-primary">upload_file</span>
+                <p class="font-bold">Choose CSV / Excel File from Computer</p>
+                <input type="file" accept=".csv, .txt" onchange="handleBulkFileSelected(this.files)" class="block mx-auto text-xs text-secondary"/>
+            </div>
+
+            <div class="space-y-2">
+                <label class="label-caps text-secondary block">Or Paste CSV / Tab-separated Text Below:</label>
+                <textarea id="bulk-paste-text" rows="4" placeholder="name,sku,price,category,images&#10;Graphic Hoodie,HOOD-101,1599,Unisex Clothing,/images/plain_oversized_black.jpg" class="w-full bg-surface border border-outline-variant/60 rounded-lg p-3 text-xs font-mono focus:outline-none focus:border-primary"></textarea>
+                <button onclick="handleBulkPasteParse()" class="bg-surface-container-high border border-outline-variant text-primary label-caps px-4 py-2 rounded-lg text-xs">Parse Text Data</button>
+            </div>
+        </div>
+
+        <div id="bulk-status-msg" class="text-xs font-mono text-primary font-bold"></div>
+
+        <!-- Preview Area -->
+        <div id="bulk-preview-area" class="hidden space-y-3">
+            <h4 class="label-caps text-secondary text-xs">Parsed Items Preview:</h4>
+            <div class="max-h-48 overflow-y-auto border border-outline-variant/60 rounded-lg">
+                <table class="w-full text-left text-xs">
+                    <thead class="bg-surface-container-high border-b border-outline-variant/60">
+                        <tr>
+                            <th class="p-2">#</th>
+                            <th class="p-2">Name</th>
+                            <th class="p-2">SKU</th>
+                            <th class="p-2">Category</th>
+                            <th class="p-2">Price</th>
+                            <th class="p-2">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bulk-preview-table-body" class="bg-background"></tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-outline-variant/40">
+                <button onclick="closeBulkUploadModal()" class="px-4 py-2 rounded-lg text-xs label-caps bg-surface text-secondary">Cancel</button>
+                <button onclick="executeBulkImport()" class="px-6 py-2 rounded-lg text-xs label-caps bg-primary text-background font-bold shadow">Import All Products</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
