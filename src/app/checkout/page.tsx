@@ -53,7 +53,7 @@ export default function CheckoutPage() {
 
   const validateForm = (): boolean => {
     if (!fullName.trim()) { setErrorMessage('Please enter your full name.'); return false; }
-    if (!email.trim() || !email.includes('@')) { setErrorMessage('Please enter a valid email address.'); return false; }
+    if (email.trim() && !email.includes('@')) { setErrorMessage('Please enter a valid email address.'); return false; }
     if (!isValidIndianPhone(phone)) { setErrorMessage('Please enter a valid 10-digit Indian mobile number (+91).'); return false; }
     if (!address.trim() || address.length < 10) { setErrorMessage('Please enter your complete street address.'); return false; }
     if (!city.trim()) { setErrorMessage('Please enter your city.'); return false; }
@@ -253,9 +253,9 @@ export default function CheckoutPage() {
                   className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-neon" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-zinc-400 font-mono">Email *</label>
-                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder="rohan@example.com"
+                <label className="text-zinc-400 font-mono">Email (Optional)</label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                  placeholder="rohan@example.com (Optional)"
                   className="w-full bg-street-950 border border-street-800 rounded-xl px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:border-brand-neon" />
               </div>
               <div className="space-y-1.5">

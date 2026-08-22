@@ -13,9 +13,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
     }
 
-    if (!customer || !customer.fullName || !customer.email || !customer.phone || !customer.address) {
+    if (!customer || !customer.fullName || !customer.phone || !customer.address) {
       return NextResponse.json({ error: 'Incomplete customer details' }, { status: 400 });
     }
+
+    const customerEmail = customer.email?.trim() || `customer_${customer.phone.replace(/\D/g, '')}@inkthreadhub.in`;
+    customer.email = customerEmail;
 
     // SERVER-SIDE PRICE AND STOCK RE-VALIDATION
     let verifiedSubtotal = 0;
